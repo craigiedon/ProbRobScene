@@ -24,4 +24,4 @@ python dualArmTable.py
 
 ## Project Aims / Further Information
 
-TODO: Link to Roadmap Document
+[Rough Draft Roadmap Document](https://www.overleaf.com/read/xvrdrpzdckfw)
