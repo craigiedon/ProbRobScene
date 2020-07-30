@@ -2,8 +2,8 @@
 
 A set of python scripts which set up manipulation environments for the [Coppelia-Sim](https://www.coppeliarobotics.com/) simulator. Current scenarios are:
 
-- `dualRamTable.py` Dual Panda Arms mounted on Desk with Assorted Cubes
-- TODO 2
+- `dualRamTable.py` Dual Panda Arms mounted on Desk with Assorted Cubes  <img src='pictures/dualArm.png' width=200px style='display: block'>
+- `cupPour.py`
 - TODO 3
 
 ## Setup / Running
