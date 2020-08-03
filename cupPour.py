@@ -49,12 +49,7 @@ setAonB(bowl, bowl_table)
 pr.start()
 
 ## TODO: Actually solve manipulation task
-rc.move_above_object(pr, panda_1, c1, z_offset=0.0)
-
-for i in range(2000):
-    pr.step()
-    if i % 100 == 0:
-        print(i)
+rc.move_above_object(pr, panda_1, c1, z_offset=0.1)
 
 pr.stop()
 pr.shutdown()
