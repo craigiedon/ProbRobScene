@@ -9,11 +9,11 @@ from pyrep.backend import sim
 from multiprocessing import Process
 import numpy as np
 import matplotlib.pyplot as plt
-from setupFuncs import setAonB, create_table, top_of
+from setupFuncs import setAonB, setAonPos, create_table, top_of
 import robotControl as rc
 
 pr = PyRep()
-pr.launch("", headless=False, responsive_ui=True)
+pr.launch("scenes/emptyBullet28.ttt", headless=False, responsive_ui=True)
 
 scene_view = Camera('DefaultCamera')
 scene_view.set_position([3.45, 0.18, 2.0])
@@ -30,25 +30,27 @@ gripper_1 = PandaGripper(0)
 
 # Prop Creation
 cups_table = create_table(pr, 0.75, 0.75, 0.8)
-# cups_table.set_position([2.0, 2.0, 0.0])
-c1 = pr.import_model("models/Cup.ttm")
-c2 = pr.import_model("models/Cup.ttm")
-c3 = pr.import_model("models/Cup.ttm")
+# setAonPos(cups_table, [0,])
+c1 = pr.import_model("models/FilledCup.ttm")
+c2 = pr.import_model("models/FilledCup.ttm")
+c3 = pr.import_model("models/FilledCup.ttm")
 
-setAonB(panda_1, cups_table, -0.5, -0.5)
-setAonB(c1, cups_table, 0.0, 0.0)
-setAonB(c2, cups_table, 0.0, 0.2)
-setAonB(c3, cups_table, 0.0, 0.4)
+setAonB(panda_1, cups_table, -0.3)
+setAonB(c1, cups_table, 0.1, 0.0)
+setAonB(c2, cups_table, 0.1, 0.2)
+setAonB(c3, cups_table, 0.1, -0.2)
 
-bowl_table = create_table(pr, 0.6, 0.6, 0.6)
-bowl_table.set_position([-1.0, -1.0, 0.0])
+bowl_table = create_table(pr, 0.6, 0.6, 0.5)
+setAonPos(bowl_table, [-1.0, 0.0, 0.0])
 bowl = pr.import_model("models/Bowl.ttm")
 setAonB(bowl, bowl_table)
 
 
 pr.start()
 
-pr.stop()
+## TODO: Actually solve manipulation task
+rc.move_above_object(pr, panda_1, c1, z_offset=0.0)
+
 for i in range(2000):
     pr.step()
     if i % 100 == 0:
