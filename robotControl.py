@@ -1,4 +1,5 @@
 import numpy as np
+from setupFuncs import top_of
 
 
 def grasp(pr, gripper, close: bool) -> None:
@@ -18,11 +19,11 @@ def grasp(pr, gripper, close: bool) -> None:
     return
 
 
-def move_above_object(pr, agent, target_obj, z_offset=0.05):
-    pos = target_obj.get_position()
-    pos[2] = pos[2] + z_offset
+def move_above_object(pr, agent, target_obj, z_offset=0.00, ig_cols=False):
+    pos = top_of(target_obj)
+    pos[2] += z_offset
 
-    path = agent.get_path(position=pos, euler=[-np.pi, 0.0, np.pi / 2.0], ignore_collisions=True)  # , euler=orient)
+    path = agent.get_path(position=pos, euler=[-np.pi, 0.0, np.pi / 2.0], ignore_collisions=ig_cols)  # , euler=orient)
     # path.visualize()
 
     done = False
@@ -33,8 +34,8 @@ def move_above_object(pr, agent, target_obj, z_offset=0.05):
     return
 
 
-def move_to_pos(pr, agent, pos, z_offset=0.0):
-    path = agent.get_path(position=pos + np.array([0.0, 0.0, z_offset]), euler=[-np.pi, 0, np.pi/2])
+def move_to_pos(pr, agent, pos, z_offset=0.0, ig_cols=False):
+    path = agent.get_path(position=pos + np.array([0.0, 0.0, z_offset]), euler=[-np.pi, 0, np.pi/2], ignore_collisions=ig_cols)
     done = False
     while not done:
         done = path.step()

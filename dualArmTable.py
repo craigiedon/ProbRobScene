@@ -60,7 +60,7 @@ rc.grasp(pr, gripper_1, True)
 gripper_1.grasp(c1)
 
 
-lift_pos = [np.random.uniform(-0.05, 0.05), np.random.uniform(-0.05, 0.05), top_of(table) + 0.1]
+lift_pos = [np.random.uniform(-0.05, 0.05), np.random.uniform(-0.05, 0.05), top_of(table)[2] + 0.1]
 rc.move_to_pos(pr, panda_1, lift_pos)
 gripper_1.release()
 rc.grasp(pr, gripper_1, False)

@@ -46,4 +46,4 @@ def top_of(obj):
     else:
         b_box_top = obj.get_bounding_box()[-1]
 
-    return z + b_box_top
+    return [x, y, z + b_box_top]
