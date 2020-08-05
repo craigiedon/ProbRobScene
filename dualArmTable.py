@@ -36,7 +36,8 @@ setAonB(in_tray, table, 0.1, -0.4)
 out_tray = pr.import_model("models/Tray.ttm")
 setAonB(out_tray, table, 0.1, 0.4)
 
-c1 = Shape.create(type=PrimitiveShape.CUBOID, color=[0.5, 0.0, 0.0], size=[0.05, 0.05, 0.05], visible_edges=True)
+c1 = Shape.create(type=PrimitiveShape.CUBOID, color=[0.5, 0.0, 0.0], size=[0.05, 0.05, 0.05], visible_edges=True, mass=0.01)
+print("Friction coeef: ", c1.get_bullet_friction())
 setAonB(c1, in_tray, np.random.uniform(-0.05, 0.05), np.random.uniform(-0.05, 0.05))
 
 pr.step_ui()
@@ -55,8 +56,9 @@ pr.start()
 pr.step()
 
 cube_pos_from_im = rc.location_from_depth_cam(pr, depth_cam, c1)
-rc.move_to_pos(pr, panda_1, cube_pos_from_im, z_offset=-0.02)
+rc.move_to_pos(pr, panda_1, cube_pos_from_im, z_offset=-0.04)
 rc.grasp(pr, gripper_1, True)
+rc.move_to_pos(pr, panda_1, cube_pos_from_im, z_offset=0.1)
 gripper_1.grasp(c1)
 
 
@@ -75,6 +77,11 @@ gripper_2.grasp(c1)
 rc.move_above_object(pr, panda_2, out_tray, z_offset=0.1)
 gripper_2.release()
 rc.grasp(pr, gripper_2, False)
+
+for i in range(400):
+    pr.step()
+    if i % 100 == 0:
+        print(i)
 
 pr.stop()
 

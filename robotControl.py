@@ -11,12 +11,20 @@ def grasp(pr, gripper, close: bool) -> None:
     actuated = False
     i = 0
     while not actuated:
-        actuated = gripper.actuate(pos, 0.01)
+        actuated = gripper.actuate(pos, 0.1)
+        print("Open amount: ", gripper.get_open_amount())
         pr.step()
-        i += 1
     pr.step()
 
     return
+
+
+def force_grasp(pr, gripper, close: bool) -> None:
+    joints = gripper.joints
+    print("joints: ", len(joints))
+
+    # gripper.set_joint_forces([5.0, 5.0])
+    gripper.set_joint_target_velocities([-0.04] * gripper._num_joints)
 
 
 def move_above_object(pr, agent, target_obj, z_offset=0.00, ig_cols=False):
