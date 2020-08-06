@@ -13,7 +13,7 @@ import robotControl as rc
 
 # def run():
 pr = PyRep()
-pr.launch("", headless=False, responsive_ui=True)
+pr.launch("scenes/emptyVortex.ttt", headless=False, responsive_ui=True)
 
 scene_view = Camera('DefaultCamera')
 scene_view.set_position([3.45, 0.18, 2.0])
@@ -59,12 +59,10 @@ cube_pos_from_im = rc.location_from_depth_cam(pr, depth_cam, c1)
 rc.move_to_pos(pr, panda_1, cube_pos_from_im, z_offset=-0.04)
 rc.grasp(pr, gripper_1, True)
 rc.move_to_pos(pr, panda_1, cube_pos_from_im, z_offset=0.1)
-gripper_1.grasp(c1)
 
 
 lift_pos = [np.random.uniform(-0.05, 0.05), np.random.uniform(-0.05, 0.05), top_of(table)[2] + 0.1]
 rc.move_to_pos(pr, panda_1, lift_pos)
-gripper_1.release()
 rc.grasp(pr, gripper_1, False)
 lift_pos[1] -= 0.45
 rc.move_to_pos(pr, panda_1, lift_pos)
@@ -72,10 +70,8 @@ rc.move_to_pos(pr, panda_1, lift_pos)
 cube_pos_from_im = rc.location_from_depth_cam(pr, depth_cam, c1)
 rc.move_to_pos(pr, panda_2, cube_pos_from_im, z_offset=-0.02)
 rc.grasp(pr, gripper_2, True)
-gripper_2.grasp(c1)
 
 rc.move_above_object(pr, panda_2, out_tray, z_offset=0.1)
-gripper_2.release()
 rc.grasp(pr, gripper_2, False)
 
 for i in range(400):

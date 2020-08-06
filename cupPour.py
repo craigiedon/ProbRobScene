@@ -13,7 +13,7 @@ from setupFuncs import setAonB, setAonPos, create_table, top_of
 import robotControl as rc
 
 pr = PyRep()
-pr.launch("scenes/emptyBullet28.ttt", headless=False, responsive_ui=True)
+pr.launch("scenes/emptyVortex.ttt", headless=False, responsive_ui=True)
 
 scene_view = Camera('DefaultCamera')
 scene_view.set_position([3.45, 0.18, 2.0])
