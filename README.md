@@ -2,9 +2,23 @@
 
 A set of python scripts which set up manipulation environments for the [Coppelia-Sim](https://www.coppeliarobotics.com/) simulator. Current scenarios are:
 
-- `dualRamTable.py` Dual arms mounted on desk with assorted cubes.  <img src='pictures/dualArm.png' height=200px style='display: block'>
-- `cupPour.py` Table of cups filled with liquid. Another table with bowl for transfer. <img src='pictures/cupPour.png' height=200px style='display: block'>
-- `gearInsert.py` A gear with hole in it, and a a peg to insert it on. <img src='pictures/gearInsert.png' height=200px style='display: block'>
+### `dualRamTable.py`
+
+Dual arms mounted on desk with assorted cubes.
+
+ <img src='pictures/dualArm.png' height=200px style='display: block'>
+
+### `cupPour.py` 
+
+Table of cups filled with liquid. Another table with bowl for transfer.
+
+<img src='pictures/cupPour.png' height=200px style='display: block'>
+
+### `gearInsert.py`
+
+A gear with hole in it, and a a peg to insert it on.
+
+ <img src='pictures/gearInsert.png' height=200px style='display: block'>
 
 ## Setup / Running
 
