@@ -20,6 +20,11 @@ A gear with hole in it, and a a peg to insert it on.
 
  <img src='pictures/gearInsert.png' height=150px>
 
+
+### `ropeBasket.py`
+
+TODO: Rope Basket
+
 ## Setup / Running
 
 First, make sure you have the latest version of [Coppellia-Sim](https://www.coppeliarobotics.com/) installed.
