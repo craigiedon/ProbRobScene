@@ -12,6 +12,8 @@ import matplotlib.pyplot as plt
 from setupFuncs import setAonB, setAonPos, create_table, top_of
 import robotControl as rc
 
+
+### SETUP CODE ###
 pr = PyRep()
 pr.launch("scenes/emptyVortex.ttt", headless=False, responsive_ui=True)
 
@@ -30,7 +32,6 @@ gripper_1 = PandaGripper(0)
 
 # Prop Creation
 cups_table = create_table(pr, 0.75, 0.75, 0.8)
-# setAonPos(cups_table, [0,])
 c1 = pr.import_model("models/FilledCup.ttm")
 c2 = pr.import_model("models/FilledCup.ttm")
 c3 = pr.import_model("models/FilledCup.ttm")
@@ -46,10 +47,17 @@ bowl = pr.import_model("models/Bowl.ttm")
 setAonB(bowl, bowl_table)
 
 
+######################
+
+
 pr.start()
+
+### Robot Code goes here ###
 
 ## TODO: Actually solve manipulation task
 rc.move_above_object(pr, panda_1, c1, z_offset=0.1)
+
+############################
 
 pr.stop()
 pr.shutdown()

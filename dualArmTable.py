@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 from setupFuncs import setAonB, create_table, top_of
 import robotControl as rc
 
-# def run():
+### SETUP CODE ###
 pr = PyRep()
 pr.launch("scenes/emptyVortex.ttt", headless=False, responsive_ui=True)
 
@@ -52,8 +52,11 @@ setAonB(panda_1, table, -0.5, -0.4)
 setAonB(panda_2, table, -0.5, 0.4)
 
 
+#############################################
 pr.start()
 pr.step()
+
+### Robot Movement Code Goes Here ####
 
 cube_pos_from_im = rc.location_from_depth_cam(pr, depth_cam, c1)
 rc.move_to_pos(pr, panda_1, cube_pos_from_im, z_offset=-0.04)
@@ -78,6 +81,8 @@ for i in range(400):
     pr.step()
     if i % 100 == 0:
         print(i)
+
+#########################################
 
 pr.stop()
 

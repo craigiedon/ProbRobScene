@@ -12,6 +12,8 @@ import matplotlib.pyplot as plt
 from setupFuncs import setAonB, setAonPos, create_table, top_of
 import robotControl as rc
 
+
+### SETUP CODE ###
 pr = PyRep()
 pr.launch("scenes/emptyVortex.ttt", headless=False, responsive_ui=True)
 
@@ -38,9 +40,11 @@ setAonB(panda_1, table, -0.3)
 setAonB(gear, table, 0.0, 0.2)
 setAonB(g_base, table, 0.0, -0.2)
 
+###################
+
 pr.start()
-pr.stop()
-pr.start()
+
+### Robot Movement Code Goes Here ###
 
 rc.move_above_object(pr, panda_1, gear, z_offset=0, ig_cols=True)
 rc.move_to_pos(pr, panda_1, top_of(table) + np.array([-0.4, 0.2, 0.0]), ig_cols=True)
@@ -49,6 +53,8 @@ for i in range(1000):
     pr.step()
     if i % 100 == 0:
         print(i)
+
+######################################
 
 pr.stop()
 pr.shutdown()
