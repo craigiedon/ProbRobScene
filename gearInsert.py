@@ -46,7 +46,7 @@ pr.start()
 
 ### Robot Movement Code Goes Here ###
 
-rc.move_above_object(pr, panda_1, gear, z_offset=0, ig_cols=True)
+rc.move_above_object(pr, panda_1, gear, z_offset=-0.1, ig_cols=True)
 # rc.move_to_pos(pr, panda_1, top_of(table) + np.array([-0.4, 0.2, 0.0]), ig_cols=True)
 
 for i in range(2000):
