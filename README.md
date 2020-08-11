@@ -21,9 +21,11 @@ A gear with hole in it, and a a peg to insert it on.
  <img src='pictures/gearInsert.png' height=150px>
 
 
-### `ropeBasket.py`
+### `swingingBucket.py`
 
-TODO: Rope Basket
+A table with stacked cubes which need to be put into a wobbly swinging basket
+
+<img src='pictures/swingingBucket.png' height=150px>
 
 ## Setup / Running
 
