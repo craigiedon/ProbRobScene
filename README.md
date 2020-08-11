@@ -2,7 +2,7 @@
 
 A set of python scripts which set up manipulation environments for the [Coppelia-Sim](https://www.coppeliarobotics.com/) simulator. Current scenarios are:
 
-#### `dualRamTable.py`
+#### `dualArmTable.py`
 
 Dual arms mounted on desk with assorted cubes.
 
