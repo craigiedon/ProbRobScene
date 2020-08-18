@@ -23,9 +23,16 @@ A gear with hole in it, and a a peg to insert it on.
 
 ### `swingingBucket.py`
 
-A table with stacked cubes which need to be put into a wobbly swinging basket
+A table with stacked cubes which need to be put into a wobbly swinging basket.
 
 <img src='pictures/swingingBucket.png' height=150px>
+
+
+### `rotationRestuarant.py`
+
+A stacked plate on a rotating sushi conveyor belt must be picked up and placed on a dining table.
+
+<img src='pictures/rotationRestaurant.png' height=150px>
 
 ## Setup / Running
 
