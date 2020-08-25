@@ -27,6 +27,19 @@ class Scene:
         self.egoObject = egoObject
         self.params = params
 
+    def show_3d(self, block=True):
+        import matplotlib.pyplot as plt
+        from mpl_toolkits.mplot3d import Axes3D
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection='3d')
+        self.workspace.show_3d(ax)  # TODO: Work out what to do about aspect ratio thing!
+
+        print("Num objects:", len(self.objects))
+        for obj in self.objects:
+            obj.show_3d(ax, highlight=(obj is self.egoObject))
+
+        plt.show(block=block)
+
     def show(self, zoom=None, block=True):
         """Render a schematic of the scene for debugging."""
         import matplotlib.pyplot as plt

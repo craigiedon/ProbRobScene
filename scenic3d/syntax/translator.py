@@ -285,6 +285,11 @@ orientedPointSpecifiers = {
     ('facing', 'toward'): 'FacingToward',
     ('facing',): 'Facing'
 }
+
+point3dSpecifiers = {
+    ('at',): 'At3D'
+}
+
 objectSpecifiers = {
 }
 
@@ -295,9 +300,12 @@ for imp in orientedPointSpecifiers.values():
     assert imp in api, imp
 for imp in objectSpecifiers.values():
     assert imp in api, imp
+for imp in point3dSpecifiers.values():
+    assert imp in api, imp
 
 builtinConstructors = {
     'Point': Constructor('Point', None, pointSpecifiers),
+    'Point3D': Constructor('Point3D', None, point3dSpecifiers),
     'OrientedPoint': Constructor('OrientedPoint', 'Point', orientedPointSpecifiers),
     'Object': Constructor('Object', 'OrientedPoint', objectSpecifiers)
 }

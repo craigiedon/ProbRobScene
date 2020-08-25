@@ -16,7 +16,7 @@ from scenic3d.core.geometry import sin, cos, hypot, findMinMax, pointIsInCone, a
 from scenic3d.core.lazy_eval import valueInContext
 from scenic3d.core.type_support import toVector
 from scenic3d.core.utils import cached, areEquivalent
-from scenic3d.core.vectors import Vector, OrientedVector, VectorDistribution
+from scenic3d.core.vectors import Vector, OrientedVector, VectorDistribution, Vector3D
 
 
 def toPolygon(thing):
@@ -222,6 +222,54 @@ class CircularRegion(Region):
 
     def __str__(self):
         return f'CircularRegion({self.center}, {self.radius})'
+
+
+class SphericalRegion(Region):
+    def __init__(self, center, radius, resolution=32):
+        super().__init__('Sphere', center, radius)
+        self.center = center.to_vector_3d()
+        self.radius = radius
+        self.circumsphere = (self.center, self.radius)
+
+        if not (needsSampling(self.center) or needsSampling(self.radius)):
+            ctr = shapely.geometry.Point(self.center)
+            self.polygon = ctr.buffer(self.radius, resolution=resolution)
+
+    def sampleGiven(self, value):
+        return SphericalRegion(value[self.center], value[self.radius])
+
+    def evaluateInner(self, context):
+        center = valueInContext(self.center, context)
+        radius = valueInContext(self.radius, context)
+        return SphericalRegion(center, radius)
+
+    def containsPoint(self, point):
+        point = point.to_vector_3d()
+        return point.distanceTo(self.center) <= self.radius
+
+    def uniformPointInner(self):
+        x, y, z = self.center
+        u = 2.0 * random.random() - 1.0
+        phi = 2.0 * math.pi * random.random()
+        r = random.random() ** (1 / 3.)
+        x_offset = r * cos(phi) * (1 - u ** 2) ** 0.5
+        y_offset = r * sin(phi) * (1 - u ** 2) ** 0.5
+        z_offset = r * u
+        pt = Vector3D(x + x_offset, y + y_offset, z + z_offset)
+        return pt
+
+    def getAABB(self):
+        x, y, z = self.center
+        r = self.radius
+        return (x - r, y - r, z - r), (x + r, y + r, z + r)
+
+    def isEquivalentTo(self, other):
+        if type(other) is not SphericalRegion:
+            return False
+        return areEquivalent(other.center, self.center) and areEquivalent(other.radius, self.radius)
+
+    def __str__(self):
+        return f'SphericalRegion({self.center}, {self.radius})'
 
 
 class SectorRegion(Region):

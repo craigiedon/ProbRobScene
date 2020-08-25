@@ -10,7 +10,7 @@ import shapely.geometry
 
 import scenic3d.core.utils as utils
 from scenic3d.core.distributions import (Samplable, Distribution, MethodDistribution,
-										 needsSampling, makeOperatorHandler, distributionMethod)
+                                         needsSampling, makeOperatorHandler, distributionMethod)
 from scenic3d.core.geometry import normalizeAngle
 from scenic3d.core.lazy_eval import valueInContext, needsLazyEvaluation, makeDelayedFunctionCall
 
@@ -239,6 +239,70 @@ class Vector(Samplable, collections.abc.Sequence):
 
 
 VectorDistribution.defaultValueType = Vector
+
+
+class Vector3D(Samplable, collections.abc.Sequence):
+    """A 3D Vector, whose coordinates can be distributions"""
+
+    def __init__(self, x, y, z):
+        self.coordinates = (x, y, z)
+        super().__init__(self.coordinates)
+
+    @property
+    def x(self):
+        return self.coordinates[0]
+
+    @property
+    def y(self):
+        return self.coordinates[1]
+
+    @property
+    def z(self):
+        return self.coordinates[2]
+
+    def to_vector_3d(self):
+        return self
+
+    def sampleGiven(self, value):
+        return Vector3D(*(value[coord] for coord in self.coordinates))
+
+    def evaluateInner(self, context):
+        return Vector3D(*(valueInContext(coord, context) for coord in self.coordinates))
+
+    @scalarOperator
+    def distanceTo(self, other):
+        dx, dy, dz = other.to_vector_3d() - self
+        math.sqrt(dx ** 2 + dy ** 2 + dz ** 2)
+
+    @vectorOperator
+    def __add__(self, other):
+        return Vector3D(self[0] + other[0], self[1] + other[1], self[2] + other[2])
+
+    @vectorOperator
+    def __sub__(self, other):
+        return Vector3D(self[0] - other[0], self[1] - other[1], self[2] - other[2])
+
+    @vectorOperator
+    def __rsub__(self, other):
+        return Vector3D(other[0] - self[0], other[1] - self[1], other[2] - self[2])
+
+    def __len__(self):
+        return len(self.coordinates)
+
+    def __getitem__(self, index):
+        return self.coordinates[index]
+
+    def __repr__(self):
+        return f'({self.x} @ {self.y} @ {self.z})'
+
+    def __eq__(self, other):
+        if type(other) is not Vector3D:
+            return False
+        return other.coordinates == self.coordinates
+
+    def __hash__(self):
+        return hash(self.coordinates)
+
 
 
 class OrientedVector(Vector):

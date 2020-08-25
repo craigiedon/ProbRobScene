@@ -18,7 +18,7 @@ __all__ = (
     'RelativeHeading', 'ApparentHeading',
     'DistanceFrom', 'AngleTo', 'AngleFrom', 'Follow', 'CanSee',
     # Primitive types
-    'Vector', 'VectorField', 'PolygonalVectorField',
+    'Vector', 'VectorField', 'PolygonalVectorField', 'Point3D', 'Vector3D',
     'Region', 'PointSetRegion', 'RectangularRegion', 'PolygonalRegion', 'PolylineRegion',
     'Workspace', 'Mutator',
     'Range', 'Options', 'Uniform', 'Discrete', 'Normal',
@@ -27,7 +27,7 @@ __all__ = (
     'Point', 'OrientedPoint', 'Object',
     # Specifiers
     'With',
-    'At', 'In', 'Beyond', 'VisibleFrom', 'VisibleSpec', 'OffsetBy', 'OffsetAlongSpec',
+    'At', 'At3D', 'In', 'Beyond', 'VisibleFrom', 'VisibleSpec', 'OffsetBy', 'OffsetAlongSpec',
     'Facing', 'FacingToward', 'ApparentlyFacing',
     'LeftSpec', 'RightSpec', 'Ahead', 'Behind',
     'Following',
@@ -42,14 +42,14 @@ from scenic3d.core.distributions import Range, Options, Normal
 from scenic3d.core.geometry import sin, cos, hypot, max, min
 from scenic3d.core.regions import (Region, PointSetRegion, RectangularRegion,
                                    PolygonalRegion, PolylineRegion, everywhere, nowhere)
-from scenic3d.core.vectors import Vector, VectorField, PolygonalVectorField
+from scenic3d.core.vectors import Vector, VectorField, PolygonalVectorField, Vector3D
 from scenic3d.core.workspaces import Workspace
 
 Uniform = lambda *opts: Options(opts)  # TODO separate these?
 Discrete = Options
 from scenic3d.core.external_params import (VerifaiParameter, VerifaiRange, VerifaiDiscreteRange,
                                            VerifaiOptions)
-from scenic3d.core.object_types import Mutator, Point, OrientedPoint, Object
+from scenic3d.core.object_types import Mutator, Point, OrientedPoint, Object, Point3D
 from scenic3d.core.specifiers import PropertyDefault  # TODO remove
 
 # everything that should not be directly accessible from the language is imported here:
@@ -410,6 +410,14 @@ def At(pos):
 
     Specifies 'position', with no dependencies."""
     pos = toVector(pos, 'specifier "at X" with X not a vector')
+    return Specifier('position', pos)
+
+def At3D(pos):
+    """
+    Specifies the 3d position with no dependencies
+    """
+
+    pos = toType(pos, Vector3D)
     return Specifier('position', pos)
 
 

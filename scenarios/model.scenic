@@ -8,6 +8,7 @@ workspace = Workspace(RectangularRegion(0 @ 0, 0, width, height))
 
 class Cube:
     position: Point in workspace
+    position3d: Point3D at Vector3D((-1.5, 1.5),(-1.5, 1.5),(-1.5, 1.5))
     heading: (-math.pi, math.pi)
     width: 0.2
     height: 0.2

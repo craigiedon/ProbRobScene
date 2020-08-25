@@ -4,15 +4,17 @@ import collections
 import inspect
 import math
 import random
+import numpy as np
 
 from scenic3d.core.distributions import Samplable, needsSampling
 from scenic3d.core.geometry import RotatedRectangle, averageVectors, hypot, min
 from scenic3d.core.lazy_eval import needsLazyEvaluation
-from scenic3d.core.regions import CircularRegion, SectorRegion
+from scenic3d.core.regions import CircularRegion, SectorRegion, SphericalRegion
 from scenic3d.core.specifiers import Specifier, PropertyDefault
 from scenic3d.core.type_support import toVector, toScalar
 from scenic3d.core.utils import areEquivalent, RuntimeParseError
-from scenic3d.core.vectors import Vector
+from scenic3d.core.vectors import Vector, Vector3D
+from scenic3d.core.plotUtil3d import draw_cube
 
 
 ## Abstract base class
@@ -277,6 +279,34 @@ class Point(Constructible):
             raise AttributeError(f"'{type(self).__name__}' object has no attribute '{attr}'")
 
 
+## Point 3D
+
+class Point3D(Constructible):
+    position: Vector3D(0, 0, 0)
+    visibleDistance: 50
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # TODO: Wtf does this line even mean?
+        # self.position = to_vector_3d(self.position, f'"position" of {self} not a vector3d')
+        self.corners = (self.position,)
+        self.visibleRegion = SphericalRegion(self.position, self.visibleDistance)
+
+    def to_vector_3d(self):
+        return self.position.to_vector_3d()
+
+    def sampleGiven(self, value):
+        sample = super().sampleGiven(value)
+        # TODO: Mutation stuff here?
+        return sample
+
+    def __getattr__(self, attr):
+        if hasattr(Vector3D, attr):
+            return getattr(self.to_vector_3d(), attr)
+        else:
+            raise AttributeError(f"'{type(self).__name__}' object has no attribute '{attr}'")
+
+
 ## OrientedPoint
 
 class OrientedPoint(Point):
@@ -366,6 +396,19 @@ class Object(OrientedPoint, RotatedRectangle):
         self.visibleRegion = SectorRegion(camera, self.visibleDistance,
                                           self.heading, self.viewAngle)
         self._relations = []
+
+    def show_3d(self, ax, highlight=False):
+        if needsSampling(self):
+            raise RuntimeError('tried to show_3d() symbolic Object')
+
+        if hasattr(self, 'position3d'):
+            color = self.color if hasattr(self, 'color') else (1, 0, 0)
+            draw_cube(ax, np.array([*self.position3d.position]), np.array([self.width, self.height, 1.0]), np.array([self.heading, 0.0, 0.0]), color=color)
+
+        # # corners = self.corners  # TODO: Make a corners 3d to take in height, width, length etc.
+        # draw_cube(ax, np.array([*self.position, 0.0]), np.array([self.width, self.height, 1.0]),
+        #           np.array([self.heading, 0.0, 0.0]),
+        #           color=color)  # TODO: Can you do an api that works with corners? This seems like what scenic is going for...
 
     def show(self, workspace, plt, highlight=False):
         if needsSampling(self):

@@ -4,6 +4,7 @@ from scenic3d.core.distributions import needsSampling
 from scenic3d.core.geometry import findMinMax
 from scenic3d.core.regions import Region, everywhere
 from scenic3d.core.utils import RuntimeParseError
+import numpy as np
 
 
 class Workspace(Region):
@@ -14,6 +15,19 @@ class Workspace(Region):
             raise RuntimeParseError('workspace region must be fixed')
         super().__init__('workspace', orientation=region.orientation)
         self.region = region
+
+    def show_3d(self, ax):
+        try:
+            aabb = self.region.getAABB()  # TODO: Come up with a 3d-version of this
+        except NotImplementedError: # unbounded Regions don't support this
+            return
+
+        ((xmin, ymin), (xmax, ymax)) = aabb
+        ax.set_xlim(np.minimum(xmin, ymin), np.maximum(xmax, ymax))
+        ax.set_ylim(np.minimum(xmin, ymin), np.maximum(xmax, ymax))
+
+        ax.set_zlim(np.minimum(xmin, ymin), np.maximum(xmax, ymax)) # TODO: Actually put in z bounds
+
 
     def show(self, plt):
         """Render a schematic of the workspace for debugging"""
