@@ -1,7 +1,8 @@
 import numpy as np
-from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
 from scipy.spatial.transform import Rotation as R
+
+from scenic3d.core.vectors import offset_beyond, Vector3D
 
 
 def draw_cube(ax, pos: np.array, size: np.array, rot: np.array, color: str = 'b'):
@@ -26,12 +27,21 @@ def draw_cube(ax, pos: np.array, size: np.array, rot: np.array, color: str = 'b'
 if __name__ == "__main__":
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
-    draw_cube(ax, np.array([5, 0, 0]), np.array([1.0, 1.0, 5.0]), np.array([45.0, 0.0, 0.0]), 'b')
-    draw_cube(ax, np.array([0, 0, 0]), np.array([1.0, 1.0, 5.0]), np.array([0.0, 45.0, 0.0]), 'r')
-    draw_cube(ax, np.array([1, 1, 0]), np.array([1.0, 1.0, 5.0]), np.array([0.0, 0.0, 45.0]), 'g')
 
-    ax.set_xlim(-5.0, 5.0)
-    ax.set_ylim(-5.0, 5.0)
-    ax.set_zlim(-5.0, 5.0)
+    ego = np.array([0.3, 0.4, 0.2])
+    cube = np.array([0.5, 0.6, -0.2])
+
+    draw_cube(ax, ego, 0.1 * np.ones(3), np.zeros(3), 'g')
+    draw_cube(ax, cube, 0.1 * np.ones(3), np.zeros(3), 'b')
+
+    new_pos = offset_beyond(Vector3D(*cube), Vector3D(0.4, 0.0, 0.0), Vector3D(*ego))
+
+    draw_cube(ax, new_pos, 0.1 * np.ones(3), np.zeros(3), 'y')
+
+    ax.quiver(cube[0], cube[1], cube[2], new_pos[0] - cube[0], new_pos[1] - cube[1], new_pos[2] - cube[2])
+
+    ax.set_xlim(-0.0, 1.0)
+    ax.set_ylim(-0.0, 1.0)
+    ax.set_zlim(-0.0, 1.0)
 
     plt.show()

@@ -9,7 +9,7 @@ from scenic3d.core.distributions import Distribution
 from scenic3d.core.lazy_eval import (DelayedArgument, valueInContext, requiredProperties,
 									 needsLazyEvaluation)
 from scenic3d.core.utils import RuntimeParseError
-from scenic3d.core.vectors import Vector
+from scenic3d.core.vectors import Vector, Vector3D
 
 
 # Typing and coercion rules:
@@ -76,6 +76,8 @@ def canCoerceType(typeA, typeB):
         return canCoerceType(typeA, float) or hasattr(typeA, 'toHeading')
     elif typeB is Vector:
         return hasattr(typeA, 'toVector')
+    elif typeB is Vector3D:
+        return hasattr(typeA, 'to_vector_3d')
     else:
         return issubclass(typeA, typeB)
 
@@ -97,6 +99,8 @@ def coerce(thing, ty):
         return thing.toHeading() if hasattr(thing, 'toHeading') else float(thing)
     elif ty is Vector:
         return thing.toVector()
+    elif ty is Vector3D:
+        return thing.to_vector_3d()
     else:
         return thing
 

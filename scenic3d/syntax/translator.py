@@ -287,8 +287,23 @@ orientedPointSpecifiers = {
 }
 
 point3dSpecifiers = {
-    ('at',): 'At3D'
+    ('at',): 'At3D',
+    ('in',): 'In3D',
+    ('beyond',): 'Beyond3D',
+    ('offset', 'by'): 'OffsetBy3D',
+    ('facing',): 'Facing3D',
+    ('facing', 'toward'): 'FacingToward3D',
+    ('left', 'of'): 'LeftSpec3D',
+    ('right', 'of'): 'RightSpec3D',
+    ('ahead', 'of'): 'Ahead3D',
+    ('behind',): 'Behind3D',
+    ('above',): 'Above3D',
+    ('below',): 'Below3D',
+    ('following',): 'Following3D',
+
+
 }
+
 
 objectSpecifiers = {
 }
@@ -335,7 +350,9 @@ prefixOperators = {
     ('left',): 'Left',
     ('right',): 'Right',
     ('follow',): 'Follow',
-    ('visible',): 'Visible'
+    ('visible',): 'Visible',
+    ('top',): 'Top',
+    ('bottom',): 'Bottom'
 }
 assert all(1 <= len(op) <= 2 for op in prefixOperators)
 prefixIncipits = {op[0] for op in prefixOperators}

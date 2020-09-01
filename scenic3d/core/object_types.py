@@ -11,7 +11,7 @@ from scenic3d.core.geometry import RotatedRectangle, averageVectors, hypot, min
 from scenic3d.core.lazy_eval import needsLazyEvaluation
 from scenic3d.core.regions import CircularRegion, SectorRegion, SphericalRegion
 from scenic3d.core.specifiers import Specifier, PropertyDefault
-from scenic3d.core.type_support import toVector, toScalar
+from scenic3d.core.type_support import toVector, toScalar, toType
 from scenic3d.core.utils import areEquivalent, RuntimeParseError
 from scenic3d.core.vectors import Vector, Vector3D
 from scenic3d.core.plotUtil3d import draw_cube
@@ -347,28 +347,21 @@ class OrientedPoint(Point):
         return self.heading
 
 
-## Object
+class OrientedPoint3D(Point3D):
+    orientation: Vector3D(0, 0, 0)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.orientation = toType(self.orientation, Vector3D)
+
+    def to_orientation(self):
+        return self.orientation
+
 
 class Object(OrientedPoint, RotatedRectangle):
-    """Implementation of the Scenic class ``Object``.
-
-    Attributes:
-        width (float): Width of the object, i.e. extent along its X axis.
-          Default value 1.
-        height (float): Height of the object, i.e. extent along its Y axis.
-          Default value 1.
-        allowCollisions (bool): Whether the object is allowed to intersect
-          other objects. Default value ``False``.
-        requireVisible (bool): Whether the object is required to be visible
-          from the ``ego`` object. Default value ``True``.
-        regionContainedIn (`Region` or ``None``): A `Region` the object is
-          required to be contained in. If ``None``, the object need only be
-          contained in the scenario's workspace.
-        cameraOffset (`Vector`): Position of the camera for the ``can see``
-          operator, relative to the object's ``position``. Default ``0 @ 0``.
-    """
     width: 1
     height: 1
+    length: 1
     allowCollisions: False
     requireVisible: True
     regionContainedIn: None
@@ -403,7 +396,8 @@ class Object(OrientedPoint, RotatedRectangle):
 
         if hasattr(self, 'position3d'):
             color = self.color if hasattr(self, 'color') else (1, 0, 0)
-            draw_cube(ax, np.array([*self.position3d.position]), np.array([self.width, self.height, 1.0]), np.array([self.heading, 0.0, 0.0]), color=color)
+            draw_cube(ax, np.array([*self.position3d.position]), np.array([self.width, self.length, self.height]),
+                      np.array([self.heading, 0.0, 0.0]), color=color)
 
         # # corners = self.corners  # TODO: Make a corners 3d to take in height, width, length etc.
         # draw_cube(ax, np.array([*self.position, 0.0]), np.array([self.width, self.height, 1.0]),

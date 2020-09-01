@@ -6,11 +6,13 @@ import itertools
 import math
 from math import sin, cos
 
+import numpy as np
 import shapely.geometry
+from scipy.spatial.transform import Rotation as R
 
 import scenic3d.core.utils as utils
 from scenic3d.core.distributions import (Samplable, Distribution, MethodDistribution,
-                                         needsSampling, makeOperatorHandler, distributionMethod)
+                                         needsSampling, makeOperatorHandler, distributionMethod, distributionFunction)
 from scenic3d.core.geometry import normalizeAngle
 from scenic3d.core.lazy_eval import valueInContext, needsLazyEvaluation, makeDelayedFunctionCall
 
@@ -304,7 +306,6 @@ class Vector3D(Samplable, collections.abc.Sequence):
         return hash(self.coordinates)
 
 
-
 class OrientedVector(Vector):
     def __init__(self, x, y, heading):
         super().__init__(x, y)
@@ -344,6 +345,28 @@ class VectorField:
         return f'<{type(self).__name__} {self.name}>'
 
 
+class VectorField3D:
+    def __init__(self, name, value):
+        self.name = name
+        self.value = value
+        self.valueType = float
+
+    @distributionMethod
+    def __getitem__(self, pos):
+        return self.value(pos)
+
+    @vectorDistributionMethod
+    def follow_from(self, pos, dist, steps=4):
+        step_size = dist / steps
+        followed_pos = pos
+        for i in range(steps):
+            followed_pos += rotate_euler(Vector3D(step_size, 0.0, 0.0), self[pos])
+        return followed_pos
+
+    def __str__(self):
+        return f'<{type(self).__name__} {self.name}>'
+
+
 class PolygonalVectorField(VectorField):
     def __init__(self, name, cells, headingFunction=None, defaultHeading=None):
         self.cells = tuple(cells)
@@ -364,3 +387,42 @@ class PolygonalVectorField(VectorField):
         if self.defaultHeading is not None:
             return self.defaultHeading
         raise RuntimeError(f'evaluated PolygonalVectorField at undefined point {pos}')
+
+
+@distributionFunction
+def rotation_to_vec(from_vec: Vector3D, to_vec: Vector3D) -> R:
+    from_vec = from_vec / np.linalg.norm(from_vec)
+    to_vec = to_vec / np.linalg.norm(to_vec)
+
+    angle_rad = np.arccos(np.dot(from_vec, to_vec))
+    cross_prod = np.cross(from_vec, to_vec)
+
+    if np.linalg.norm(cross_prod) == 0.0:
+        rot_vec = R.identity()
+    else:
+        rot_vec = R.from_rotvec(cross_prod / np.linalg.norm(cross_prod) * angle_rad)
+
+    return rot_vec
+
+
+@distributionFunction
+def rotation_to_euler(from_vec: Vector3D, to_vec: Vector3D) -> Vector3D:
+    rot_vec = rotation_to_vec(from_vec, to_vec)
+    return Vector3D(*rot_vec.as_euler('zyx'))
+
+
+@distributionFunction
+def offset_beyond(origin: Vector3D, offset: Vector3D, from_perspective_pos: Vector3D) -> Vector3D:
+    diff = origin - from_perspective_pos
+    assert np.linalg.norm(
+        diff) > 0.0, "Origin and perspective cannot be the same. Perhaps you just want offset specifier?"
+    rot_vec = rotation_to_vec(Vector3D(1.0, 0.0, 0.0), diff)
+
+    rotated_offset = rot_vec.apply(offset)
+    return origin + rotated_offset
+
+
+@distributionFunction
+def rotate_euler(vec: Vector3D, euler_rot: Vector3D):
+    rot = R.from_euler('zyx', euler_rot)
+    return rot.apply(vec)
