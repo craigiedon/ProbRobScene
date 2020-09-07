@@ -1,7 +1,7 @@
 """Workspaces."""
 
 from scenic3d.core.distributions import needsSampling
-from scenic3d.core.geometry import findMinMax
+from scenic3d.core.geometry import min_and_max
 from scenic3d.core.regions import Region, everywhere
 from scenic3d.core.utils import RuntimeParseError
 import numpy as np
@@ -17,17 +17,14 @@ class Workspace(Region):
         self.region = region
 
     def show_3d(self, ax):
-        try:
-            aabb = self.region.getAABB()  # TODO: Come up with a 3d-version of this
-        except NotImplementedError: # unbounded Regions don't support this
-            return
+        aabb = self.region.getAABB()  # TODO: Come up with a 3d-version of this
 
-        ((xmin, ymin), (xmax, ymax)) = aabb
-        ax.set_xlim(np.minimum(xmin, ymin), np.maximum(xmax, ymax))
-        ax.set_ylim(np.minimum(xmin, ymin), np.maximum(xmax, ymax))
+        min_coords, max_coords = aabb
+        total_min, total_max = np.min(min_coords), np.max(max_coords)
 
-        ax.set_zlim(np.minimum(xmin, ymin), np.maximum(xmax, ymax)) # TODO: Actually put in z bounds
-
+        ax.set_xlim(total_min, total_max)
+        ax.set_ylim(total_min, total_max)
+        ax.set_zlim(total_min, total_max)
 
     def show(self, plt):
         """Render a schematic of the workspace for debugging"""
@@ -44,8 +41,8 @@ class Workspace(Region):
         """Zoom the schematic around the specified objects"""
         positions = (self.scenicToSchematicCoords(obj.position) for obj in objects)
         x, y = zip(*positions)
-        minx, maxx = findMinMax(x)
-        miny, maxy = findMinMax(y)
+        minx, maxx = min_and_max(x)
+        miny, maxy = min_and_max(y)
         sx = expansion * (maxx - minx)
         sy = expansion * (maxy - miny)
         s = max(sx, sy, self.minimumZoomSize) / 2.0

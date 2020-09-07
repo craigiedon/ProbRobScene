@@ -1,5 +1,5 @@
 """Objects representing regions in space."""
-
+import abc
 import itertools
 import math
 import random
@@ -8,27 +8,22 @@ import numpy
 import scipy.spatial
 import shapely.geometry
 import shapely.ops
+import numpy as np
 
 from scenic3d.core.distributions import Samplable, RejectionException, needsSampling
-from scenic3d.core.geometry import RotatedRectangle
-from scenic3d.core.geometry import headingOfSegment, triangulatePolygon, plotPolygon, polygonUnion
-from scenic3d.core.geometry import sin, cos, hypot, findMinMax, pointIsInCone, averageVectors
+from scenic3d.core.geometry import headingOfSegment, triangulatePolygon, plotPolygon, polygonUnion, \
+    cuboid_contains_point
+from scenic3d.core.geometry import sin, cos, hypot, min_and_max, pointIsInCone, averageVectors
 from scenic3d.core.lazy_eval import valueInContext
 from scenic3d.core.type_support import toVector
 from scenic3d.core.utils import cached, areEquivalent
-from scenic3d.core.vectors import Vector, OrientedVector, VectorDistribution, Vector3D
+from scenic3d.core.vectors import Vector, OrientedVector, VectorDistribution, Vector3D, rotate_euler
 
 
-def toPolygon(thing):
-    if needsSampling(thing):
-        return None
-    if hasattr(thing, 'polygon'):
-        return thing.polygon
-    if hasattr(thing, 'polygons'):
-        return thing.polygons
-    if hasattr(thing, 'lineString'):
-        return thing.lineString
-    return None
+class Polygonable(abc.ABC):
+    @abc.abstractmethod
+    def to_poly(self):
+        pass
 
 
 def regionFromShapelyObject(obj, orientation=None):
@@ -74,7 +69,7 @@ class Region(Samplable):
         if triedReversed:
             return IntersectionRegion(self, other)
         else:
-            return other.intersect(self, triedReversed=True)
+            return other.intersect(self, tried_reversed=True)
 
     @staticmethod
     def uniformPointIn(region):
@@ -134,7 +129,7 @@ class Region(Samplable):
 class AllRegion(Region):
     """Region consisting of all space."""
 
-    def intersect(self, other, triedReversed=False):
+    def intersect(self, other, tried_reversed=False):
         return other
 
     def containsPoint(self, point):
@@ -179,16 +174,18 @@ everywhere = AllRegion('everywhere')
 nowhere = EmptyRegion('nowhere')
 
 
-class CircularRegion(Region):
+class CircularRegion(Region, Polygonable):
+    def to_poly(self):
+        assert not (needsSampling(self.center) or needsSampling(self.radius))
+        ctr = shapely.geometry.Point(self.center)
+        return ctr.buffer(self.radius, resolution=self.resolution)
+
     def __init__(self, center, radius, resolution=32):
         super().__init__('Circle', center, radius)
         self.center = center.toVector()
         self.radius = radius
         self.circumcircle = (self.center, self.radius)
-
-        if not (needsSampling(self.center) or needsSampling(self.radius)):
-            ctr = shapely.geometry.Point(self.center)
-            self.polygon = ctr.buffer(self.radius, resolution=resolution)
+        self.resolution = resolution
 
     def sampleGiven(self, value):
         return CircularRegion(value[self.center], value[self.radius])
@@ -212,7 +209,7 @@ class CircularRegion(Region):
     def getAABB(self):
         x, y = self.center
         r = self.radius
-        return ((x - r, y - r), (x + r, y + r))
+        return (x - r, y - r), (x + r, y + r)
 
     def isEquivalentTo(self, other):
         if type(other) is not CircularRegion:
@@ -224,16 +221,18 @@ class CircularRegion(Region):
         return f'CircularRegion({self.center}, {self.radius})'
 
 
-class SphericalRegion(Region):
+class SphericalRegion(Region, Polygonable):
+    def to_poly(self):
+        assert not (needsSampling(self.center) or needsSampling(self.radius))
+        ctr = shapely.geometry.Point(self.center)
+        return ctr.buffer(self.radius, resolution=self.resolution)
+
     def __init__(self, center, radius, resolution=32):
         super().__init__('Sphere', center, radius)
         self.center = center.to_vector_3d()
         self.radius = radius
         self.circumsphere = (self.center, self.radius)
-
-        if not (needsSampling(self.center) or needsSampling(self.radius)):
-            ctr = shapely.geometry.Point(self.center)
-            self.polygon = ctr.buffer(self.radius, resolution=resolution)
+        self.resolution = resolution
 
     def sampleGiven(self, value):
         return SphericalRegion(value[self.center], value[self.radius])
@@ -272,29 +271,32 @@ class SphericalRegion(Region):
         return f'SphericalRegion({self.center}, {self.radius})'
 
 
-class SectorRegion(Region):
+class SectorRegion(Region, Polygonable):
+    def to_poly(self):
+        assert not any(needsSampling(x) for x in (self.center, self.radius, self.heading, self.angle))
+        ctr = shapely.geometry.Point(self.center)
+        circle = ctr.buffer(self.radius, resolution=self.resolution)
+        if self.angle >= math.tau - 0.001:
+            return circle
+
+        mask = shapely.geometry.Polygon([
+            self.center,
+            self.center.offsetRadially(self.radius, self.heading + self.angle / 2),
+            self.center.offsetRadially(2 * self.radius, self.heading),
+            self.center.offsetRadially(self.radius, self.heading - self.angle / 2)
+        ])
+
+        return circle & mask
+
     def __init__(self, center, radius, heading, angle, resolution=32):
         super().__init__('Sector', center, radius, heading, angle)
         self.center = center.toVector()
         self.radius = radius
         self.heading = heading
         self.angle = angle
+        self.resolution = resolution
         r = (radius / 2) * cos(angle / 2)
         self.circumcircle = (self.center.offsetRadially(r, heading), r)
-
-        if not any(needsSampling(x) for x in (self.center, radius, heading, angle)):
-            ctr = shapely.geometry.Point(self.center)
-            circle = ctr.buffer(self.radius, resolution=resolution)
-            if angle >= math.tau - 0.001:
-                self.polygon = circle
-            else:
-                mask = shapely.geometry.Polygon([
-                    self.center,
-                    self.center.offsetRadially(radius, heading + angle / 2),
-                    self.center.offsetRadially(2 * radius, heading),
-                    self.center.offsetRadially(radius, heading - angle / 2)
-                ])
-                self.polygon = circle & mask
 
     def sampleGiven(self, value):
         return SectorRegion(value[self.center], value[self.radius],
@@ -334,7 +336,11 @@ class SectorRegion(Region):
         return f'SectorRegion({self.center},{self.radius},{self.heading},{self.angle})'
 
 
-class RectangularRegion(RotatedRectangle, Region):
+class RectangularRegion(Region, Polygonable):
+
+    def to_poly(self):
+        return shapely.geometry.Polygon((self.corners[0], self.corners[1], self.corners[2], self.corners[3], self.corners[0]))
+
     def __init__(self, position, heading, width, height):
         super().__init__('Rectangle', position, heading, width, height)
         self.position = position.toVector()
@@ -347,6 +353,9 @@ class RectangularRegion(RotatedRectangle, Region):
         self.corners = tuple(position.offsetRotated(heading, Vector(*offset))
                              for offset in ((hw, hh), (-hw, hh), (-hw, -hh), (hw, -hh)))
         self.circumcircle = (self.position, self.radius)
+
+    def containsPoint(self, point):
+        raise NotImplementedError("Put in the geometry stuff!")
 
     def sampleGiven(self, value):
         return RectangularRegion(value[self.position], value[self.heading],
@@ -368,9 +377,9 @@ class RectangularRegion(RotatedRectangle, Region):
 
     def getAABB(self):
         x, y = zip(*self.corners)
-        minx, maxx = findMinMax(x)
-        miny, maxy = findMinMax(y)
-        return ((minx, miny), (maxx, maxy))
+        minx, maxx = min_and_max(x)
+        miny, maxy = min_and_max(y)
+        return (minx, miny), (maxx, maxy)
 
     def isEquivalentTo(self, other):
         if type(other) is not RectangularRegion:
@@ -384,8 +393,73 @@ class RectangularRegion(RotatedRectangle, Region):
         return f'RectangularRegion({self.position},{self.heading},{self.width},{self.height})'
 
 
-class PolylineRegion(Region):
+class CuboidRegion(Region):
+
+    def __init__(self, position, orientation, width, length, height):
+        super().__init__('Cuboid', position, orientation, width, length, height)
+        self.position = position.to_vector_3d()
+        self.orientation = orientation
+        self.width = width
+        self.length = length
+        self.height = height
+
+        self.hw = hw = width / 2.0
+        self.hl = hl = length / 2.0
+        self.hh = hh = height / 2.0
+
+        self.radius = np.linalg.norm((hw, hl, hh))
+        self.corners = tuple(self.position + rotate_euler(Vector3D(*offset), self.orientation)
+                             for offset in itertools.product((hw, -hw), (hl, -hl), (hh, -hh)))
+        self.circumcircle = (self.position, self.radius)
+
+    def containsPoint(self, point):
+        return cuboid_contains_point(self, point)
+
+    def sampleGiven(self, value):
+        return CuboidRegion(value[self.position], value[self.orientation], value[self.width], value[self.length],
+                            value[self.height])
+
+    def evaluateInner(self, context):
+        position = valueInContext(self.position, context)
+        orientation = valueInContext(self.orientation, context)
+        width = valueInContext(self.width, context)
+        length = valueInContext(self.length, context)
+        height = valueInContext(self.height, context)
+        return CuboidRegion(position, orientation, width, length, height)
+
+    def uniformPointInner(self):
+        hw, hl, hh = self.hw, self.hl, self.hh
+        rx = random.uniform(-hw, hw)
+        ry = random.uniform(-hl, hl)
+        rz = random.uniform(-hh, hh)
+        pt = self.position + rotate_euler(Vector3D(rx, ry, rz), self.orientation)
+        return pt
+
+    def getAABB(self):
+        xs, ys, zs = zip(*self.corners)
+        min_x, max_x = min_and_max(xs)
+        min_y, max_y = min_and_max(ys)
+        min_z, max_z = min_and_max(zs)
+        return (min_x, min_y, min_z), (max_x, max_y, max_z)
+
+    def isEquivalentTo(self, other):
+        if type(other) is not CuboidRegion:
+            return False
+        return (areEquivalent(other.position, self.position)
+                and areEquivalent(other.orientation, self.orientation)
+                and areEquivalent(other.width, self.width)
+                and areEquivalent(other.length, self.length)
+                and areEquivalent(other.height, self.height))
+
+    def __str__(self):
+        return f'CuboidRegion({self.position},{self.orientation},{self.width},{self.length},{self.height}'
+
+
+class PolylineRegion(Region, Polygonable):
     """Region given by one or more polylines (chain of line segments)"""
+
+    def to_poly(self):
+        return self.lineString
 
     def __init__(self, points=None, polyline=None, orientation=True):
         super().__init__('Polyline', orientation=orientation)
@@ -451,17 +525,18 @@ class PolylineRegion(Region):
         else:
             return self.orient(Vector(x, y))
 
-    def intersect(self, other, triedReversed=False):
-        poly = toPolygon(other)
-        if poly is not None:
-            intersection = self.lineString & poly
-            if (intersection.is_empty or
-                    not isinstance(intersection, (shapely.geometry.LineString,
-                                                  shapely.geometry.MultiLineString))):
-                # TODO handle points!
-                return nowhere
-            return PolylineRegion(polyline=intersection)
-        return super().intersect(other, triedReversed)
+    def intersect(self, other, tried_reversed=False):
+        if needsSampling(other) or not isinstance(other, Polygonable):
+            return super().intersect(other, tried_reversed)
+
+        poly = other.to_poly()
+        intersection = self.lineString & poly
+        if (intersection.is_empty or
+                not isinstance(intersection, (shapely.geometry.LineString,
+                                              shapely.geometry.MultiLineString))):
+            # TODO handle points!
+            return nowhere
+        return PolylineRegion(polyline=intersection)
 
     def containsPoint(self, point):
         return self.lineString.intersects(shapely.geometry.Point(point))
@@ -490,8 +565,11 @@ class PolylineRegion(Region):
         return hash(str(self.lineString))
 
 
-class PolygonalRegion(Region):
+class PolygonalRegion(Region, Polygonable):
     """Region given by one or more polygons (possibly with holes)"""
+
+    def to_poly(self):
+        return self.polygons
 
     def __init__(self, points=None, polygon=None, orientation=None):
         super().__init__('Polygon', orientation=orientation)
@@ -542,36 +620,35 @@ class PolygonalRegion(Region):
             if triangle.intersects(shapely.geometry.Point(x, y)):
                 return self.orient(Vector(x, y))
 
-    def intersect(self, other, triedReversed=False):
-        poly = toPolygon(other)
+    def intersect(self, other, tried_reversed=False):
+        if not isinstance(other, Polygonable) or needsSampling(other):
+            return super().intersect(other, tried_reversed)
+
+        poly = other.to_poly()
         orientation = other.orientation if self.orientation is None else self.orientation
-        if poly is not None:
-            intersection = self.polygons & poly
-            if intersection.is_empty:
-                return nowhere
-            elif isinstance(intersection, (shapely.geometry.Polygon,
-                                           shapely.geometry.MultiPolygon)):
-                return PolygonalRegion(polygon=intersection, orientation=orientation)
-            elif isinstance(intersection, shapely.geometry.GeometryCollection):
-                polys = []
-                for geom in intersection:
-                    if isinstance(geom, shapely.geometry.Polygon):
-                        polys.append(geom)
-                if len(polys) == 0:
-                    # TODO handle points, lines
-                    raise RuntimeError('unhandled type of polygon intersection')
-                intersection = shapely.geometry.MultiPolygon(polys)
-                return PolygonalRegion(polygon=intersection, orientation=orientation)
-            else:
+        intersection = self.polygons & poly
+        if intersection.is_empty:
+            return nowhere
+        elif isinstance(intersection, (shapely.geometry.Polygon,
+                                       shapely.geometry.MultiPolygon)):
+            return PolygonalRegion(polygon=intersection, orientation=orientation)
+        elif isinstance(intersection, shapely.geometry.GeometryCollection):
+            polys = []
+            for geom in intersection:
+                if isinstance(geom, shapely.geometry.Polygon):
+                    polys.append(geom)
+            if len(polys) == 0:
                 # TODO handle points, lines
                 raise RuntimeError('unhandled type of polygon intersection')
-        return super().intersect(other, triedReversed)
+            intersection = shapely.geometry.MultiPolygon(polys)
+            return PolygonalRegion(polygon=intersection, orientation=orientation)
+        else:
+            # TODO handle points, lines
+            raise RuntimeError('unhandled type of polygon intersection')
 
     def union(self, other):
-        poly = toPolygon(other)
-        if not poly:
-            raise RuntimeError(f'cannot take union of PolygonalRegion with {other}')
-        union = polygonUnion((self.polygons, poly))
+        assert isinstance(other, Polygonable) and not needsSampling(other)
+        union = polygonUnion((self.polygons, other.to_poly()))
         return PolygonalRegion(polygon=union)
 
     def containsPoint(self, point):
@@ -726,8 +803,8 @@ class GridRegion(PointSetRegion):
         # Slow check
         gps = [self.pointToGrid(corner) for corner in obj.corners]
         x, y = zip(*gps)
-        minx, maxx = findMinMax(x)
-        miny, maxy = findMinMax(y)
+        minx, maxx = min_and_max(x)
+        miny, maxy = min_and_max(y)
         for x in range(minx, maxx + 1):
             for y in range(miny, maxy + 1):
                 p = self.gridToPoint((x, y))

@@ -423,6 +423,13 @@ def offset_beyond(origin: Vector3D, offset: Vector3D, from_perspective_pos: Vect
 
 
 @distributionFunction
-def rotate_euler(vec: Vector3D, euler_rot: Vector3D):
+def rotate_euler(vec: Vector3D, euler_rot: Vector3D) -> Vector3D:
     rot = R.from_euler('zyx', euler_rot)
     return rot.apply(vec)
+
+
+@distributionFunction
+def reverse_euler(euler_rot: Vector3D) -> Vector3D:
+    rot = R.from_euler('zyx', euler_rot)
+    inv = rot.inv()
+    return inv.as_euler('zyx')

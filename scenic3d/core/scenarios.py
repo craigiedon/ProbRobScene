@@ -4,9 +4,10 @@ import random
 
 from scenic3d.core.distributions import Samplable, RejectionException, needsSampling
 from scenic3d.core.external_params import ExternalSampler
+from scenic3d.core.geometry import cuboids_intersect
 from scenic3d.core.lazy_eval import needsLazyEvaluation
 from scenic3d.core.utils import areEquivalent, InvalidScenarioError
-from scenic3d.core.vectors import Vector
+from scenic3d.core.vectors import Vector, Vector3D
 from scenic3d.core.workspaces import Workspace
 
 
@@ -16,15 +17,15 @@ class Scene:
     Attributes:
         objects (tuple(:obj:`~scenic3d.core.object_types.Object`)): All objects in the
           scene. The ``ego`` object is first.
-        egoObject (:obj:`~scenic3d.core.object_types.Object`): The ``ego`` object.
+        ego_object (:obj:`~scenic3d.core.object_types.Object`): The ``ego`` object.
         params (dict): Dictionary mapping the name of each global parameter to its value.
         workspace (:obj:`~scenic3d.core.workspaces.Workspace`): Workspace for the scenario.
     """
 
-    def __init__(self, workspace, objects, egoObject, params):
+    def __init__(self, workspace, objects, ego_object, params):
         self.workspace = workspace
         self.objects = tuple(objects)
-        self.egoObject = egoObject
+        self.egoObject = ego_object
         self.params = params
 
     def show_3d(self, block=True):
@@ -49,36 +50,40 @@ class Scene:
         for obj in self.objects:
             obj.show(self.workspace, plt, highlight=(obj is self.egoObject))
         # zoom in if requested
-        if zoom != None:
+        if zoom is not None:
             self.workspace.zoomAround(plt, self.objects, expansion=zoom)
         plt.show(block=block)
+
+
+def has_static_bounds(obj):
+    return not(needsSampling(obj.position) or any(needsSampling(corner) for corner in obj.corners))
 
 
 class Scenario:
     """A compiled Scenic scenario, from which scenes can be sampled."""
 
     def __init__(self, workspace,
-                 objects, egoObject,
-                 params, externalParams,
-                 requirements, requirementDeps):
+                 objects, ego_object,
+                 params, external_params,
+                 requirements, requirement_deps):
         if workspace is None:
             workspace = Workspace()  # default empty workspace
         self.workspace = workspace
         ordered = []
         for obj in objects:
             ordered.append(obj)
-            if obj is egoObject:  # make ego the first object
+            if obj is ego_object:  # make ego the first object
                 ordered[0], ordered[-1] = ordered[-1], ordered[0]
-        assert ordered[0] is egoObject
+        assert ordered[0] is ego_object
         self.objects = tuple(ordered)
-        self.egoObject = egoObject
+        self.egoObject = ego_object
         self.params = dict(params)
-        self.externalParams = tuple(externalParams)
+        self.externalParams = tuple(external_params)
         self.requirements = tuple(requirements)
-        self.externalSampler = ExternalSampler.forParameters(self.externalParams, self.params)
+        self.external_sampler = ExternalSampler.forParameters(self.externalParams, self.params)
         # dependencies must use fixed order for reproducibility
-        paramDeps = tuple(p for p in self.params.values() if isinstance(p, Samplable))
-        self.dependencies = self.objects + paramDeps + tuple(requirementDeps)
+        param_deps = tuple(p for p in self.params.values() if isinstance(p, Samplable))
+        self.dependencies = self.objects + param_deps + tuple(requirement_deps)
         self.validate()
 
     def isEquivalentTo(self, other):
@@ -89,132 +94,44 @@ class Scenario:
                 and areEquivalent(other.params, self.params)
                 and areEquivalent(other.externalParams, self.externalParams)
                 and areEquivalent(other.requirements, self.requirements)
-                and other.externalSampler == self.externalSampler)
-
-    def containerOfObject(self, obj):
-        if hasattr(obj, 'regionContainedIn') and obj.regionContainedIn is not None:
-            return obj.regionContainedIn
-        else:
-            return self.workspace.region
+                and other.external_sampler == self.external_sampler)
 
     def validate(self):
         """Make some simple static checks for inconsistent built-in requirements."""
         objects = self.objects
-        staticVisibility = not needsSampling(self.egoObject.visibleRegion)
-        staticBounds = [self.hasStaticBounds(obj) for obj in objects]
+        static_visibility = not needsSampling(self.egoObject.visibleRegion)
+        static_bounds = [has_static_bounds(obj) for obj in objects]
         for i in range(len(objects)):
             oi = objects[i]
             # skip objects with unknown positions or bounding boxes
-            if not staticBounds[i]:
+            if not static_bounds[i]:
                 continue
             # Require object to be contained in the workspace/valid region
-            container = self.containerOfObject(oi)
+            container = container_of_object(oi, self.workspace)
             if not needsSampling(container) and not container.containsObject(oi):
                 raise InvalidScenarioError(f'Object at {oi.position} does not fit in container')
-            # Require object to be visible from the ego object
-            if staticVisibility and oi.requireVisible is True and oi is not self.egoObject:
-                if not self.egoObject.canSee(oi):
-                    raise InvalidScenarioError(f'Object at {oi.position} is not visible from ego')
-            # Require object to not intersect another object
             for j in range(i):
                 oj = objects[j]
-                if not staticBounds[j]:
+                if not static_bounds[j]:
                     continue
-                if oi.intersects(oj):
+                if cuboids_intersect(oi, oj):
                     raise InvalidScenarioError(f'Object at {oi.position} intersects'
                                                f' object at {oj.position}')
 
-    def hasStaticBounds(self, obj):
-        if needsSampling(obj.position):
-            return False
-        if any(needsSampling(corner) for corner in obj.corners):
-            return False
-        return True
-
-    def generate(self, maxIterations=2000, verbosity=0, feedback=None):
-        """Sample a `Scene` from this scenario.
-
-        Args:
-            maxIterations (int): Maximum number of rejection sampling iterations.
-            verbosity (int): Verbosity level.
-            feedback (float): Feedback to pass to external samplers doing active sampling.
-                See :mod:`scenic3d.core.external_params`.
-
-        Returns:
-            A pair with the sampled `Scene` and the number of iterations used.
-
-        Raises:
-            `RejectionException`: if no valid sample is found in **maxIterations** iterations.
-        """
-        objects = self.objects
-
-        # choose which custom requirements will be enforced for this sample
+    def generate(self, max_iterations=2000, verbosity=0, feedback=None):
         active_reqs = [req for req, prob in self.requirements if random.random() <= prob]
 
-        # do rejection sampling until requirements are satisfied
-        rejection = True
-        iterations = 0
-        while rejection is not None:
-            if iterations > 0:  # rejected the last sample
-                if verbosity >= 2:
-                    print(f'  Rejected sample {iterations} because of: {rejection}')
-                if self.externalSampler is not None:
-                    feedback = self.externalSampler.rejectionFeedback
-            if iterations >= maxIterations:
-                raise RejectionException(f'failed to generate scenario in {iterations} iterations')
-            iterations += 1
-            try:
-                if self.externalSampler is not None:
-                    self.externalSampler.sample(feedback)
-                sample = Samplable.sampleAll(self.dependencies)
-            except RejectionException as e:
-                rejection = e
-                continue
-            rejection = None
-            ego = sample[self.egoObject]
-            # Normalize types of some built-in properties
-            for obj in objects:
-                sampledObj = sample[obj]
-                assert not needsSampling(sampledObj)
-                assert isinstance(sampledObj.position, Vector)
-                sampledObj.heading = float(sampledObj.heading)
-            # Check built-in requirements
-            for i in range(len(objects)):
-                vi = sample[objects[i]]
-                # Require object to be contained in the workspace/valid region
-                container = self.containerOfObject(vi)
-                if not container.containsObject(vi):
-                    rejection = 'object containment'
-                    break
-                # Require object to be visible from the ego object
-                if vi.requireVisible and vi is not ego and not ego.canSee(vi):
-                    rejection = 'object visibility'
-                    break
-                # Require object to not intersect another object
-                if not vi.allowCollisions:
-                    for j in range(i):
-                        vj = sample[objects[j]]
-                        if not vj.allowCollisions and vi.intersects(vj):
-                            rejection = 'object intersection'
-                            break
-                if rejection is not None:
-                    break
-            if rejection is not None:
-                continue
-            # Check user-specified requirements
-            for req in active_reqs:
-                if not req(sample):
-                    rejection = 'user-specified requirement'
-                    break
+        sample, iterations = rejection_sample(self.objects, self.dependencies, self.workspace,
+                                              active_reqs, self.external_sampler, max_iterations, verbosity)
 
         # obtained a valid sample; assemble a scene from it
-        sampledObjects = tuple(sample[obj] for obj in objects)
-        sampledParams = {}
+        sampled_objects = tuple(sample[obj] for obj in self.objects)
+        sampled_params = {}
         for param, value in self.params.items():
-            sampledValue = sample[value] if isinstance(value, Samplable) else value
-            assert not needsLazyEvaluation(sampledValue)
-            sampledParams[param] = sampledValue
-        scene = Scene(self.workspace, sampledObjects, ego, sampledParams)
+            sampled_value = sample[value] if isinstance(value, Samplable) else value
+            assert not needsLazyEvaluation(sampled_value)
+            sampled_params[param] = sampled_value
+        scene = Scene(self.workspace, sampled_objects, self.egoObject, sampled_params)
         return scene, iterations
 
     def reset_external_sampler(self):
@@ -222,4 +139,45 @@ class Scenario:
 
         If the Python random seed is reset before calling this function, this
         should cause the sequence of generated scenes to be deterministic."""
-        self.externalSampler = ExternalSampler.forParameters(self.externalParams, self.params)
+        self.external_sampler = ExternalSampler.forParameters(self.externalParams, self.params)
+
+
+def rejection_sample(objects, dependencies, workspace, active_reqs, external_sampler, max_iterations, verbosity):
+    for i in range(max_iterations):
+        sample, rejection_reason = try_sample(external_sampler, dependencies, objects, workspace, active_reqs)
+        if sample is not None:
+            return sample, i
+        if verbosity >= 2:
+            print(f'  Rejected sample {i} because of: {rejection_reason}')
+    raise RejectionException(f'failed to generate scenario in {max_iterations} iterations')
+
+
+def try_sample(external_sampler, dependencies, objects, workspace, active_reqs):
+    try:
+        if external_sampler is not None:
+            external_sampler.sample(external_sampler.rejectionFeedback)
+        sample = Samplable.sampleAll(dependencies)
+    except RejectionException as e:
+        return None, e
+
+    for i in range(len(objects)):
+        vi = sample[objects[i]]
+        container = container_of_object(vi, workspace)
+        if not container.containsObject(vi):
+            return None, 'object containment'
+
+        if not vi.allowCollisions:
+            for j in range(i):
+                vj = sample[objects[j]]
+                if not vj.allowCollisions and cuboids_intersect(vi, vj):
+                    return None, 'object intersection'
+
+    for req in active_reqs:
+        if not req(sample):
+            return None, 'user-specified requirement'
+
+    return sample, None
+
+
+def container_of_object(obj, workspace):
+    return obj.region_contained_in if obj.region_contained_in is not None else workspace.region

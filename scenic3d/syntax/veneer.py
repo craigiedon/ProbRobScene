@@ -19,7 +19,7 @@ __all__ = (
     'DistanceFrom', 'AngleTo', 'AngleFrom', 'Follow', 'CanSee',
     # Primitive types
     'Vector', 'VectorField', 'PolygonalVectorField', 'Point3D', 'Vector3D',
-    'Region', 'PointSetRegion', 'RectangularRegion', 'PolygonalRegion', 'PolylineRegion',
+    'Region', 'PointSetRegion', 'RectangularRegion', 'CuboidRegion', 'SphericalRegion', 'PolygonalRegion', 'PolylineRegion',
     'Workspace', 'Mutator',
     'Range', 'Options', 'Uniform', 'Discrete', 'Normal',
     'VerifaiParameter', 'VerifaiRange', 'VerifaiDiscreteRange', 'VerifaiOptions',
@@ -50,7 +50,7 @@ from scenic3d.core.distributions import Range, Options, Normal
 # various Python types and functions used in the language but defined elsewhere
 from scenic3d.core.geometry import sin, cos, hypot, max, min
 from scenic3d.core.regions import (Region, PointSetRegion, RectangularRegion,
-                                   PolygonalRegion, PolylineRegion, everywhere, nowhere)
+                                   PolygonalRegion, PolylineRegion, everywhere, nowhere, CuboidRegion, SphericalRegion)
 from scenic3d.core.vectors import Vector, VectorField, PolygonalVectorField, Vector3D, offset_beyond, \
     rotation_to_euler, rotate_euler, VectorField3D
 from scenic3d.core.workspaces import Workspace

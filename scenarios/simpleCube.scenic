@@ -17,9 +17,6 @@ to randomly sample colours from a vector
 
 
 t = Tray
-c1 = Cube in t.usable_area
+ego = Cube with color 'green'
+c1 = Cube in workspace
 
-ego = Cube ahead of (front of t) by 0.3, facing toward t, with color 'green'
-
-p3d  = Point3D beyond c1.position3d by 0.5 from t.position3d
-c2 = Cube with position3d p3d

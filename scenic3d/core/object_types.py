@@ -2,18 +2,19 @@
 
 import collections
 import inspect
+import itertools
 import math
 import random
 import numpy as np
 
 from scenic3d.core.distributions import Samplable, needsSampling
-from scenic3d.core.geometry import RotatedRectangle, averageVectors, hypot, min
+from scenic3d.core.geometry import averageVectors, hypot, min
 from scenic3d.core.lazy_eval import needsLazyEvaluation
 from scenic3d.core.regions import CircularRegion, SectorRegion, SphericalRegion
 from scenic3d.core.specifiers import Specifier, PropertyDefault
 from scenic3d.core.type_support import toVector, toScalar, toType
 from scenic3d.core.utils import areEquivalent, RuntimeParseError
-from scenic3d.core.vectors import Vector, Vector3D
+from scenic3d.core.vectors import Vector, Vector3D, rotate_euler
 from scenic3d.core.plotUtil3d import draw_cube
 
 
@@ -358,36 +359,50 @@ class OrientedPoint3D(Point3D):
         return self.orientation
 
 
-class Object(OrientedPoint, RotatedRectangle):
+def relative_position_3d(rel_pos, reference_pos, reference_orientation):
+    pos = reference_pos + rotate_euler(rel_pos, reference_orientation)
+    return OrientedPoint3D(position=pos, orientation=reference_orientation)
+
+
+class Object(OrientedPoint3D):
     width: 1
     height: 1
     length: 1
     allowCollisions: False
     requireVisible: True
-    regionContainedIn: None
+    region_contained_in: None
     cameraOffset: Vector(0, 0)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         import scenic3d.syntax.veneer as veneer  # TODO improve?
         veneer.registerObject(self)
+
         self.hw = hw = self.width / 2
         self.hh = hh = self.height / 2
+        self.hl = hl = self.length / 2
+
         self.radius = hypot(hw, hh)  # circumcircle; for collision detection
         self.inradius = min(hw, hh)  # incircle; for collision detection
-        self.left = self.relativePosition(-hw, 0)
-        self.right = self.relativePosition(hw, 0)
-        self.front = self.relativePosition(0, hh)
-        self.back = self.relativePosition(0, -hh)
-        self.frontLeft = self.relativePosition(-hw, hh)
-        self.frontRight = self.relativePosition(hw, hh)
-        self.backLeft = self.relativePosition(-hw, -hh)
-        self.backRight = self.relativePosition(hw, -hh)
-        self.corners = (self.frontRight.toVector(), self.frontLeft.toVector(),
-                        self.backLeft.toVector(), self.backRight.toVector())
-        camera = self.position.offsetRotated(self.heading, self.cameraOffset)
-        self.visibleRegion = SectorRegion(camera, self.visibleDistance,
-                                          self.heading, self.viewAngle)
+
+        self.left = relative_position_3d(Vector3D(-hw, 0, 0), self.position, self.orientation)
+        self.right = relative_position_3d(Vector3D(hw, 0, 0), self.position, self.orientation)
+        self.front = relative_position_3d(Vector3D(0, hl, 0), self.position, self.orientation)
+        self.back = relative_position_3d(Vector3D(0, -hl, 0), self.position, self.orientation)
+
+        self.top = relative_position_3d(Vector3D(0, 0, hh), self.position, self.orientation)
+        self.bottom = relative_position_3d(Vector3D(0, 0, hh), self.position, self.orientation)
+
+        self.frontLeft = relative_position_3d(Vector3D(-hw, hl, 0), self.position, self.orientation)
+        self.frontRight = relative_position_3d(Vector3D(hw, hl, 0), self.position, self.orientation)
+        self.backLeft = relative_position_3d(Vector3D(-hw, -hl, 0), self.position, self.orientation)
+        self.backRight = relative_position_3d(Vector3D(-hw, hl, 0), self.position, self.orientation)
+
+        self.corners = tuple(self.position + rotate_euler(Vector3D(*offset), self.orientation)
+                             for offset in itertools.product((hw, -hw), (hl, -hl), (hh, -hh)))
+        # self.corners = (self.frontRight.toVector(), self.frontLeft.toVector(), self.backLeft.toVector(), self.backRight.toVector())
+        # camera = self.position.offsetRotated(self.heading, self.cameraOffset)
+        # self.visibleRegion = SectorRegion(camera, self.visibleDistance, self.heading, self.viewAngle)
         self._relations = []
 
     def show_3d(self, ax, highlight=False):

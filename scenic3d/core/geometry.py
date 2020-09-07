@@ -1,5 +1,5 @@
 """Utility functions for geometric computation."""
-
+import abc
 import math
 import warnings
 
@@ -51,37 +51,37 @@ def normalizeAngle(angle):
 def addVectors(a, b):
     ax, ay = a[0], a[1]
     bx, by = b[0], b[1]
-    return (ax + bx, ay + by)
+    return ax + bx, ay + by
 
 
 def subtractVectors(a, b):
     ax, ay = a[0], a[1]
     bx, by = b[0], b[1]
-    return (ax - bx, ay - by)
+    return ax - bx, ay - by
 
 
 def averageVectors(a, b, weight=0.5):
     ax, ay = a[0], a[1]
     bx, by = b[0], b[1]
     aw, bw = 1.0 - weight, weight
-    return (ax * aw + bx * bw, ay * aw + by * bw)
+    return ax * aw + bx * bw, ay * aw + by * bw
 
 
 def rotateVector(vector, angle):
     x, y = vector
     c, s = cos(angle), sin(angle)
-    return ((c * x) - (s * y), (s * x) + (c * y))
+    return (c * x) - (s * y), (s * x) + (c * y)
 
 
-def findMinMax(iterable):
-    minv = float('inf')
-    maxv = float('-inf')
+def min_and_max(iterable):
+    min_v = float('inf')
+    max_v = float('-inf')
     for val in iterable:
-        if val < minv:
-            minv = val
-        if val > maxv:
-            maxv = val
-    return (minv, maxv)
+        if val < min_v:
+            min_v = val
+        if val > max_v:
+            max_v = val
+    return min_v, max_v
 
 
 def radialToCartesian(point, radius, heading):
@@ -294,54 +294,119 @@ def plotPolygon(polygon, plt, style='r-'):
             plotRing(ring)
 
 
-class RotatedRectangle:
-    """mixin providing collision detection for rectangular objects and regions"""
+# class RotatedRectangle:
+#     """mixin providing collision detection for rectangular objects and regions"""
+#
+#     def containsPoint(self, point):
+#         diff = point - self.position.toVector()
+#         x, y = diff.rotatedBy(-self.heading)
+#         return abs(x) <= self.hw and abs(y) <= self.hh
+#
+#     def intersects(self, rect):
+#         if not isinstance(rect, RotatedRectangle):
+#             raise RuntimeError(f'tried to intersect RotatedRectangle with {type(rect)}')
+#         # Quick check by bounding circles
+#         dx, dy = rect.position.toVector() - self.position.toVector()
+#         rr = self.radius + rect.radius
+#         if (dx * dx) + (dy * dy) > (rr * rr):
+#             return False
+#         # Check for separating line parallel to our edges
+#         if self.edgeSeparates(self, rect):
+#             return False
+#         # Check for separating line parallel to rect's edges
+#         if self.edgeSeparates(rect, self):
+#             return False
+#         return True
+#
+#     @staticmethod
+#     def edgeSeparates(rectA, rectB):
+#         """Whether an edge of rectA separates it from rectB"""
+#         base = rectA.position.toVector()
+#         rot = -rectA.heading
+#         rc = [(corner - base).rotatedBy(rot) for corner in rectB.corners]
+#         x, y = zip(*rc)
+#         minx, maxx = min_and_max(x)
+#         miny, maxy = min_and_max(y)
+#         if maxx < -rectA.hw or rectA.hw < minx:
+#             return True
+#         if maxy < -rectA.hh or rectA.hh < miny:
+#             return True
+#         return False
+#
+#     @property
+#     def polygon(self):
+#         if any(needsSampling(c) or needsLazyEvaluation(c) for c in self.corners):
+#             return None  # can only convert fixed Regions to Polygons
+#         return self.getConstantPolygon()
+#
+#     @utils.cached
+#     def getConstantPolygon(self):
+#         assert not any(needsSampling(c) or needsLazyEvaluation(c) for c in self.corners)
+#         # TODO refactor???
+#         corners = [(x, y) for x, y in self.corners]  # convert Vectors to tuples
+#         return shapely.geometry.Polygon(corners)
 
-    def containsPoint(self, point):
-        diff = point - self.position.toVector()
-        x, y = diff.rotatedBy(-self.heading)
-        return abs(x) <= self.hw and abs(y) <= self.hh
 
-    def intersects(self, rect):
-        if not isinstance(rect, RotatedRectangle):
-            raise RuntimeError(f'tried to intersect RotatedRectangle with {type(rect)}')
-        # Quick check by bounding circles
-        dx, dy = rect.position.toVector() - self.position.toVector()
-        rr = self.radius + rect.radius
-        if (dx * dx) + (dy * dy) > (rr * rr):
-            return False
-        # Check for separating line parallel to our edges
-        if self.edgeSeparates(self, rect):
-            return False
-        # Check for separating line parallel to rect's edges
-        if self.edgeSeparates(rect, self):
-            return False
-        return True
+class Polygonable(abc.ABC):
+    @abc.abstractmethod
+    def polygon(self):
+        pass
 
-    @staticmethod
-    def edgeSeparates(rectA, rectB):
-        """Whether an edge of rectA separates it from rectB"""
-        base = rectA.position.toVector()
-        rot = -rectA.heading
-        rc = [(corner - base).rotatedBy(rot) for corner in rectB.corners]
-        x, y = zip(*rc)
-        minx, maxx = findMinMax(x)
-        miny, maxy = findMinMax(y)
-        if maxx < -rectA.hw or rectA.hw < minx:
-            return True
-        if maxy < -rectA.hh or rectA.hh < miny:
-            return True
+
+# class Intersectable(abc.ABC):
+#     @abc.abstractmethod
+#     def intersets(self):
+#         pass
+
+def cuboid_contains_point(obj, point):
+    from scenic3d.core.vectors import rotate_euler
+    from scenic3d.core.vectors import reverse_euler
+    diff = point - obj.position
+    x, y, z = rotate_euler(diff, reverse_euler(obj.orientation))
+    return abs(x) <= obj.hw and abs(y) <= obj.hl and abs(z) <= obj.hh
+
+
+def cuboids_intersect(cuboid_a, cuboid_b):
+    # Quick bounding circle check
+    dx, dy, dz = cuboid_a.position - cuboid_b.position
+    rr = cuboid_a.radius + cuboid_b.radius
+    if (dx * dx) + (dy * dy) + (dz * dz) > (rr * rr):
         return False
 
-    @property
-    def polygon(self):
-        if any(needsSampling(c) or needsLazyEvaluation(c) for c in self.corners):
-            return None  # can only convert fixed Regions to Polygons
-        return self.getConstantPolygon()
+    if cube_edge_separates(cuboid_a, cuboid_b) or cube_edge_separates(cuboid_b, cuboid_a):
+        return False
 
-    @utils.cached
-    def getConstantPolygon(self):
-        assert not any(needsSampling(c) or needsLazyEvaluation(c) for c in self.corners)
-        # TODO refactor???
-        corners = [(x, y) for x, y in self.corners]  # convert Vectors to tuples
-        return shapely.geometry.Polygon(corners)
+    return True
+
+
+def cube_edge_separates(cuboid_a, cuboid_b):
+    from scenic3d.core.vectors import reverse_euler
+    from scenic3d.core.vectors import rotate_euler
+    base = cuboid_a.position.to_vector_3d()
+
+    # A reversal of the first one's rotation
+    rot = reverse_euler(cuboid_a.orientation)
+
+    # Take each of cube_b's corners, then get the relative vector from the position of cube_a to each of these corners
+    # Then take each of these relative vectors and undo the rotation of A
+    rc = [rotate_euler(corner - base, rot) for corner in cuboid_b.corners]
+    xs, ys, zs = zip(*rc)
+
+    min_x, max_x = min_and_max(xs)
+    min_y, max_y = min_and_max(ys)
+    min_z, max_z = min_and_max(zs)
+
+    if max_x < -cuboid_a.hw or min_x > cuboid_a.hw:
+        return True
+    if max_y < -cuboid_a.hl or min_y > cuboid_a.hl:
+        return True
+    if max_z < -cuboid_a.hh or min_z > cuboid_a.hh:
+        return True
+
+    return False
+
+
+def get_constant_polygon(cuboid):
+    assert not any(needsSampling(c) or needsLazyEvaluation(c) for c in cuboid.corners)
+    corners = [(x, y, z) for x, y, z in cuboid.corners]  # convert Vectors to tuples
+    return shapely.geometry.Polygon(corners)

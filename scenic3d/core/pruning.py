@@ -9,7 +9,8 @@ import shapely.geos
 import scenic3d.core.regions as regions
 from scenic3d.core.distributions import (Samplable, MethodDistribution, OperatorDistribution,
                                          supportInterval, underlyingFunction)
-from scenic3d.core.geometry import normalizeAngle, polygonUnion
+from scenic3d.core.geometry import normalizeAngle, polygonUnion, Polygonable
+from scenic3d.core.scenarios import container_of_object
 from scenic3d.core.utils import InvalidScenarioError
 from scenic3d.core.vectors import VectorField, PolygonalVectorField, VectorMethodDistribution
 from scenic3d.core.workspaces import Workspace
@@ -31,15 +32,14 @@ def isMethodCall(thing, method):
     return thing.method is underlyingFunction(method)
 
 
-def matchInRegion(position):
-    """Match uniform samples from a Region, returning the Region if any."""
-    position = position.toVector()
-    if isinstance(position, regions.PointInRegionDistribution):
-        reg = position.region
-        if isinstance(reg, Workspace):
-            reg = reg.region
-        return reg
-    return None
+# def match_in_region(position):
+#     """Match uniform samples from a Region, returning the Region if any."""
+#     if isinstance(position, regions.PointInRegionDistribution):
+#         reg = position.region
+#         # if isinstance(reg, Workspace):
+#         #     reg = reg.region
+#         # return reg
+#     return None
 
 
 def matchPolygonalField(heading, position):
@@ -67,71 +67,64 @@ def matchPolygonalField(heading, position):
 ### Pruning procedures
 
 def prune(scenario, verbosity=1):
-    """Prune a Scenario, removing infeasible parts of the space.
-
-    This function directly modifies the Distributions used in the Scenario,
-    but leaves the conditional distribution under the scenario's requirements
-    unchanged.
-    """
     if verbosity >= 1:
         print('  Pruning scenario...')
-        startTime = time.time()
+        start_time = time.time()
 
-    pruneContainment(scenario, verbosity)
-    pruneRelativeHeading(scenario, verbosity)
+    prune_containment(scenario, verbosity)
+    # prune_relative_heading(scenario, verbosity)
 
     if verbosity >= 1:
-        totalTime = time.time() - startTime
-        print(f'  Pruned scenario in {totalTime:.4g} seconds.')
+        total_time = time.time() - start_time
+        print(f'  Pruned scenario in {total_time:.4g} seconds.')
 
 
 ## Pruning based on containment
+def prunable(obj, scenario) -> bool:
+    return (isinstance(obj.position, regions.PointInRegionDistribution) and
+            isinstance(obj.position.region, Polygonable) and
+            isinstance(container_of_object(obj, scenario.workspace), Polygonable))
 
-def pruneContainment(scenario, verbosity):
+
+def prune_containment(scenario, verbosity):
     """Prune based on the requirement that individual Objects fit within their container.
 
     Specifically, if O is positioned uniformly in region B and has container C, then we
     can instead pick a position uniformly in their intersection. If we can also lower
     bound the radius of O, then we can first erode C by that distance.
     """
-    for obj in scenario.objects:
-        base = matchInRegion(obj.position)
-        if base is None:  # match objects positioned uniformly in a Region
-            continue
-        if isinstance(base, regions.EmptyRegion):
-            raise InvalidScenarioError(f'Object {obj} placed in empty region')
-        basePoly = regions.toPolygon(base)
-        if basePoly is None:  # to prune, the Region must be polygonal
-            continue
-        if basePoly.is_empty:
-            raise InvalidScenarioError(f'Object {obj} placed in empty region')
-        container = scenario.containerOfObject(obj)
-        containerPoly = regions.toPolygon(container)
-        if containerPoly is None:  # the object's container must also be polygonal
-            return None
-        minRadius, _ = supportInterval(obj.inradius)
-        if minRadius is not None:  # if we can lower bound the radius, erode the container
-            containerPoly = containerPoly.buffer(-minRadius)
+
+    for obj in (x for x in scenario.objects if prunable(x, scenario)):
+        base = obj.position.region
+        base_poly = base.to_poly()
+        container = container_of_object(obj, scenario.workspace)
+        container_poly = container.to_poly()
+
+        min_radius, _ = supportInterval(obj.inradius)
+        if min_radius is not None:  # if we can lower bound the radius, erode the container
+            container_poly = container_poly.buffer(-min_radius)
         elif base is container:
             continue
-        newBasePoly = basePoly & containerPoly  # restrict the base Region to the container
-        if newBasePoly.is_empty:
+
+        # Here is actually the functionality of this function! Intersect the base poly region with the containing region
+        new_base_poly = base_poly & container_poly  # restrict the base Region to the container
+        if new_base_poly.is_empty:
             raise InvalidScenarioError(f'Object {obj} does not fit in container')
+
         if verbosity >= 1:
-            if basePoly.area > 0:
-                ratio = newBasePoly.area / basePoly.area
+            if base_poly.area > 0:
+                ratio = new_base_poly.area / base_poly.area
             else:
-                ratio = newBasePoly.length / basePoly.length
+                ratio = new_base_poly.length / base_poly.length
             percent = 100 * (1.0 - ratio)
             print(f'    Region containment constraint pruned {percent:.1f}% of space.')
-        newBase = regions.regionFromShapelyObject(newBasePoly, orientation=base.orientation)
-        newPos = regions.Region.uniformPointIn(newBase)
-        obj.position.conditionTo(newPos)
+
+        new_base = regions.regionFromShapelyObject(new_base_poly, orientation=base.orientation)
+        new_pos = regions.Region.uniformPointIn(new_base)
+        obj.position.conditionTo(new_pos)
 
 
-## Pruning based on orientation
-
-def pruneRelativeHeading(scenario, verbosity):
+def prune_relative_heading(scenario, verbosity):
     """Prune based on requirements bounding the relative heading of an Object.
 
     Specifically, if an object O is:
@@ -152,13 +145,13 @@ def pruneRelativeHeading(scenario, verbosity):
     # Check which objects are (approximately) aligned to polygonal vector fields
     fields = {}
     for obj in scenario.objects:
-        field, offsetL, offsetR = matchPolygonalField(obj.heading, obj.position)
+        field, offset_l, offset_r = matchPolygonalField(obj.heading, obj.position)
         if field is not None:
-            fields[obj] = (field, offsetL, offsetR)
+            fields[obj] = (field, offset_l, offset_r)
     # Check for relative heading relations among such objects
-    for obj, (field, offsetL, offsetR) in fields.items():
+    for obj, (field, offset_l, offset_r) in fields.items():
         position = currentPropValue(obj, 'position')
-        base = matchInRegion(position)
+        base = match_in_region(position)
         if base is None:  # obj must be positioned uniformly in a Region
             continue
         basePoly = regions.toPolygon(base)
@@ -171,7 +164,7 @@ def pruneRelativeHeading(scenario, verbosity):
                 maxDist = maxDistanceBetween(scenario, obj, rel.target)
                 if maxDist == float('inf'):  # the distance between the objects must be bounded
                     continue
-                feasible = feasibleRHPolygon(field, offsetL, offsetR,
+                feasible = feasibleRHPolygon(field, offset_l, offset_r,
                                              tField, tOffsetL, tOffsetR,
                                              rel.lower, rel.upper, maxDist)
                 if feasible is None:  # the RH bounds may be too weak to restrict the space
