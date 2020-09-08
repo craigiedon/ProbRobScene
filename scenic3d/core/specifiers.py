@@ -1,8 +1,8 @@
 """Specifiers and associated objects."""
 
-from scenic3d.core.distributions import toDistribution
+from scenic3d.core.distributions import to_distribution
 from scenic3d.core.lazy_eval import (DelayedArgument, toDelayedArgument, requiredProperties,
-                                     needsLazyEvaluation)
+                                     needs_lazy_evaluation)
 from scenic3d.core.utils import RuntimeParseError
 
 
@@ -14,26 +14,18 @@ class Specifier:
     Any optionally-specified properties are evaluated as attributes of the primary value.
     """
 
-    def __init__(self, prop, value, deps=None, optionals={}):
-        self.property = prop
-        self.value = toDelayedArgument(value)
+    def __init__(self, prop, value, deps=None, optionals=None):
         if deps is None:
             deps = set()
         deps |= requiredProperties(value)
+        if optionals is None:
+            optionals = {}
+        self.property = prop
+        self.value = toDelayedArgument(value)
         if prop in deps:
             raise RuntimeParseError(f'specifier for property {prop} depends on itself')
         self.requiredProperties = deps
         self.optionals = optionals
-
-    def applyTo(self, obj, optionals):
-        """Apply specifier to an object, including the specified optional properties."""
-        val = self.value.evaluateIn(obj)
-        val = toDistribution(val)
-        assert not needsLazyEvaluation(val)
-        setattr(obj, self.property, val)
-        for opt in optionals:
-            assert opt in self.optionals
-            setattr(obj, opt, getattr(val, opt))
 
     def __str__(self):
         return f'<Specifier of {self.property}>'

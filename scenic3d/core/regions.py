@@ -14,7 +14,7 @@ from scenic3d.core.distributions import Samplable, RejectionException, needsSamp
 from scenic3d.core.geometry import headingOfSegment, triangulatePolygon, plotPolygon, polygonUnion, \
     cuboid_contains_point
 from scenic3d.core.geometry import sin, cos, hypot, min_and_max, pointIsInCone, averageVectors
-from scenic3d.core.lazy_eval import valueInContext
+from scenic3d.core.lazy_eval import value_in_context
 from scenic3d.core.type_support import toVector
 from scenic3d.core.utils import cached, areEquivalent
 from scenic3d.core.vectors import Vector, OrientedVector, VectorDistribution, Vector3D, rotate_euler
@@ -47,7 +47,7 @@ class PointInRegionDistribution(VectorDistribution):
         self.region = region
 
     def sampleGiven(self, value):
-        return value[self.region].uniformPointInner()
+        return value[self.region].uniform_point_inner()
 
     def __str__(self):
         return f'PointIn({self.region})'
@@ -64,52 +64,31 @@ class Region(Samplable):
     def sampleGiven(self, value):
         return self
 
-    def intersect(self, other, triedReversed=False):
+    def intersect(self, other, tried_reversed=False):
         """Get a `Region` representing the intersection of this one with another."""
-        if triedReversed:
+        if tried_reversed:
             return IntersectionRegion(self, other)
         else:
             return other.intersect(self, tried_reversed=True)
 
-    @staticmethod
-    def uniformPointIn(region):
-        """Get a uniform `Distribution` over points in a `Region`."""
-        return PointInRegionDistribution(region)
-
-    def uniformPoint(self):
-        """Sample a uniformly-random point in this `Region`.
-
-        Can only be called on fixed Regions with no random parameters.
-        """
-        assert not needsSampling(self)
-        return self.uniformPointInner()
-
-    def uniformPointInner(self):
+    def uniform_point_inner(self):
         """Do the actual random sampling. Implemented by subclasses."""
         raise NotImplementedError()
 
-    def containsPoint(self, point):
+    def contains_point(self, point):
         """Check if the `Region` contains a point. Implemented by subclasses."""
         raise NotImplementedError()
 
-    def containsObject(self, obj):
-        """Check if the `Region` contains an :obj:`~scenic3d.core.object_types.Object`.
-
-        The default implementation assumes the `Region` is convex; subclasses must
-        override the method if this is not the case.
-        """
-        for corner in obj.corners:
-            if not self.containsPoint(corner):
-                return False
-        return True
+    def contains_object(self, obj):
+        return all(self.contains_point(c) for c in obj.corners)
 
     def __contains__(self, thing):
         """Check if this `Region` contains an object or vector."""
         from scenic3d.core.object_types import Object
         if isinstance(thing, Object):
-            return self.containsObject(thing)
+            return self.contains_object(thing)
         vec = toVector(thing, '"X in Y" with X not an Object or a vector')
-        return self.containsPoint(vec)
+        return self.contains_point(vec)
 
     def getAABB(self):
         """Axis-aligned bounding box for this `Region`. Implemented by some subclasses."""
@@ -126,16 +105,20 @@ class Region(Samplable):
         return f'<Region {self.name}>'
 
 
+def uniform_distribution_from_region(r: Region) -> PointInRegionDistribution:
+    return PointInRegionDistribution(r)
+
+
 class AllRegion(Region):
     """Region consisting of all space."""
 
     def intersect(self, other, tried_reversed=False):
         return other
 
-    def containsPoint(self, point):
+    def contains_point(self, point):
         return True
 
-    def containsObject(self, obj):
+    def contains_object(self, obj):
         return True
 
     def __eq__(self, other):
@@ -148,16 +131,16 @@ class AllRegion(Region):
 class EmptyRegion(Region):
     """Region containing no points."""
 
-    def intersect(self, other, triedReversed=False):
+    def intersect(self, other, tried_reversed=False):
         return self
 
-    def uniformPointInner(self):
+    def uniform_point_inner(self):
         raise RejectionException(f'sampling empty Region')
 
-    def containsPoint(self, point):
+    def contains_point(self, point):
         return False
 
-    def containsObject(self, obj):
+    def contains_object(self, obj):
         return False
 
     def show(self, plt, style=None):
@@ -191,15 +174,15 @@ class CircularRegion(Region, Polygonable):
         return CircularRegion(value[self.center], value[self.radius])
 
     def evaluateInner(self, context):
-        center = valueInContext(self.center, context)
-        radius = valueInContext(self.radius, context)
+        center = value_in_context(self.center, context)
+        radius = value_in_context(self.radius, context)
         return CircularRegion(center, radius)
 
-    def containsPoint(self, point):
+    def contains_point(self, point):
         point = point.toVector()
         return point.distanceTo(self.center) <= self.radius
 
-    def uniformPointInner(self):
+    def uniform_point_inner(self):
         x, y = self.center
         r = random.triangular(0, self.radius, self.radius)
         t = random.uniform(-math.pi, math.pi)
@@ -238,15 +221,15 @@ class SphericalRegion(Region, Polygonable):
         return SphericalRegion(value[self.center], value[self.radius])
 
     def evaluateInner(self, context):
-        center = valueInContext(self.center, context)
-        radius = valueInContext(self.radius, context)
+        center = value_in_context(self.center, context)
+        radius = value_in_context(self.radius, context)
         return SphericalRegion(center, radius)
 
-    def containsPoint(self, point):
+    def contains_point(self, point):
         point = point.to_vector_3d()
         return point.distanceTo(self.center) <= self.radius
 
-    def uniformPointInner(self):
+    def uniform_point_inner(self):
         x, y, z = self.center
         u = 2.0 * random.random() - 1.0
         phi = 2.0 * math.pi * random.random()
@@ -303,19 +286,19 @@ class SectorRegion(Region, Polygonable):
                             value[self.heading], value[self.angle])
 
     def evaluateInner(self, context):
-        center = valueInContext(self.center, context)
-        radius = valueInContext(self.radius, context)
-        heading = valueInContext(self.heading, context)
-        angle = valueInContext(self.angle, context)
+        center = value_in_context(self.center, context)
+        radius = value_in_context(self.radius, context)
+        heading = value_in_context(self.heading, context)
+        angle = value_in_context(self.angle, context)
         return SectorRegion(center, radius, heading, angle)
 
-    def containsPoint(self, point):
+    def contains_point(self, point):
         point = point.toVector()
         if not pointIsInCone(tuple(point), tuple(self.center), self.heading, self.angle):
             return False
         return point.distanceTo(self.center) <= self.radius
 
-    def uniformPointInner(self):
+    def uniform_point_inner(self):
         x, y = self.center
         heading, angle, maxDist = self.heading, self.angle, self.radius
         r = random.triangular(0, maxDist, maxDist)
@@ -339,7 +322,8 @@ class SectorRegion(Region, Polygonable):
 class RectangularRegion(Region, Polygonable):
 
     def to_poly(self):
-        return shapely.geometry.Polygon((self.corners[0], self.corners[1], self.corners[2], self.corners[3], self.corners[0]))
+        return shapely.geometry.Polygon(
+            (self.corners[0], self.corners[1], self.corners[2], self.corners[3], self.corners[0]))
 
     def __init__(self, position, heading, width, height):
         super().__init__('Rectangle', position, heading, width, height)
@@ -354,7 +338,7 @@ class RectangularRegion(Region, Polygonable):
                              for offset in ((hw, hh), (-hw, hh), (-hw, -hh), (hw, -hh)))
         self.circumcircle = (self.position, self.radius)
 
-    def containsPoint(self, point):
+    def contains_point(self, point):
         raise NotImplementedError("Put in the geometry stuff!")
 
     def sampleGiven(self, value):
@@ -362,13 +346,13 @@ class RectangularRegion(Region, Polygonable):
                                  value[self.width], value[self.height])
 
     def evaluateInner(self, context):
-        position = valueInContext(self.position, context)
-        heading = valueInContext(self.heading, context)
-        width = valueInContext(self.width, context)
-        height = valueInContext(self.height, context)
+        position = value_in_context(self.position, context)
+        heading = value_in_context(self.heading, context)
+        width = value_in_context(self.width, context)
+        height = value_in_context(self.height, context)
         return RectangularRegion(position, heading, width, height)
 
-    def uniformPointInner(self):
+    def uniform_point_inner(self):
         hw, hh = self.hw, self.hh
         rx = random.uniform(-hw, hw)
         ry = random.uniform(-hh, hh)
@@ -412,7 +396,7 @@ class CuboidRegion(Region):
                              for offset in itertools.product((hw, -hw), (hl, -hl), (hh, -hh)))
         self.circumcircle = (self.position, self.radius)
 
-    def containsPoint(self, point):
+    def contains_point(self, point):
         return cuboid_contains_point(self, point)
 
     def sampleGiven(self, value):
@@ -420,14 +404,14 @@ class CuboidRegion(Region):
                             value[self.height])
 
     def evaluateInner(self, context):
-        position = valueInContext(self.position, context)
-        orientation = valueInContext(self.orientation, context)
-        width = valueInContext(self.width, context)
-        length = valueInContext(self.length, context)
-        height = valueInContext(self.height, context)
+        position = value_in_context(self.position, context)
+        orientation = value_in_context(self.orientation, context)
+        width = value_in_context(self.width, context)
+        length = value_in_context(self.length, context)
+        height = value_in_context(self.height, context)
         return CuboidRegion(position, orientation, width, length, height)
 
-    def uniformPointInner(self):
+    def uniform_point_inner(self):
         hw, hl, hh = self.hw, self.hl, self.hh
         rx = random.uniform(-hw, hw)
         ry = random.uniform(-hl, hl)
@@ -515,7 +499,7 @@ class PolylineRegion(Region, Polygonable):
         else:
             raise RuntimeError('called segmentsOf on non-linestring')
 
-    def uniformPointInner(self):
+    def uniform_point_inner(self):
         pointA, pointB = random.choices(self.segments,
                                         cum_weights=self.cumulativeLengths)[0]
         interpolation = random.random()
@@ -538,10 +522,10 @@ class PolylineRegion(Region, Polygonable):
             return nowhere
         return PolylineRegion(polyline=intersection)
 
-    def containsPoint(self, point):
+    def contains_point(self, point):
         return self.lineString.intersects(shapely.geometry.Point(point))
 
-    def containsObject(self, obj):
+    def contains_object(self, obj):
         return False
 
     def getAABB(self):
@@ -609,7 +593,7 @@ class PolygonalRegion(Region, Polygonable):
         areas = (triangle.area for triangle in triangles)
         self.cumulativeTriangleAreas = tuple(itertools.accumulate(areas))
 
-    def uniformPointInner(self):
+    def uniform_point_inner(self):
         triangle, bounds = random.choices(
             self.trianglesAndBounds,
             cum_weights=self.cumulativeTriangleAreas)[0]
@@ -651,10 +635,10 @@ class PolygonalRegion(Region, Polygonable):
         union = polygonUnion((self.polygons, other.to_poly()))
         return PolygonalRegion(polygon=union)
 
-    def containsPoint(self, point):
+    def contains_point(self, point):
         return self.polygons.intersects(shapely.geometry.Point(point))
 
-    def containsObject(self, obj):
+    def contains_object(self, obj):
         objPoly = obj.polygon
         if objPoly is None:
             raise RuntimeError('tried to test containment of symbolic Object!')
@@ -711,27 +695,27 @@ class PointSetRegion(Region):
         self.orientation = orientation
         self.tolerance = tolerance
 
-    def uniformPointInner(self):
+    def uniform_point_inner(self):
         return self.orient(Vector(*random.choice(self.points)))
 
-    def intersect(self, other, triedReversed=False):
+    def intersect(self, other, tried_reversed=False):
         def sampler(intRegion):
             o = intRegion.regions[1]
             center, radius = o.circumcircle
             possibles = (Vector(*self.kdTree.data[i])
                          for i in self.kdTree.query_ball_point(center, radius))
-            intersection = [p for p in possibles if o.containsPoint(p)]
+            intersection = [p for p in possibles if o.contains_point(p)]
             if len(intersection) == 0:
                 raise RejectionException(f'empty intersection of Regions {self} and {o}')
             return self.orient(random.choice(intersection))
 
         return IntersectionRegion(self, other, sampler=sampler, orientation=self.orientation)
 
-    def containsPoint(self, point):
+    def contains_point(self, point):
         distance, location = self.kdTree.query(point)
         return (distance <= self.tolerance)
 
-    def containsObject(self, obj):
+    def contains_object(self, obj):
         raise NotImplementedError()
 
     def __eq__(self, other):
@@ -787,18 +771,18 @@ class GridRegion(PointSetRegion):
             return None
         return (nx, ny)
 
-    def containsPoint(self, point):
+    def contains_point(self, point):
         gp = self.pointToGrid(point)
         if gp is None:
             return False
         x, y = gp
         return (self.grid[y, x] == 0)
 
-    def containsObject(self, obj):
+    def contains_object(self, obj):
         # TODO improve this procedure!
         # Fast check
         for c in obj.corners:
-            if not self.containsPoint(c):
+            if not self.contains_point(c):
                 return False
         # Slow check
         gps = [self.pointToGrid(corner) for corner in obj.corners]
@@ -808,7 +792,7 @@ class GridRegion(PointSetRegion):
         for x in range(minx, maxx + 1):
             for y in range(miny, maxy + 1):
                 p = self.gridToPoint((x, y))
-                if self.grid[y, x] == 1 and obj.containsPoint(p):
+                if self.grid[y, x] == 1 and obj.contains_point(p):
                     return False
         return True
 
@@ -842,22 +826,22 @@ class IntersectionRegion(Region):
                                   sampler=self.sampler)
 
     def evaluateInner(self, context):
-        regs = (valueInContext(reg, context) for reg in self.regions)
-        orientation = valueInContext(self.orientation, context)
+        regs = (value_in_context(reg, context) for reg in self.regions)
+        orientation = value_in_context(self.orientation, context)
         return IntersectionRegion(*regs, orientation=orientation, sampler=self.sampler)
 
-    def containsPoint(self, point):
-        return all(region.containsPoint(point) for region in self.regions)
+    def contains_point(self, point):
+        return all(region.contains_point(point) for region in self.regions)
 
-    def uniformPointInner(self):
+    def uniform_point_inner(self):
         return self.orient(self.sampler(self))
 
     @staticmethod
     def genericSampler(intersection):
         regs = intersection.regions
-        point = regs[0].uniformPointInner()
+        point = regs[0].uniform_point_inner()
         for region in regs[1:]:
-            if not region.containsPoint(point):
+            if not region.contains_point(point):
                 raise RejectionException(
                     f'sampling intersection of Regions {regs[0]} and {region}')
         return point

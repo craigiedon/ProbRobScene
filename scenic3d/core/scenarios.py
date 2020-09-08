@@ -5,9 +5,8 @@ import random
 from scenic3d.core.distributions import Samplable, RejectionException, needsSampling
 from scenic3d.core.external_params import ExternalSampler
 from scenic3d.core.geometry import cuboids_intersect
-from scenic3d.core.lazy_eval import needsLazyEvaluation
+from scenic3d.core.lazy_eval import needs_lazy_evaluation
 from scenic3d.core.utils import areEquivalent, InvalidScenarioError
-from scenic3d.core.vectors import Vector, Vector3D
 from scenic3d.core.workspaces import Workspace
 
 
@@ -30,10 +29,9 @@ class Scene:
 
     def show_3d(self, block=True):
         import matplotlib.pyplot as plt
-        from mpl_toolkits.mplot3d import Axes3D
         fig = plt.figure()
         ax = fig.add_subplot(111, projection='3d')
-        self.workspace.show_3d(ax)  # TODO: Work out what to do about aspect ratio thing!
+        self.workspace.show_3d(ax)
 
         print("Num objects:", len(self.objects))
         for obj in self.objects:
@@ -56,7 +54,7 @@ class Scene:
 
 
 def has_static_bounds(obj):
-    return not(needsSampling(obj.position) or any(needsSampling(corner) for corner in obj.corners))
+    return not (needsSampling(obj.position) or any(needsSampling(corner) for corner in obj.corners))
 
 
 class Scenario:
@@ -107,8 +105,8 @@ class Scenario:
             if not static_bounds[i]:
                 continue
             # Require object to be contained in the workspace/valid region
-            container = container_of_object(oi, self.workspace)
-            if not needsSampling(container) and not container.containsObject(oi):
+            container = self.workspace.region
+            if not needsSampling(container) and not container.contains_object(oi):
                 raise InvalidScenarioError(f'Object at {oi.position} does not fit in container')
             for j in range(i):
                 oj = objects[j]
@@ -129,7 +127,7 @@ class Scenario:
         sampled_params = {}
         for param, value in self.params.items():
             sampled_value = sample[value] if isinstance(value, Samplable) else value
-            assert not needsLazyEvaluation(sampled_value)
+            assert not needs_lazy_evaluation(sampled_value)
             sampled_params[param] = sampled_value
         scene = Scene(self.workspace, sampled_objects, self.egoObject, sampled_params)
         return scene, iterations
@@ -160,24 +158,16 @@ def try_sample(external_sampler, dependencies, objects, workspace, active_reqs):
     except RejectionException as e:
         return None, e
 
-    for i in range(len(objects)):
-        vi = sample[objects[i]]
-        container = container_of_object(vi, workspace)
-        if not container.containsObject(vi):
-            return None, 'object containment'
+    obj_samples = (sample[o] for o in objects)
+    collidable = (o for o in obj_samples if not o.allowCollisions)
 
-        if not vi.allowCollisions:
-            for j in range(i):
-                vj = sample[objects[j]]
-                if not vj.allowCollisions and cuboids_intersect(vi, vj):
-                    return None, 'object intersection'
+    if any(not workspace.region.contains_object(o) for o in obj_samples):
+        return None, 'object containment'
 
-    for req in active_reqs:
-        if not req(sample):
-            return None, 'user-specified requirement'
+    if any(cuboids_intersect(vi, vj) for (i, vi) in collidable for vj in collidable[:i]):
+        return None, 'object intersection'
+
+    if any(not req(sample) for req in active_reqs):
+        return None, 'user-specified requirement'
 
     return sample, None
-
-
-def container_of_object(obj, workspace):
-    return obj.region_contained_in if obj.region_contained_in is not None else workspace.region

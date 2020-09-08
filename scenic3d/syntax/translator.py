@@ -49,7 +49,7 @@ import scenic3d.core.pruning as pruning
 import scenic3d.syntax.relations as relations
 import scenic3d.syntax.veneer as veneer
 from scenic3d.core.distributions import Samplable, needsSampling
-from scenic3d.core.lazy_eval import needsLazyEvaluation
+from scenic3d.core.lazy_eval import needs_lazy_evaluation
 from scenic3d.core.object_types import Constructible
 from scenic3d.core.scenarios import Scenario
 from scenic3d.core.utils import ParseError, RuntimeParseError, InvalidScenarioError
@@ -300,7 +300,9 @@ point3dSpecifiers = {
     ('above',): 'Above3D',
     ('below',): 'Below3D',
     ('following',): 'Following3D',
+}
 
+orientedPoint3DSpecifiers = {
 
 }
 
@@ -322,7 +324,8 @@ builtinConstructors = {
     'Point': Constructor('Point', None, pointSpecifiers),
     'Point3D': Constructor('Point3D', None, point3dSpecifiers),
     'OrientedPoint': Constructor('OrientedPoint', 'Point', orientedPointSpecifiers),
-    'Object': Constructor('Object', 'OrientedPoint', objectSpecifiers)
+    'OrientedPoint3D': Constructor('OrientedPoint3D', 'Point3D', orientedPoint3DSpecifiers),
+    'Object': Constructor('Object', 'OrientedPoint3D', objectSpecifiers)
 }
 functionStatements.update(builtinConstructors)
 
@@ -1230,7 +1233,7 @@ def storeScenarioStateIn(namespace, requirementSyntax, filename):
     # Extract global parameters
     namespace['_params'] = veneer.globalParameters
     for name, value in veneer.globalParameters.items():
-        if needsLazyEvaluation(value):
+        if needs_lazy_evaluation(value):
             raise InvalidScenarioError(f'parameter {name} uses value {value}'
                                        ' undefined outside of object definition')
 
@@ -1250,7 +1253,7 @@ def storeScenarioStateIn(namespace, requirementSyntax, filename):
         def evaluator():
             result = req()
             assert not needsSampling(result)
-            if needsLazyEvaluation(result):
+            if needs_lazy_evaluation(result):
                 raise InvalidScenarioError(f'requirement on line {line} uses value'
                                            ' undefined outside of object definition')
             return result
@@ -1283,7 +1286,7 @@ def storeScenarioStateIn(namespace, requirementSyntax, filename):
         for value in bindings.values():
             if needsSampling(value):
                 requirementDeps.add(value)
-            if needsLazyEvaluation(value):
+            if needs_lazy_evaluation(value):
                 raise InvalidScenarioError(f'requirement on line {line} uses value {value}'
                                            ' undefined outside of object definition')
         if ego is not None:
@@ -1306,7 +1309,7 @@ def constructScenarioFrom(namespace):
             raise InvalidScenarioError(f'workspace {workspace} is not a Workspace')
         if needsSampling(workspace):
             raise InvalidScenarioError('workspace must be a fixed region')
-        if needsLazyEvaluation(workspace):
+        if needs_lazy_evaluation(workspace):
             raise InvalidScenarioError('workspace uses value undefined '
                                        'outside of object definition')
     else:

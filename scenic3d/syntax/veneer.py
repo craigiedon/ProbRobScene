@@ -19,12 +19,13 @@ __all__ = (
     'DistanceFrom', 'AngleTo', 'AngleFrom', 'Follow', 'CanSee',
     # Primitive types
     'Vector', 'VectorField', 'PolygonalVectorField', 'Point3D', 'Vector3D',
-    'Region', 'PointSetRegion', 'RectangularRegion', 'CuboidRegion', 'SphericalRegion', 'PolygonalRegion', 'PolylineRegion',
+    'Region', 'PointSetRegion', 'RectangularRegion', 'CuboidRegion', 'SphericalRegion', 'PolygonalRegion',
+    'PolylineRegion',
     'Workspace', 'Mutator',
     'Range', 'Options', 'Uniform', 'Discrete', 'Normal',
     'VerifaiParameter', 'VerifaiRange', 'VerifaiDiscreteRange', 'VerifaiOptions',
     # Constructible types
-    'Point', 'OrientedPoint', 'Object',
+    'Point', 'OrientedPoint', 'Object', 'OrientedPoint3D',
     # Specifiers
     'With',
     'At', 'In', 'Beyond', 'VisibleFrom', 'VisibleSpec', 'OffsetBy', 'OffsetAlongSpec',
@@ -50,7 +51,8 @@ from scenic3d.core.distributions import Range, Options, Normal
 # various Python types and functions used in the language but defined elsewhere
 from scenic3d.core.geometry import sin, cos, hypot, max, min
 from scenic3d.core.regions import (Region, PointSetRegion, RectangularRegion,
-                                   PolygonalRegion, PolylineRegion, everywhere, nowhere, CuboidRegion, SphericalRegion)
+                                   PolygonalRegion, PolylineRegion, everywhere, nowhere, CuboidRegion, SphericalRegion,
+                                   uniform_distribution_from_region)
 from scenic3d.core.vectors import Vector, VectorField, PolygonalVectorField, Vector3D, offset_beyond, \
     rotation_to_euler, rotate_euler, VectorField3D
 from scenic3d.core.workspaces import Workspace
@@ -64,7 +66,7 @@ from scenic3d.core.specifiers import PropertyDefault  # TODO remove
 
 # everything that should not be directly accessible from the language is imported here:
 import inspect
-from scenic3d.core.distributions import Distribution, toDistribution
+from scenic3d.core.distributions import Distribution, to_distribution
 from scenic3d.core.type_support import isA, toType, toTypes, toScalar, toHeading, toVector
 from scenic3d.core.type_support import evaluateRequiringEqualTypes, underlyingType
 from scenic3d.core.geometry import normalizeAngle, apparentHeadingAtPoint
@@ -203,11 +205,11 @@ def param(*quotedParams, **params):
     if evaluatingRequirement:
         raise RuntimeParseError('tried to create a global parameter inside a requirement')
     for name, value in params.items():
-        globalParameters[name] = toDistribution(value)
+        globalParameters[name] = to_distribution(value)
     assert len(quotedParams) % 2 == 0, quotedParams
     it = iter(quotedParams)
     for name, value in zip(it, it):
-        globalParameters[name] = toDistribution(value)
+        globalParameters[name] = to_distribution(value)
 
 
 def mutate(*objects):  # TODO update syntax
@@ -274,13 +276,13 @@ def RelativeTo(X, Y):
     if xf or yf:
         if xf and yf and X.valueType != Y.valueType:
             raise RuntimeParseError('"X relative to Y" with X, Y fields of different types')
-        fieldType = X.valueType if xf else Y.valueType
+        field_type = X.valueType if xf else Y.valueType
         error = '"X relative to Y" with field and value of different types'
 
         def helper(context):
             pos = context.position.toVector()
-            xp = X[pos] if xf else toType(X, fieldType, error)
-            yp = Y[pos] if yf else toType(Y, fieldType, error)
+            xp = X[pos] if xf else toType(X, field_type, error)
+            yp = Y[pos] if yf else toType(Y, field_type, error)
             return xp + yp
 
         return DelayedArgument({'position'}, helper)
@@ -408,7 +410,7 @@ def CanSee(X, Y):
         return X.canSee(Y)
     else:
         Y = toVector(Y, '"X can see Y" with Y not a vector')
-        return X.visibleRegion.containsPoint(Y)
+        return X.visibleRegion.contains_point(Y)
 
 
 ### Specifiers
@@ -446,12 +448,12 @@ def In(region):
     """
     region = toType(region, Region, 'specifier "in/on R" with R not a Region')
     extras = {'heading'} if alwaysProvidesOrientation(region) else {}
-    return Specifier('position', Region.uniformPointIn(region), optionals=extras)
+    return Specifier('position', uniform_distribution_from_region(region), optionals=extras)
 
 
 def In3D(region):
     region = toType(region, Region, 'specifier "in R" with R not a Region')
-    return Specifier('position', Region.uniformPointIn(region))
+    return Specifier('position', uniform_distribution_from_region(region))
 
 
 def alwaysProvidesOrientation(region):
@@ -512,7 +514,7 @@ def VisibleFrom(base):
     """
     if not isinstance(base, Point):
         raise RuntimeParseError('specifier "visible from O" with O not a Point')
-    return Specifier('position', Region.uniformPointIn(base.visibleRegion))
+    return Specifier('position', uniform_distribution_from_region(base.visibleRegion))
 
 
 def VisibleSpec():
@@ -601,92 +603,101 @@ def ApparentlyFacing(heading, fromPt=None):
 
 
 def LeftSpec(pos, dist=0):
-    return leftSpecHelper('left of', pos, dist, 'width', lambda dist: (dist, 0),
-                          lambda self, dx, dy: Vector(-self.width / 2 - dx, dy))
+    return left_spec_helper('left of', pos, dist, 'width', lambda dist: (dist, 0),
+                            lambda self, dx, dy: Vector(-self.width / 2 - dx, dy))
 
 
 def RightSpec(pos, dist=0):
-    return leftSpecHelper('right of', pos, dist, 'width', lambda dist: (dist, 0),
-                          lambda self, dx, dy: Vector(self.width / 2 + dx, dy))
+    return left_spec_helper('right of', pos, dist, 'width', lambda dist: (dist, 0),
+                            lambda self, dx, dy: Vector(self.width / 2 + dx, dy))
 
 
 def Ahead(pos, dist=0):
-    return leftSpecHelper('ahead of', pos, dist, 'height', lambda dist: (0, dist),
-                          lambda self, dx, dy: Vector(dx, self.height / 2.0 + dy))
+    return left_spec_helper('ahead of', pos, dist, 'height', lambda dist: (0, dist),
+                            lambda self, dx, dy: Vector(dx, self.height / 2.0 + dy))
 
 
 def Behind(pos, dist=0):
-    return leftSpecHelper('behind', pos, dist, 'height', lambda dist: (0, dist),
-                          lambda self, dx, dy: Vector(dx, -self.height / 2.0 - dy))
+    return left_spec_helper('behind', pos, dist, 'height', lambda dist: (0, dist),
+                            lambda self, dx, dy: Vector(dx, -self.height / 2.0 - dy))
 
 
-def LeftSpec3D(pos, dist=0):
-    return leftSpec3DHelper('left of', pos, dist, 'width', lambda dist: (dist, 0, 0),
-                            lambda self, dx, dy, dz: Vector3D(-self.width / 2.0 - dx, dy, dz))
+eps = 1e-9
 
 
-def RightSpec3D(pos, dist=0):
-    return leftSpec3DHelper('right of', pos, dist, 'width', lambda dist: (dist, 0, 0),
-                            lambda self, dx, dy, dz: Vector3D(self.width / 2.0 + dx, dy, dz))
+def LeftSpec3D(pos, dist=eps):
+    return directional_spec_helper('left of', pos, dist, 'width', lambda dist: (dist, 0, 0),
+                                   lambda self, dx, dy, dz: Vector3D(-self.width / 2.0 - dx, dy, dz))
 
 
-def Ahead3D(pos, dist=0):
-    return leftSpec3DHelper('ahead of', pos, dist, 'length', lambda dist: (0, dist, 0),
-                            lambda self, dx, dy, dz: Vector3D(dx, self.length / 2.0 + dy, dz))
+def RightSpec3D(pos, dist=eps):
+    return directional_spec_helper('right of', pos, dist, 'width', lambda dist: (dist, 0, 0),
+                                   lambda self, dx, dy, dz: Vector3D(self.width / 2.0 + dx, dy, dz))
 
 
-def Behind3D(pos, dist=0):
-    return leftSpec3DHelper('behind', pos, dist, 'length', lambda dist: (0, dist, 0),
-                            lambda self, dx, dy, dz: Vector3D(dx, -self.length / 2.0 - dy, dz))
+def Ahead3D(pos, dist=eps):
+    return directional_spec_helper('ahead of', pos, dist, 'length', lambda dist: (0, dist, 0),
+                                   lambda self, dx, dy, dz: Vector3D(dx, self.length / 2.0 + dy, dz))
 
 
-def Above3D(pos, dist=0):
-    return leftSpec3DHelper('above', pos, dist, 'height', lambda dist: (0, 0, dist),
-                            lambda self, dx, dy, dz: Vector3D(dx, dy, self.height / 2.0 + dz))
+def Behind3D(pos, dist=eps):
+    return directional_spec_helper('behind', pos, dist, 'length', lambda dist: (0, dist, 0),
+                                   lambda self, dx, dy, dz: Vector3D(dx, -self.length / 2.0 - dy, dz))
 
 
-def Below3D(pos, dist=0):
-    return leftSpec3DHelper('below', pos, dist, 'height', lambda dist: (0, 0, dist),
-                            lambda self, dx, dy, dz: Vector3D(dx, dy, -self.height / 2.0 - dz))
+def Above3D(pos, dist=eps):
+    return directional_spec_helper('above', pos, dist, 'height', lambda dist: (0, 0, dist),
+                                   lambda self, dx, dy, dz: Vector3D(dx, dy, self.height / 2.0 + dz))
 
 
-def leftSpecHelper(syntax, pos, dist, axis, toComponents, makeOffset):
-    extras = set()
-    dType = underlyingType(dist)
-    if dType is float or dType is int:
-        dx, dy = toComponents(dist)
-    elif dType is Vector:
-        dx, dy = dist
-    else:
-        raise RuntimeParseError(f'"{syntax} X by D" with D not a number or vector')
-    if isinstance(pos, OrientedPoint):  # TODO too strict?
-        val = lambda self: pos.relativePosition(makeOffset(self, dx, dy))
-        new = DelayedArgument({axis}, val)
-        extras.add('heading')
-    else:
-        pos = toVector(pos, f'specifier "{syntax} X" with X not a vector')
-        val = lambda self: pos.offsetRotated(self.heading, makeOffset(self, dx, dy))
-        new = DelayedArgument({axis, 'heading'}, val)
-    return Specifier('position', new, optionals=extras)
+def Below3D(pos, dist=eps):
+    return directional_spec_helper('below', pos, dist, 'height', lambda dist: (0, 0, dist),
+                                   lambda self, dx, dy, dz: Vector3D(dx, dy, -self.height / 2.0 - dz))
+
+def OnTopOf(thing, dist=eps):
+    # So...if it is a point ... then we can proceed as for above/below etc: just set the spec position of the object to be above this point based on the half height...
+    # If it is another object ... then we want the position to be a uniform point in the region on its top surface. In other words...its width / length rotated, plus the offset...
+    # If it is another *region* well...this is fine provided the other region also has width lenghth height, and an orientation...
+    # Create a cuboid region with zero height positioned and orientated at correct place...
 
 
-def leftSpec3DHelper(syntax, pos, dist, axis, to_components, make_offset):
+def left_spec_helper(syntax, pos, dist, axis, to_components, make_offset):
+    raise NotImplementedError
+    # extras = set()
+    # dType = underlyingType(dist)
+    # if dType is float or dType is int:
+    #     dx, dy = to_components(dist)
+    # elif dType is Vector:
+    #     dx, dy = dist
+    # else:
+    #     raise RuntimeParseError(f'"{syntax} X by D" with D not a number or vector')
+    # if isinstance(pos, OrientedPoint):  # TODO too strict?
+    #     val = lambda self: pos.relativePosition(make_offset(self, dx, dy))
+    #     new = DelayedArgument({axis}, val)
+    #     extras.add('heading')
+    # else:
+    #     pos = toVector(pos, f'specifier "{syntax} X" with X not a vector')
+    #     val = lambda self: pos.offsetRotated(self.heading, make_offset(self, dx, dy))
+    #     new = DelayedArgument({axis, 'heading'}, val)
+    # return Specifier('position', new, optionals=extras)
+
+
+def directional_spec_helper(syntax, pos, dist, axis, to_components, make_offset):
     extras = set()
     d_type = underlyingType(dist)
     if d_type is float or d_type is int:
-        dx, dy, dz = to_components(dist)
+        offset_vec = to_components(dist)
     elif d_type is Vector3D:
-        dx, dy, dz = dist
+        offset_vec = dist
     else:
         raise RuntimeParseError(f'"{syntax} X by D" with D not a number or vector3d')
 
     if isinstance(pos, OrientedPoint3D):
-        val = lambda self: pos + rotate_euler(make_offset(self, dx, dy, dz), pos.orientation)
+        val = lambda self: pos.position + rotate_euler(make_offset(self, *offset_vec), pos.orientation)
         new = DelayedArgument({axis}, val)
-        extras.add('orientation')
     else:
         pos = toType(pos, Vector3D)
-        val = lambda self: pos + rotate_euler(make_offset(self, dx, dy, dz), self.orientation)
+        val = lambda self: pos + rotate_euler(make_offset(self, *offset_vec), self.orientation)
         new = DelayedArgument({axis, 'orientation'}, val)
     return Specifier('position', new, optionals=extras)
 

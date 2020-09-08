@@ -16,7 +16,7 @@ to randomly sample colours from a vector
 """
 
 
-t = Tray
-ego = Cube with color 'green'
-c1 = Cube in workspace
-
+table = Table in workspace
+tray = Tray above (top table)
+ego = Cube above (top tray)
+c2 = Cube above (top ego)

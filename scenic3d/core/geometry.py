@@ -11,7 +11,7 @@ import shapely.ops
 import scenic3d.core.utils as utils
 from scenic3d.core.distributions import (needsSampling, distributionFunction,
                                          monotonicDistributionFunction)
-from scenic3d.core.lazy_eval import needsLazyEvaluation
+from scenic3d.core.lazy_eval import needs_lazy_evaluation
 
 
 @distributionFunction
@@ -25,8 +25,8 @@ def cos(x):
 
 
 @monotonicDistributionFunction
-def hypot(x, y):
-    return math.hypot(x, y)
+def hypot(x, y, z):
+    return math.hypot(x, y, z)
 
 
 @monotonicDistributionFunction
@@ -407,6 +407,6 @@ def cube_edge_separates(cuboid_a, cuboid_b):
 
 
 def get_constant_polygon(cuboid):
-    assert not any(needsSampling(c) or needsLazyEvaluation(c) for c in cuboid.corners)
+    assert not any(needsSampling(c) or needs_lazy_evaluation(c) for c in cuboid.corners)
     corners = [(x, y, z) for x, y, z in cuboid.corners]  # convert Vectors to tuples
     return shapely.geometry.Polygon(corners)

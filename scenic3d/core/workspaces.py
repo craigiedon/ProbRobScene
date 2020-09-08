@@ -60,17 +60,17 @@ class Workspace(Region):
         """Convert Scenic coordinates to those used for schematic rendering."""
         return coords
 
-    def uniformPointInner(self):
-        return self.region.uniformPointInner()
+    def uniform_point_inner(self):
+        return self.region.uniform_point_inner()
 
-    def intersect(self, other, triedReversed=False):
-        return self.region.intersect(other, triedReversed)
+    def intersect(self, other, tried_reversed=False):
+        return self.region.intersect(other, tried_reversed)
 
-    def containsPoint(self, point):
-        return self.region.containsPoint(point)
+    def contains_point(self, point):
+        return self.region.contains_point(point)
 
-    def containsObject(self, obj):
-        return self.region.containsObject(obj)
+    def contains_object(self, obj):
+        return self.region.contains_object(obj)
 
     def getAABB(self):
         return self.region.getAABB()

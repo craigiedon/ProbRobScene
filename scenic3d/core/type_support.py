@@ -6,8 +6,8 @@ import sys
 import numpy as np
 
 from scenic3d.core.distributions import Distribution
-from scenic3d.core.lazy_eval import (DelayedArgument, valueInContext, requiredProperties,
-									 needsLazyEvaluation)
+from scenic3d.core.lazy_eval import (DelayedArgument, value_in_context, requiredProperties,
+                                     needs_lazy_evaluation)
 from scenic3d.core.utils import RuntimeParseError
 from scenic3d.core.vectors import Vector, Vector3D
 
@@ -62,55 +62,23 @@ def unifyingType(opts):  # TODO improve?
     raise RuntimeError(f'broken MRO for types {types}')
 
 
-## Type coercions (for internal use -- see the type checking API below)
-
-def canCoerceType(typeA, typeB):
-    """Can values of typeA be coerced into typeB?"""
-    if typeB is float:
-        if issubclass(typeA, (float, int)):
-            return True
-        if issubclass(typeA, np.number) and not issubclass(typeA, np.complexfloating):
-            return True
-        return False
-    elif typeB is Heading:
-        return canCoerceType(typeA, float) or hasattr(typeA, 'toHeading')
-    elif typeB is Vector:
-        return hasattr(typeA, 'toVector')
-    elif typeB is Vector3D:
-        return hasattr(typeA, 'to_vector_3d')
-    else:
-        return issubclass(typeA, typeB)
-
-
-def canCoerce(thing, ty):
-    """Can this value be coerced into the given type?"""
-    tt = underlyingType(thing)
-    return canCoerceType(tt, ty)
-
-
-def coerce(thing, ty):
-    """Coerce something into the given type."""
-    assert canCoerce(thing, ty), (thing, ty)
-    if isinstance(thing, Distribution):
-        return thing
-    if ty is float:
-        return float(thing)
-    elif ty is Heading:
-        return thing.toHeading() if hasattr(thing, 'toHeading') else float(thing)
-    elif ty is Vector:
-        return thing.toVector()
-    elif ty is Vector3D:
-        return thing.to_vector_3d()
-    else:
-        return thing
-
-
-def coerceToAny(thing, types, error):
+def coerce(thing, types, error):
     """Coerce something into any of the given types, printing an error if impossible."""
     for ty in types:
-        if canCoerce(thing, ty):
-            return coerce(thing, ty)
-    print(f'Failed to coerce {thing} of type {underlyingType(thing)} to {types}', file=sys.stderr)
+        if isinstance(thing, Distribution):
+            return thing
+        if ty is float:
+            return float(thing)
+        elif ty is Heading:
+            return thing.toHeading() if hasattr(thing, 'toHeading') else float(thing)
+        elif ty is Vector:
+            return thing.toVector()
+        elif ty is Vector3D:
+            return thing.to_vector_3d()
+        elif isinstance(thing, ty):
+            return thing
+
+    print(f'Failed to coerce {thing} to {types}', file=sys.stderr)
     raise RuntimeParseError(error)
 
 
@@ -118,11 +86,11 @@ def coerceToAny(thing, types, error):
 
 def toTypes(thing, types, typeError='wrong type'):
     """Convert something to any of the given types, printing an error if impossible."""
-    if needsLazyEvaluation(thing):
+    if needs_lazy_evaluation(thing):
         # cannot check the type now; create proxy object to check type after evaluation
         return TypeChecker(thing, types, typeError)
     else:
-        return coerceToAny(thing, types, typeError)
+        return coerce(thing, types, typeError)
 
 
 def toType(thing, ty, typeError='wrong type'):
@@ -150,7 +118,7 @@ def evaluateRequiringEqualTypes(func, thingA, thingB, typeError='type mismatch')
 
     If func produces a lazy value, it should not have any required properties beyond
     those of thingA and thingB."""
-    if not needsLazyEvaluation(thingA) and not needsLazyEvaluation(thingB):
+    if not needs_lazy_evaluation(thingA) and not needs_lazy_evaluation(thingB):
         if underlyingType(thingA) is not underlyingType(thingB):
             raise RuntimeParseError(typeError)
         return func()
@@ -167,7 +135,7 @@ class TypeChecker(DelayedArgument):
     def __init__(self, arg, types, error):
         def check(context):
             val = arg.evaluateIn(context)
-            return coerceToAny(val, types, error)
+            return coerce(val, types, error)
 
         super().__init__(requiredProperties(arg), check)
         self.inner = arg
@@ -184,11 +152,11 @@ class TypeEqualityChecker(DelayedArgument):
         props = requiredProperties(checkA) | requiredProperties(checkB)
 
         def check(context):
-            ca = valueInContext(checkA, context)
-            cb = valueInContext(checkB, context)
+            ca = value_in_context(checkA, context)
+            cb = value_in_context(checkB, context)
             if underlyingType(ca) is not underlyingType(cb):
                 raise RuntimeParseError(error)
-            return valueInContext(func(), context)
+            return value_in_context(func(), context)
 
         super().__init__(props, check)
         self.inner = func

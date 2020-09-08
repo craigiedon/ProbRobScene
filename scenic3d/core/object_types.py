@@ -7,9 +7,9 @@ import math
 import random
 import numpy as np
 
-from scenic3d.core.distributions import Samplable, needsSampling
+from scenic3d.core.distributions import Samplable, needsSampling, to_distribution
 from scenic3d.core.geometry import averageVectors, hypot, min
-from scenic3d.core.lazy_eval import needsLazyEvaluation
+from scenic3d.core.lazy_eval import needs_lazy_evaluation
 from scenic3d.core.regions import CircularRegion, SectorRegion, SphericalRegion
 from scenic3d.core.specifiers import Specifier, PropertyDefault
 from scenic3d.core.type_support import toVector, toScalar, toType
@@ -31,10 +31,10 @@ class Constructible(Samplable):
     """
 
     @classmethod
-    def defaults(cla):  # TODO improve so this need only be done once?
+    def defaults(cls):  # TODO improve so this need only be done once?
         # find all defaults provided by the class or its superclasses
         allDefs = collections.defaultdict(list)
-        for sc in inspect.getmro(cla):
+        for sc in inspect.getmro(cls):
             if hasattr(sc, '__annotations__'):
                 for prop, value in sc.__annotations__.items():
                     allDefs[prop].append(PropertyDefault.forValue(value))
@@ -50,7 +50,7 @@ class Constructible(Samplable):
     @classmethod
     def withProperties(cls, props):
         assert all(reqProp in props for reqProp in cls.defaults())
-        assert all(not needsLazyEvaluation(val) for val in props.values())
+        assert all(not needs_lazy_evaluation(val) for val in props.values())
         specs = (Specifier(prop, val) for prop, val in props.items())
         return cls(*specs)
 
@@ -74,7 +74,7 @@ class Constructible(Samplable):
                     optionals[opt].append(spec)
 
         # Decide which optionals to use
-        optionalsForSpec = collections.defaultdict(set)
+        optionals_for_spec = collections.defaultdict(set)
         for opt, specs in optionals.items():
             if opt in properties:
                 continue  # optionals do not override a primary specification
@@ -83,14 +83,12 @@ class Constructible(Samplable):
             assert len(specs) == 1
             spec = specs[0]
             properties[opt] = spec
-            optionalsForSpec[spec].add(opt)
+            optionals_for_spec[spec].add(opt)
 
         # Add any default specifiers needed
-        for prop in defs:
-            if prop not in properties:
-                spec = defs[prop]
-                specifiers.append(spec)
-                properties[prop] = spec
+        for prop in filter(lambda x: x not in properties, defs):
+            specifiers.append(defs[prop])
+            properties[prop] = defs[prop]
 
         # Topologically sort specifiers
         order = []
@@ -119,16 +117,15 @@ class Constructible(Samplable):
 
         # Evaluate and apply specifiers
         for spec in order:
-            spec.applyTo(self, optionalsForSpec[spec])
+            v = to_distribution(spec.value.evaluateIn(self))
+            assert not needs_lazy_evaluation(v)
+            setattr(self, spec.property, v)
+            for opt in optionals_for_spec[spec]:
+                assert opt in spec.optionals
+                setattr(self, opt, getattr(v, opt))
 
         # Set up dependencies
-        deps = []
-        for prop in properties:
-            assert hasattr(self, prop)
-            val = getattr(self, prop)
-            if needsSampling(val):
-                deps.append(val)
-        super().__init__(deps)
+        super().__init__(dependencies=[getattr(self, p) for p in properties if needsSampling(getattr(self, p))])
         self.properties = set(properties)
 
     def sampleGiven(self, value):
@@ -150,10 +147,10 @@ class Constructible(Samplable):
 
     def __str__(self):
         if hasattr(self, 'properties'):
-            allProps = {prop: getattr(self, prop) for prop in self.properties}
+            all_props = {prop: getattr(self, prop) for prop in self.properties}
         else:
-            allProps = '<under construction>'
-        return f'{type(self).__name__}({allProps})'
+            all_props = '<under construction>'
+        return f'{type(self).__name__}({all_props})'
 
 
 ## Mutators
@@ -257,7 +254,7 @@ class Point(Constructible):
 
     def canSee(self, other):  # TODO improve approximation?
         for corner in other.corners:
-            if self.visibleRegion.containsPoint(corner):
+            if self.visibleRegion.contains_point(corner):
                 return True
         return False
 
@@ -370,7 +367,6 @@ class Object(OrientedPoint3D):
     length: 1
     allowCollisions: False
     requireVisible: True
-    region_contained_in: None
     cameraOffset: Vector(0, 0)
 
     def __init__(self, *args, **kwargs):
@@ -382,8 +378,8 @@ class Object(OrientedPoint3D):
         self.hh = hh = self.height / 2
         self.hl = hl = self.length / 2
 
-        self.radius = hypot(hw, hh)  # circumcircle; for collision detection
-        self.inradius = min(hw, hh)  # incircle; for collision detection
+        self.radius = hypot(hw, hl, hh)  # circumcircle; for collision detection
+        self.inradius = min(hw, hl, hh)  # incircle; for collision detection
 
         self.left = relative_position_3d(Vector3D(-hw, 0, 0), self.position, self.orientation)
         self.right = relative_position_3d(Vector3D(hw, 0, 0), self.position, self.orientation)
@@ -391,7 +387,7 @@ class Object(OrientedPoint3D):
         self.back = relative_position_3d(Vector3D(0, -hl, 0), self.position, self.orientation)
 
         self.top = relative_position_3d(Vector3D(0, 0, hh), self.position, self.orientation)
-        self.bottom = relative_position_3d(Vector3D(0, 0, hh), self.position, self.orientation)
+        self.bottom = relative_position_3d(Vector3D(0, 0, -hh), self.position, self.orientation)
 
         self.frontLeft = relative_position_3d(Vector3D(-hw, hl, 0), self.position, self.orientation)
         self.frontRight = relative_position_3d(Vector3D(hw, hl, 0), self.position, self.orientation)
@@ -409,10 +405,9 @@ class Object(OrientedPoint3D):
         if needsSampling(self):
             raise RuntimeError('tried to show_3d() symbolic Object')
 
-        if hasattr(self, 'position3d'):
-            color = self.color if hasattr(self, 'color') else (1, 0, 0)
-            draw_cube(ax, np.array([*self.position3d.position]), np.array([self.width, self.length, self.height]),
-                      np.array([self.heading, 0.0, 0.0]), color=color)
+        color = self.color if hasattr(self, 'color') else (1, 0, 0)
+        draw_cube(ax, np.array([*self.position]), np.array([self.width, self.length, self.height]),
+                  np.array([*self.orientation]), color=color)
 
         # # corners = self.corners  # TODO: Make a corners 3d to take in height, width, length etc.
         # draw_cube(ax, np.array([*self.position, 0.0]), np.array([self.width, self.height, 1.0]),

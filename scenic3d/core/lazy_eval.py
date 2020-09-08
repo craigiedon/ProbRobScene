@@ -11,9 +11,9 @@ class LazilyEvaluable:
     properties.
     """
 
-    def __init__(self, requiredProps):
+    def __init__(self, required_props):
         self._dependencies = ()  # TODO improve?
-        self._requiredProperties = set(requiredProps)
+        self._requiredProperties = set(required_props)
 
     def evaluateIn(self, context):
         """Evaluate this value in the context of an object being constructed.
@@ -22,7 +22,7 @@ class LazilyEvaluable:
         """
         assert all(hasattr(context, prop) for prop in self._requiredProperties)
         value = self.evaluateInner(context)
-        assert not needsLazyEvaluation(value)  # value should not require further evaluation
+        assert not needs_lazy_evaluation(value)  # value should not require further evaluation
         return value
 
     def evaluateInner(self, context):
@@ -37,9 +37,9 @@ class DelayedArgument(LazilyEvaluable):
     construction) to a value.
     """
 
-    def __init__(self, requiredProps, value):
+    def __init__(self, required_props, value):
         self.value = value
-        super().__init__(requiredProps)
+        super().__init__(required_props)
 
     def evaluateInner(self, context):
         return self.value(context)
@@ -84,7 +84,7 @@ allowedOperators = [
 ]
 
 
-def makeDelayedOperatorHandler(op):
+def make_delayed_operator_handler(op):
     def handler(self, *args):
         dargs = [toDelayedArgument(arg) for arg in args]
         props = self._requiredProperties.union(*(darg._requiredProperties for darg in dargs))
@@ -99,7 +99,7 @@ def makeDelayedOperatorHandler(op):
 
 
 for op in allowedOperators:
-    setattr(DelayedArgument, op, makeDelayedOperatorHandler(op))
+    setattr(DelayedArgument, op, make_delayed_operator_handler(op))
 
 
 def makeDelayedFunctionCall(func, args, kwargs):
@@ -117,7 +117,7 @@ def makeDelayedFunctionCall(func, args, kwargs):
     return DelayedArgument(props, value)
 
 
-def valueInContext(value, context):
+def value_in_context(value, context):
     """Evaluate something in the context of an object being constructed."""
     try:
         return value.evaluateIn(context)
@@ -137,5 +137,5 @@ def requiredProperties(thing):
     return set()
 
 
-def needsLazyEvaluation(thing):
+def needs_lazy_evaluation(thing):
     return isinstance(thing, DelayedArgument) or requiredProperties(thing)

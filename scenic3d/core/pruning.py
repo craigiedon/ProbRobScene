@@ -10,10 +10,8 @@ import scenic3d.core.regions as regions
 from scenic3d.core.distributions import (Samplable, MethodDistribution, OperatorDistribution,
                                          supportInterval, underlyingFunction)
 from scenic3d.core.geometry import normalizeAngle, polygonUnion, Polygonable
-from scenic3d.core.scenarios import container_of_object
 from scenic3d.core.utils import InvalidScenarioError
 from scenic3d.core.vectors import VectorField, PolygonalVectorField, VectorMethodDistribution
-from scenic3d.core.workspaces import Workspace
 from scenic3d.syntax.relations import RelativeHeadingRelation, DistanceRelation
 
 
@@ -64,8 +62,6 @@ def matchPolygonalField(heading, position):
     return None, 0, 0
 
 
-### Pruning procedures
-
 def prune(scenario, verbosity=1):
     if verbosity >= 1:
         print('  Pruning scenario...')
@@ -79,11 +75,10 @@ def prune(scenario, verbosity=1):
         print(f'  Pruned scenario in {total_time:.4g} seconds.')
 
 
-## Pruning based on containment
 def prunable(obj, scenario) -> bool:
     return (isinstance(obj.position, regions.PointInRegionDistribution) and
             isinstance(obj.position.region, Polygonable) and
-            isinstance(container_of_object(obj, scenario.workspace), Polygonable))
+            isinstance(scenario.workspace.region, Polygonable))
 
 
 def prune_containment(scenario, verbosity):
@@ -97,7 +92,7 @@ def prune_containment(scenario, verbosity):
     for obj in (x for x in scenario.objects if prunable(x, scenario)):
         base = obj.position.region
         base_poly = base.to_poly()
-        container = container_of_object(obj, scenario.workspace)
+        container = scenario.workspace.region
         container_poly = container.to_poly()
 
         min_radius, _ = supportInterval(obj.inradius)
@@ -120,7 +115,7 @@ def prune_containment(scenario, verbosity):
             print(f'    Region containment constraint pruned {percent:.1f}% of space.')
 
         new_base = regions.regionFromShapelyObject(new_base_poly, orientation=base.orientation)
-        new_pos = regions.Region.uniformPointIn(new_base)
+        new_pos = regions.uniform_distribution_from_region(new_base)
         obj.position.conditionTo(new_pos)
 
 
@@ -161,7 +156,7 @@ def prune_relative_heading(scenario, verbosity):
         for rel in obj._relations:
             if isinstance(rel, RelativeHeadingRelation) and rel.target in fields:
                 tField, tOffsetL, tOffsetR = fields[rel.target]
-                maxDist = maxDistanceBetween(scenario, obj, rel.target)
+                maxDist = max_distance_between(scenario, obj, rel.target)
                 if maxDist == float('inf'):  # the distance between the objects must be bounded
                     continue
                 feasible = feasibleRHPolygon(field, offset_l, offset_r,
@@ -180,11 +175,11 @@ def prune_relative_heading(scenario, verbosity):
         if newBasePoly is not basePoly:
             newBase = regions.PolygonalRegion(polygon=newBasePoly,
                                               orientation=base.orientation)
-            newPos = regions.Region.uniformPointIn(newBase)
+            newPos = regions.uniform_distribution_from_region(newBase)
             obj.position.conditionTo(newPos)
 
 
-def maxDistanceBetween(scenario, obj, target):
+def max_distance_between(scenario, obj, target):
     """Upper bound the distance between the given Objects."""
     # If one of the objects is the ego, use visibility requirements
     ego = scenario.egoObject

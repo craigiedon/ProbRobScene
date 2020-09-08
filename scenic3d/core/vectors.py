@@ -14,7 +14,7 @@ import scenic3d.core.utils as utils
 from scenic3d.core.distributions import (Samplable, Distribution, MethodDistribution,
                                          needsSampling, makeOperatorHandler, distributionMethod, distributionFunction)
 from scenic3d.core.geometry import normalizeAngle
-from scenic3d.core.lazy_eval import valueInContext, needsLazyEvaluation, makeDelayedFunctionCall
+from scenic3d.core.lazy_eval import value_in_context, needs_lazy_evaluation, makeDelayedFunctionCall
 
 
 class VectorDistribution(Distribution):
@@ -63,8 +63,8 @@ class VectorOperatorDistribution(VectorDistribution):
         return op(*rest)
 
     def evaluateInner(self, context):
-        obj = valueInContext(self.object, context)
-        operands = tuple(valueInContext(arg, context) for arg in self.operands)
+        obj = value_in_context(self.object, context)
+        operands = tuple(value_in_context(arg, context) for arg in self.operands)
         return VectorOperatorDistribution(self.operator, obj, operands)
 
     def __str__(self):
@@ -88,9 +88,9 @@ class VectorMethodDistribution(VectorDistribution):
         return self.method(self.object, *args, **kwargs)
 
     def evaluateInner(self, context):
-        obj = valueInContext(self.object, context)
-        arguments = tuple(valueInContext(arg, context) for arg in self.arguments)
-        kwargs = {name: valueInContext(arg, context) for name, arg in self.kwargs.items()}
+        obj = value_in_context(self.object, context)
+        arguments = tuple(value_in_context(arg, context) for arg in self.arguments)
+        kwargs = {name: value_in_context(arg, context) for name, arg in self.kwargs.items()}
         return VectorMethodDistribution(self.method, obj, arguments, kwargs)
 
     def __str__(self):
@@ -131,7 +131,7 @@ def vectorOperator(method):
             return VectorOperatorDistribution(op, self, args)
         elif any(needsSampling(arg) for arg in args):
             return VectorMethodDistribution(method, self, args, {})
-        elif any(needsLazyEvaluation(arg) for arg in args):
+        elif any(needs_lazy_evaluation(arg) for arg in args):
             # see analogous comment in distributionFunction
             return makeDelayedFunctionCall(handler2, args, {})
         else:
@@ -147,7 +147,7 @@ def vectorDistributionMethod(method):
     def helper(self, *args, **kwargs):
         if any(needsSampling(arg) for arg in itertools.chain(args, kwargs.values())):
             return VectorMethodDistribution(method, self, args, kwargs)
-        elif any(needsLazyEvaluation(arg) for arg in itertools.chain(args, kwargs.values())):
+        elif any(needs_lazy_evaluation(arg) for arg in itertools.chain(args, kwargs.values())):
             # see analogous comment in distributionFunction
             return makeDelayedFunctionCall(helper, (self,) + args, kwargs)
         else:
@@ -178,7 +178,7 @@ class Vector(Samplable, collections.abc.Sequence):
         return Vector(*(value[coord] for coord in self.coordinates))
 
     def evaluateInner(self, context):
-        return Vector(*(valueInContext(coord, context) for coord in self.coordinates))
+        return Vector(*(value_in_context(coord, context) for coord in self.coordinates))
 
     @vectorOperator
     def rotatedBy(self, angle):
@@ -269,7 +269,7 @@ class Vector3D(Samplable, collections.abc.Sequence):
         return Vector3D(*(value[coord] for coord in self.coordinates))
 
     def evaluateInner(self, context):
-        return Vector3D(*(valueInContext(coord, context) for coord in self.coordinates))
+        return Vector3D(*(value_in_context(coord, context) for coord in self.coordinates))
 
     @scalarOperator
     def distanceTo(self, other):
