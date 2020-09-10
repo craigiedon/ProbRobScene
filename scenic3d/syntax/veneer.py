@@ -36,7 +36,7 @@ __all__ = (
     'At3D', 'In3D', 'Beyond3D', 'OffsetBy3D',
     'Facing3D', 'FacingToward3D',
     'LeftSpec3D', 'RightSpec3D', 'Ahead3D', 'Behind3D', 'Above3D', 'Below3D',
-    'Following3D',
+    'Following3D', 'OnTopOf',
     # 3D Prefix Ops
     'Top', 'Bottom',
     # 3D Infix Operators
@@ -47,7 +47,7 @@ __all__ = (
     'PropertyDefault'
 )
 
-from scenic3d.core.distributions import Range, Options, Normal
+from scenic3d.core.distributions import Range, Options, Normal, distributionFunction
 # various Python types and functions used in the language but defined elsewhere
 from scenic3d.core.geometry import sin, cos, hypot, max, min
 from scenic3d.core.regions import (Region, PointSetRegion, RectangularRegion,
@@ -584,7 +584,7 @@ def FacingToward(pos):
 
 def FacingToward3D(pos):
     pos = toType(pos, Vector3D)
-    return Specifier('orientation', DelayedArgument({'position'}, lambda s: rotation_to_euler(s, pos)))
+    return Specifier('orientation', DelayedArgument({'position'}, lambda s: rotation_to_euler(Vector3D(0, 1, 0), Vector3D(pos[0], pos[1], s.position[2]) - s.position)))#rotation_to_euler(s.orientation, pos)))
 
 
 def ApparentlyFacing(heading, fromPt=None):
@@ -654,11 +654,23 @@ def Below3D(pos, dist=eps):
     return directional_spec_helper('below', pos, dist, 'height', lambda dist: (0, 0, dist),
                                    lambda self, dx, dy, dz: Vector3D(dx, dy, -self.height / 2.0 - dz))
 
+
 def OnTopOf(thing, dist=eps):
     # So...if it is a point ... then we can proceed as for above/below etc: just set the spec position of the object to be above this point based on the half height...
-    # If it is another object ... then we want the position to be a uniform point in the region on its top surface. In other words...its width / length rotated, plus the offset...
-    # If it is another *region* well...this is fine provided the other region also has width lenghth height, and an orientation...
-    # Create a cuboid region with zero height positioned and orientated at correct place...
+    if isinstance(thing, Point3D):
+        new = DelayedArgument({'height'}, lambda s: thing.position + Vector3D(0, 0, dist + s.height / 2.0))
+    if isinstance(thing, Vector3D):
+        new = DelayedArgument({'height'}, lambda s: thing + Vector3D(0, 0, dist + s.height / 2.0))
+    else:
+        new = DelayedArgument({'height'}, lambda s: uniform_distribution_from_region(top_surface_region(s, thing, dist)))
+    return Specifier('position', new)
+
+
+def top_surface_region(to_place, ref_obj, dist: float):
+    ref_top_surface = ref_obj.position + rotate_euler(Vector3D(0, 0, ref_obj.height / 2.0), ref_obj.orientation)
+    rotated_offset = rotate_euler(Vector3D(0, 0, dist + to_place.height / 2.0), ref_obj.orientation)
+    region_pos = rotated_offset + ref_top_surface
+    return CuboidRegion(region_pos, ref_obj.orientation, ref_obj.width, ref_obj.length, 0.0)
 
 
 def left_spec_helper(syntax, pos, dist, axis, to_components, make_offset):

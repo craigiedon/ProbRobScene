@@ -99,7 +99,8 @@ class Samplable(LazilyEvaluable):
             subsamples = DefaultIdentityDict()
         for child in self._conditioned._dependencies:
             if child not in subsamples:
-                subsamples[child] = child.sample(subsamples)
+                ch_sample = child.sample(subsamples)
+                subsamples[child] = ch_sample
         return self._conditioned.sampleGiven(subsamples)
 
     def sampleGiven(self, value):

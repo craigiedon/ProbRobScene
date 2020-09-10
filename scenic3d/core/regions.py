@@ -381,7 +381,7 @@ class CuboidRegion(Region):
 
     def __init__(self, position, orientation, width, length, height):
         super().__init__('Cuboid', position, orientation, width, length, height)
-        self.position = position.to_vector_3d()
+        self.position = position
         self.orientation = orientation
         self.width = width
         self.length = length
@@ -400,8 +400,9 @@ class CuboidRegion(Region):
         return cuboid_contains_point(self, point)
 
     def sampleGiven(self, value):
-        return CuboidRegion(value[self.position], value[self.orientation], value[self.width], value[self.length],
-                            value[self.height])
+        s = CuboidRegion(value[self.position], value[self.orientation], value[self.width], value[self.length],
+                         value[self.height])
+        return s
 
     def evaluateInner(self, context):
         position = value_in_context(self.position, context)

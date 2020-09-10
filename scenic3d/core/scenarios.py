@@ -158,13 +158,15 @@ def try_sample(external_sampler, dependencies, objects, workspace, active_reqs):
     except RejectionException as e:
         return None, e
 
-    obj_samples = (sample[o] for o in objects)
-    collidable = (o for o in obj_samples if not o.allowCollisions)
+    obj_samples = [sample[o] for o in objects]
+    collidable = [o for o in obj_samples if not o.allowCollisions]
 
-    if any(not workspace.region.contains_object(o) for o in obj_samples):
-        return None, 'object containment'
+    for o in obj_samples:
+        if not workspace.region.contains_object(o):
+            return None, 'object containment'
+    # if any(not workspace.region.contains_object(o) for o in obj_samples):
 
-    if any(cuboids_intersect(vi, vj) for (i, vi) in collidable for vj in collidable[:i]):
+    if any(cuboids_intersect(vi, vj) for (i, vi) in enumerate(collidable) for vj in collidable[:i]):
         return None, 'object intersection'
 
     if any(not req(sample) for req in active_reqs):

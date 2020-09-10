@@ -6,7 +6,7 @@ from scenic3d.core.vectors import offset_beyond, Vector3D
 
 
 def draw_cube(ax, pos: np.array, size: np.array, rot: np.array, color: str = 'b'):
-    r = R.from_euler('zyx', rot, degrees=True)
+    r = R.from_euler('zyx', rot, degrees=False)
 
     global_bounds = np.transpose(np.stack([pos - size / 2.0, pos + size / 2.0]))
 

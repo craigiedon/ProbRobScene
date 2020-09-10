@@ -16,7 +16,15 @@ to randomly sample colours from a vector
 """
 
 
-table = Table in workspace
-tray = Tray above (top table)
-ego = Cube above (top tray)
-c2 = Cube above (top ego)
+# So this works: when the "on" is referencing something with a fixed position
+table = Table on floor
+tray = Tray on table
+ego = Cube on tray
+c1 = Cube on tray
+c2 = Cube on tray
+
+c3 = Robot ahead of (bottom table) by 1.0, facing toward table
+
+# But if I do
+# table = Table in workspace
+# It doesn't work, as the point distribution gets nested and fails to get sampled? Why?
