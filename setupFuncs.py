@@ -30,7 +30,6 @@ def setABelowB(a_obj, b_obj, offset=None):
     a_obj.set_position([bx + offset[0], by + offset[1], bz + b_bottom - a_top + offset[2]])
 
 
-
 def setAonPos(a_obj, pos):
     if a_obj.is_model():
         a_bottom = a_obj.get_model_bounding_box()[-2]
@@ -45,9 +44,12 @@ def create_table(pr, length: float, width: float, height: float):
     print(table.get_name())
 
     # Its not @Table, its at the name of this specific table!
-    script_call("table_length_callback@{}".format(table.get_name()), sim.sim_scripttype_customizationscript, floats=[length])
-    script_call("table_width_callback@{}".format(table.get_name()), sim.sim_scripttype_customizationscript, floats=[width])
-    script_call("table_height_callback@{}".format(table.get_name()), sim.sim_scripttype_customizationscript, floats=[height])
+    script_call("table_length_callback@{}".format(table.get_name()), sim.sim_scripttype_customizationscript,
+                floats=[length])
+    script_call("table_width_callback@{}".format(table.get_name()), sim.sim_scripttype_customizationscript,
+                floats=[width])
+    script_call("table_height_callback@{}".format(table.get_name()), sim.sim_scripttype_customizationscript,
+                floats=[height])
 
     return table
 
