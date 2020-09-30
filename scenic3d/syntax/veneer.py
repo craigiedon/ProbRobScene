@@ -19,9 +19,8 @@ __all__ = (
     'DistanceFrom', 'AngleTo', 'AngleFrom', 'Follow', 'CanSee',
     # Primitive types
     'Vector', 'VectorField', 'PolygonalVectorField', 'Point3D', 'Vector3D',
-    'Region', 'PointSetRegion', 'RectangularRegion', 'CuboidRegion', 'SphericalRegion', 'PolygonalRegion',
-    'PolylineRegion',
-    'Workspace', 'Mutator',
+    'Region', 'PointSetRegion', 'RectangularRegion', 'CuboidRegion', 'SphericalRegion',
+    'Mutator',
     'Range', 'Options', 'Uniform', 'Discrete', 'Normal',
     'VerifaiParameter', 'VerifaiRange', 'VerifaiDiscreteRange', 'VerifaiOptions',
     # Constructible types
@@ -36,7 +35,7 @@ __all__ = (
     'At3D', 'In3D', 'Beyond3D', 'OffsetBy3D',
     'Facing3D', 'FacingToward3D',
     'LeftSpec3D', 'RightSpec3D', 'Ahead3D', 'Behind3D', 'Above3D', 'Below3D',
-    'Following3D', 'OnTopOf',
+    'Following3D', 'OnTopOf', 'AheadRough',
     # 3D Prefix Ops
     'Top', 'Bottom',
     # 3D Infix Operators
@@ -51,11 +50,10 @@ from scenic3d.core.distributions import Range, Options, Normal, distributionFunc
 # various Python types and functions used in the language but defined elsewhere
 from scenic3d.core.geometry import sin, cos, hypot, max, min
 from scenic3d.core.regions import (Region, PointSetRegion, RectangularRegion,
-                                   PolygonalRegion, PolylineRegion, everywhere, nowhere, CuboidRegion, SphericalRegion,
-                                   uniform_distribution_from_region)
+                                   everywhere, nowhere, CuboidRegion, SphericalRegion,
+                                   HalfSpaceRegion, PointInRegionDistribution)
 from scenic3d.core.vectors import Vector, VectorField, PolygonalVectorField, Vector3D, offset_beyond, \
     rotation_to_euler, rotate_euler, VectorField3D
-from scenic3d.core.workspaces import Workspace
 
 Uniform = lambda *opts: Options(opts)  # TODO separate these?
 Discrete = Options
@@ -69,7 +67,7 @@ import inspect
 from scenic3d.core.distributions import Distribution, to_distribution
 from scenic3d.core.type_support import isA, toType, toTypes, toScalar, toHeading, toVector
 from scenic3d.core.type_support import evaluateRequiringEqualTypes, underlyingType
-from scenic3d.core.geometry import normalizeAngle, apparentHeadingAtPoint
+from scenic3d.core.geometry import normalize_angle, apparentHeadingAtPoint
 from scenic3d.core.object_types import Constructible
 from scenic3d.core.specifiers import Specifier
 from scenic3d.core.lazy_eval import DelayedArgument
@@ -345,7 +343,7 @@ def RelativeHeading(X, Y=None):
         Y = ego().heading
     else:
         Y = toHeading(Y, '"relative heading of X from Y" with Y not a heading')
-    return normalizeAngle(X - Y)
+    return normalize_angle(X - Y)
 
 
 def ApparentHeading(X, Y=None):
@@ -448,12 +446,12 @@ def In(region):
     """
     region = toType(region, Region, 'specifier "in/on R" with R not a Region')
     extras = {'heading'} if alwaysProvidesOrientation(region) else {}
-    return Specifier('position', uniform_distribution_from_region(region), optionals=extras)
+    return Specifier('position', PointInRegionDistribution(region), optionals=extras)
 
 
 def In3D(region):
     region = toType(region, Region, 'specifier "in R" with R not a Region')
-    return Specifier('position', uniform_distribution_from_region(region))
+    return Specifier('position', PointInRegionDistribution(region))
 
 
 def alwaysProvidesOrientation(region):
@@ -514,7 +512,7 @@ def VisibleFrom(base):
     """
     if not isinstance(base, Point):
         raise RuntimeParseError('specifier "visible from O" with O not a Point')
-    return Specifier('position', uniform_distribution_from_region(base.visibleRegion))
+    return Specifier('position', PointInRegionDistribution(base.visibleRegion))
 
 
 def VisibleSpec():
@@ -584,7 +582,10 @@ def FacingToward(pos):
 
 def FacingToward3D(pos):
     pos = toType(pos, Vector3D)
-    return Specifier('orientation', DelayedArgument({'position'}, lambda s: rotation_to_euler(Vector3D(0, 1, 0), Vector3D(pos[0], pos[1], s.position[2]) - s.position)))#rotation_to_euler(s.orientation, pos)))
+    return Specifier('orientation', DelayedArgument({'position'}, lambda s: rotation_to_euler(Vector3D(0, 1, 0),
+                                                                                              Vector3D(pos[0], pos[1],
+                                                                                                       s.position[
+                                                                                                           2]) - s.position)))  # rotation_to_euler(s.orientation, pos)))
 
 
 def ApparentlyFacing(heading, fromPt=None):
@@ -662,8 +663,21 @@ def OnTopOf(thing, dist=eps):
     if isinstance(thing, Vector3D):
         new = DelayedArgument({'height'}, lambda s: thing + Vector3D(0, 0, dist + s.height / 2.0))
     else:
-        new = DelayedArgument({'height'}, lambda s: uniform_distribution_from_region(top_surface_region(s, thing, dist)))
+        new = DelayedArgument({'height'},
+                              lambda s: PointInRegionDistribution(top_surface_region(s, thing, dist)))
     return Specifier('position', new)
+
+
+def AheadRough(obj):
+    # new = DelayedArgument({'position', 'length', 'orientation'}, lambda s: uniform_distribution_from_region(front_plane(s)))
+    new = PointInRegionDistribution(front_plane(obj))
+    return Specifier('position', new)
+
+
+def front_plane(obj: Object) -> HalfSpaceRegion:
+    point = obj.position + rotate_euler(Vector3D(0, obj.length / 2.0, 0.0), obj.orientation)
+    normal = rotate_euler(Vector3D(0, 1, 0), obj.orientation)
+    return HalfSpaceRegion(point, normal, dist=5)
 
 
 def top_surface_region(to_place, ref_obj, dist: float):

@@ -51,9 +51,9 @@ import scenic3d.syntax.veneer as veneer
 from scenic3d.core.distributions import Samplable, needsSampling
 from scenic3d.core.lazy_eval import needs_lazy_evaluation
 from scenic3d.core.object_types import Constructible
+from scenic3d.core.regions import Region
 from scenic3d.core.scenarios import Scenario
 from scenic3d.core.utils import ParseError, RuntimeParseError, InvalidScenarioError
-from scenic3d.core.workspaces import Workspace
 
 
 ### THE TOP LEVEL: compiling a Scenic program
@@ -99,17 +99,17 @@ def scenarioFromFile(path, cacheImports=False):
 def scenarioFromStream(stream, filename='<stream>', path=None, cacheImports=False):
     """Compile a stream of Scenic code into a `Scenario`."""
     # Compile the code as if it were a top-level module
-    oldModules = list(sys.modules.keys())
+    old_modules = list(sys.modules.keys())
     try:
         with topLevelNamespace(path) as namespace:
             compileStream(stream, namespace, filename=filename)
     finally:
         if not cacheImports:
-            toRemove = []
+            to_remove = []
             for name, module in sys.modules.items():
-                if name not in oldModules and getattr(module, '_isScenicModule', False):
-                    toRemove.append(name)
-            for name in toRemove:
+                if name not in old_modules and getattr(module, '_isScenicModule', False):
+                    to_remove.append(name)
+            for name in to_remove:
                 del sys.modules[name]
     # Construct a Scenario from the resulting namespace
     return constructScenarioFrom(namespace)
@@ -297,6 +297,7 @@ point3dSpecifiers = {
     ('left', 'of'): 'LeftSpec3D',
     ('right', 'of'): 'RightSpec3D',
     ('ahead', 'of'): 'Ahead3D',
+    ('aheadRough', 'of'): 'AheadRough',
     ('behind',): 'Behind3D',
     ('above',): 'Above3D',
     ('below',): 'Below3D',
@@ -1306,7 +1307,7 @@ def constructScenarioFrom(namespace):
     # Extract workspace, if one is specified
     if 'workspace' in namespace:
         workspace = namespace['workspace']
-        if not isinstance(workspace, Workspace):
+        if not isinstance(workspace, Region):
             raise InvalidScenarioError(f'workspace {workspace} is not a Workspace')
         if needsSampling(workspace):
             raise InvalidScenarioError('workspace must be a fixed region')

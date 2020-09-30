@@ -3,40 +3,27 @@ import abc
 import itertools
 import math
 import random
+from typing import Optional, Tuple
 
-import numpy
-import scipy.spatial
-import shapely.geometry
-import shapely.ops
 import numpy as np
+import scipy.spatial
+from scipy.optimize import linprog
+from scipy.spatial import ConvexHull, HalfspaceIntersection
+from scipy.spatial.transform import Rotation as R
 
 from scenic3d.core.distributions import Samplable, RejectionException, needsSampling
-from scenic3d.core.geometry import headingOfSegment, triangulatePolygon, plotPolygon, polygonUnion, \
-    cuboid_contains_point
-from scenic3d.core.geometry import sin, cos, hypot, min_and_max, pointIsInCone, averageVectors
+from scenic3d.core.geometry import cuboid_contains_point
+from scenic3d.core.geometry import sin, cos, hypot, min_and_max
 from scenic3d.core.lazy_eval import value_in_context
 from scenic3d.core.type_support import toVector
-from scenic3d.core.utils import cached, areEquivalent
-from scenic3d.core.vectors import Vector, OrientedVector, VectorDistribution, Vector3D, rotate_euler
+from scenic3d.core.utils import areEquivalent
+from scenic3d.core.vectors import Vector, OrientedVector, VectorDistribution, Vector3D, rotate_euler, rotation_to_euler
 
 
-class Polygonable(abc.ABC):
+class Intersect(abc.ABC):
     @abc.abstractmethod
-    def to_poly(self):
-        pass
-
-
-def regionFromShapelyObject(obj, orientation=None):
-    """Build a 'Region' from Shapely geometry."""
-    assert obj.is_valid, obj
-    if obj.is_empty:
-        return nowhere
-    elif isinstance(obj, (shapely.geometry.Polygon, shapely.geometry.MultiPolygon)):
-        return PolygonalRegion(polygon=obj, orientation=orientation)
-    elif isinstance(obj, (shapely.geometry.LineString, shapely.geometry.MultiLineString)):
-        return PolylineRegion(polyline=obj, orientation=orientation)
-    else:
-        raise RuntimeError(f'unhandled type of Shapely geometry: {obj}')
+    def intersect(self, other):
+        raise NotImplementedError()
 
 
 class PointInRegionDistribution(VectorDistribution):
@@ -63,13 +50,6 @@ class Region(Samplable):
 
     def sampleGiven(self, value):
         return self
-
-    def intersect(self, other, tried_reversed=False):
-        """Get a `Region` representing the intersection of this one with another."""
-        if tried_reversed:
-            return IntersectionRegion(self, other)
-        else:
-            return other.intersect(self, tried_reversed=True)
 
     def uniform_point_inner(self):
         """Do the actual random sampling. Implemented by subclasses."""
@@ -105,14 +85,10 @@ class Region(Samplable):
         return f'<Region {self.name}>'
 
 
-def uniform_distribution_from_region(r: Region) -> PointInRegionDistribution:
-    return PointInRegionDistribution(r)
-
-
-class AllRegion(Region):
+class AllRegion(Region, Intersect):
     """Region consisting of all space."""
 
-    def intersect(self, other, tried_reversed=False):
+    def intersect(self, other):
         return other
 
     def contains_point(self, point):
@@ -128,10 +104,10 @@ class AllRegion(Region):
         return hash(AllRegion)
 
 
-class EmptyRegion(Region):
+class EmptyRegion(Region, Intersect):
     """Region containing no points."""
 
-    def intersect(self, other, tried_reversed=False):
+    def intersect(self, other):
         return self
 
     def uniform_point_inner(self):
@@ -157,59 +133,7 @@ everywhere = AllRegion('everywhere')
 nowhere = EmptyRegion('nowhere')
 
 
-class CircularRegion(Region, Polygonable):
-    def to_poly(self):
-        assert not (needsSampling(self.center) or needsSampling(self.radius))
-        ctr = shapely.geometry.Point(self.center)
-        return ctr.buffer(self.radius, resolution=self.resolution)
-
-    def __init__(self, center, radius, resolution=32):
-        super().__init__('Circle', center, radius)
-        self.center = center.toVector()
-        self.radius = radius
-        self.circumcircle = (self.center, self.radius)
-        self.resolution = resolution
-
-    def sampleGiven(self, value):
-        return CircularRegion(value[self.center], value[self.radius])
-
-    def evaluateInner(self, context):
-        center = value_in_context(self.center, context)
-        radius = value_in_context(self.radius, context)
-        return CircularRegion(center, radius)
-
-    def contains_point(self, point):
-        point = point.toVector()
-        return point.distanceTo(self.center) <= self.radius
-
-    def uniform_point_inner(self):
-        x, y = self.center
-        r = random.triangular(0, self.radius, self.radius)
-        t = random.uniform(-math.pi, math.pi)
-        pt = Vector(x + (r * cos(t)), y + (r * sin(t)))
-        return self.orient(pt)
-
-    def getAABB(self):
-        x, y = self.center
-        r = self.radius
-        return (x - r, y - r), (x + r, y + r)
-
-    def isEquivalentTo(self, other):
-        if type(other) is not CircularRegion:
-            return False
-        return (areEquivalent(other.center, self.center)
-                and areEquivalent(other.radius, self.radius))
-
-    def __str__(self):
-        return f'CircularRegion({self.center}, {self.radius})'
-
-
-class SphericalRegion(Region, Polygonable):
-    def to_poly(self):
-        assert not (needsSampling(self.center) or needsSampling(self.radius))
-        ctr = shapely.geometry.Point(self.center)
-        return ctr.buffer(self.radius, resolution=self.resolution)
-
+class SphericalRegion(Region):
     def __init__(self, center, radius, resolution=32):
         super().__init__('Sphere', center, radius)
         self.center = center.to_vector_3d()
@@ -254,76 +178,7 @@ class SphericalRegion(Region, Polygonable):
         return f'SphericalRegion({self.center}, {self.radius})'
 
 
-class SectorRegion(Region, Polygonable):
-    def to_poly(self):
-        assert not any(needsSampling(x) for x in (self.center, self.radius, self.heading, self.angle))
-        ctr = shapely.geometry.Point(self.center)
-        circle = ctr.buffer(self.radius, resolution=self.resolution)
-        if self.angle >= math.tau - 0.001:
-            return circle
-
-        mask = shapely.geometry.Polygon([
-            self.center,
-            self.center.offsetRadially(self.radius, self.heading + self.angle / 2),
-            self.center.offsetRadially(2 * self.radius, self.heading),
-            self.center.offsetRadially(self.radius, self.heading - self.angle / 2)
-        ])
-
-        return circle & mask
-
-    def __init__(self, center, radius, heading, angle, resolution=32):
-        super().__init__('Sector', center, radius, heading, angle)
-        self.center = center.toVector()
-        self.radius = radius
-        self.heading = heading
-        self.angle = angle
-        self.resolution = resolution
-        r = (radius / 2) * cos(angle / 2)
-        self.circumcircle = (self.center.offsetRadially(r, heading), r)
-
-    def sampleGiven(self, value):
-        return SectorRegion(value[self.center], value[self.radius],
-                            value[self.heading], value[self.angle])
-
-    def evaluateInner(self, context):
-        center = value_in_context(self.center, context)
-        radius = value_in_context(self.radius, context)
-        heading = value_in_context(self.heading, context)
-        angle = value_in_context(self.angle, context)
-        return SectorRegion(center, radius, heading, angle)
-
-    def contains_point(self, point):
-        point = point.toVector()
-        if not pointIsInCone(tuple(point), tuple(self.center), self.heading, self.angle):
-            return False
-        return point.distanceTo(self.center) <= self.radius
-
-    def uniform_point_inner(self):
-        x, y = self.center
-        heading, angle, maxDist = self.heading, self.angle, self.radius
-        r = random.triangular(0, maxDist, maxDist)
-        ha = angle / 2.0
-        t = random.uniform(-ha, ha) + (heading + (math.pi / 2))
-        pt = Vector(x + (r * cos(t)), y + (r * sin(t)))
-        return self.orient(pt)
-
-    def isEquivalentTo(self, other):
-        if type(other) is not SectorRegion:
-            return False
-        return (areEquivalent(other.center, self.center)
-                and areEquivalent(other.radius, self.radius)
-                and areEquivalent(other.heading, self.heading)
-                and areEquivalent(other.angle, self.angle))
-
-    def __str__(self):
-        return f'SectorRegion({self.center},{self.radius},{self.heading},{self.angle})'
-
-
-class RectangularRegion(Region, Polygonable):
-
-    def to_poly(self):
-        return shapely.geometry.Polygon(
-            (self.corners[0], self.corners[1], self.corners[2], self.corners[3], self.corners[0]))
+class RectangularRegion(Region):
 
     def __init__(self, position, heading, width, height):
         super().__init__('Rectangle', position, heading, width, height)
@@ -377,7 +232,120 @@ class RectangularRegion(Region, Polygonable):
         return f'RectangularRegion({self.position},{self.heading},{self.width},{self.height})'
 
 
-class CuboidRegion(Region):
+class HalfSpaceRegion(Region, Intersect):
+    def intersect(self, other):
+        if isinstance(other, CuboidRegion):
+            return intersect_cuboid_half_space(other, self)
+        if isinstance(other, HalfSpaceRegion):
+            return intersect_halfspaces(self, other)
+        if isinstance(other, ConvexPolyRegion):
+            return intersect_halfspace_convpoly(self, other)
+        if isinstance(other, EmptyRegion) or isinstance(other, AllRegion):
+            return other.intersect(self)
+
+        raise NotImplementedError("Havent yet filled in the intersection code")
+
+    def __init__(self, point: Vector3D, normal: Vector3D, dist: float = 100.0):
+        super().__init__('PlaneCast', point, normal, dist)
+        self.point = point
+        self.normal = normal
+        self.dist = dist
+        rot = rotation_to_euler(Vector3D(0, 1, 0), self.normal)
+        self.ax_1 = rotate_euler(Vector3D(1, 0, 0), rot)
+        self.ax_2 = rotate_euler(Vector3D(0, 0, 1), rot)
+
+    def uniform_point_inner(self) -> Vector3D:
+        rx_1 = random.uniform(-self.dist / 2.0, self.dist / 2.0)
+        rx_2 = random.uniform(-self.dist / 2.0, self.dist / 2.0)
+        rn = random.uniform(0, self.dist)
+        plane_point = self.point + rx_1 * self.ax_1 + rx_2 * self.ax_2
+        cast_point = plane_point + rn * self.normal
+        return cast_point
+
+    def contains_point(self, p):
+        return np.dot(self.normal, p - self.point) >= 0
+
+    def getAABB(self):
+        pass
+
+    def to_cuboid_region(self):
+        pos = self.point + self.normal * self.dist / 2.0
+        orientation = rotation_to_euler(Vector3D(0, 1, 0), self.normal)  # TODO: Confirm this is correct
+        return CuboidRegion(pos, orientation, self.dist, self.dist, self.dist)
+
+
+class ConvexPolyRegion(Region, Intersect):
+    def intersect(self, other):
+        # Cuboid, Halfspace, convexpoly, empty, any, other
+        if isinstance(other, CuboidRegion):
+            return intersect_cuboid_convpoly(other, self)
+        if isinstance(other, HalfSpaceRegion):
+            return intersect_halfspace_convpoly(other, self)
+        if isinstance(other, ConvexPolyRegion):
+            return intersect_convpolys(self, other)
+        if isinstance(other, EmptyRegion) or isinstance(other, AllRegion):
+            return other.intersect(self)
+
+        raise NotImplementedError
+
+    def __init__(self, hsi: HalfspaceIntersection):
+        super().__init__('ConvexPoly', hsi)
+        self.hsi = hsi
+        convex_hull = ConvexHull(hsi.intersections)
+        self.corners = tuple(convex_hull.points[i] for i in convex_hull.vertices)
+
+    def uniform_point_inner(self):
+        current_point = self.hsi.interior_point
+
+        for i in range(10):
+            random_direction = np.random.normal(size=3)
+            random_direction = random_direction / np.linalg.norm(random_direction)
+
+            ts = []
+            for hs_ineq in self.hsi.halfspaces:
+                hs_norm = -hs_ineq[:-1]
+
+                point_coherence = np.dot(current_point, hs_norm) - hs_ineq[-1]
+                direction_coherence = np.dot(random_direction, hs_norm)
+                if np.abs(direction_coherence) > 1e-9:
+                    ts.append(-point_coherence / direction_coherence)
+
+            ts = np.array(ts)
+            assert len(ts) > 0
+
+            if len(ts[ts > 0]) == 0 or len(ts[ts < 0]) == 0:
+                raise Exception
+            max_t = np.min(ts[ts > 0])
+            min_t = np.max(ts[ts < 0])
+
+            current_point = current_point + np.random.uniform(min_t, max_t) * random_direction
+
+        return Vector3D(*current_point)
+
+    def contains_point(self, point):
+        for hs_ineq in self.hsi.halfspaces:
+            if np.dot(point, hs_ineq[:-1]) + hs_ineq[-1] > 0:
+                return False
+        return True
+
+    def getAABB(self):
+        cs = np.array(self.corners)
+        return np.min(cs, axis=0), np.max(cs, axis=0)
+
+
+class CuboidRegion(Region, Intersect):
+
+    def intersect(self, other: Intersect):
+        if isinstance(other, CuboidRegion):
+            return intersect_cuboid_cuboid(self, other)
+        if isinstance(other, HalfSpaceRegion):
+            return intersect_cuboid_half_space(self, other)
+        if isinstance(other, ConvexPolyRegion):
+            return intersect_cuboid_convpoly(self, other)
+        if isinstance(other, EmptyRegion) or isinstance(other, AllRegion):
+            return other.intersect(self)
+
+        raise NotImplementedError(f'Have forgotten to implement intersection between {type(self)} and {type(other)}')
 
     def __init__(self, position, orientation, width, length, height):
         super().__init__('Cuboid', position, orientation, width, length, height)
@@ -396,6 +364,9 @@ class CuboidRegion(Region):
                              for offset in itertools.product((hw, -hw), (hl, -hl), (hh, -hh)))
         self.circumcircle = (self.position, self.radius)
 
+    def dimensions(self):
+        return np.array([self.width, self.length, self.height])
+
     def contains_point(self, point):
         return cuboid_contains_point(self, point)
 
@@ -412,7 +383,7 @@ class CuboidRegion(Region):
         height = value_in_context(self.height, context)
         return CuboidRegion(position, orientation, width, length, height)
 
-    def uniform_point_inner(self):
+    def uniform_point_inner(self) -> Vector3D:
         hw, hl, hh = self.hw, self.hl, self.hh
         rx = random.uniform(-hw, hw)
         ry = random.uniform(-hl, hl)
@@ -438,234 +409,6 @@ class CuboidRegion(Region):
 
     def __str__(self):
         return f'CuboidRegion({self.position},{self.orientation},{self.width},{self.length},{self.height}'
-
-
-class PolylineRegion(Region, Polygonable):
-    """Region given by one or more polylines (chain of line segments)"""
-
-    def to_poly(self):
-        return self.lineString
-
-    def __init__(self, points=None, polyline=None, orientation=True):
-        super().__init__('Polyline', orientation=orientation)
-        if points is not None:
-            points = tuple(points)
-            if len(points) < 2:
-                raise RuntimeError('tried to create PolylineRegion with < 2 points')
-            self.points = points
-            self.lineString = shapely.geometry.LineString(points)
-        elif polyline is not None:
-            if isinstance(polyline, shapely.geometry.LineString):
-                if len(polyline.coords) < 2:
-                    raise RuntimeError('tried to create PolylineRegion with <2-point LineString')
-            elif isinstance(polyline, shapely.geometry.MultiLineString):
-                if len(polyline) == 0:
-                    raise RuntimeError('tried to create PolylineRegion from empty MultiLineString')
-                for line in polyline:
-                    assert len(line.coords) >= 2
-            else:
-                raise RuntimeError('tried to create PolylineRegion from non-LineString')
-            self.lineString = polyline
-        else:
-            raise RuntimeError('must specify points or polyline for PolylineRegion')
-        if not self.lineString.is_valid:
-            raise RuntimeError('tried to create PolylineRegion with '
-                               f'invalid LineString {self.lineString}')
-        self.segments = self.segmentsOf(self.lineString)
-        cumulativeLengths = []
-        total = 0
-        for p, q in self.segments:
-            dx, dy = p[0] - q[0], p[1] - q[1]
-            total += math.hypot(dx, dy)
-            cumulativeLengths.append(total)
-        self.cumulativeLengths = cumulativeLengths
-
-    @classmethod
-    def segmentsOf(cls, lineString):
-        if isinstance(lineString, shapely.geometry.LineString):
-            segments = []
-            points = list(lineString.coords)
-            if len(points) < 2:
-                raise RuntimeError('LineString has fewer than 2 points')
-            last = points[0]
-            for point in points[1:]:
-                segments.append((last, point))
-                last = point
-            return segments
-        elif isinstance(lineString, shapely.geometry.MultiLineString):
-            allSegments = []
-            for line in lineString:
-                allSegments.extend(cls.segmentsOf(line))
-            return allSegments
-        else:
-            raise RuntimeError('called segmentsOf on non-linestring')
-
-    def uniform_point_inner(self):
-        pointA, pointB = random.choices(self.segments,
-                                        cum_weights=self.cumulativeLengths)[0]
-        interpolation = random.random()
-        x, y = averageVectors(pointA, pointB, weight=interpolation)
-        if self.orientation is True:
-            return OrientedVector(x, y, headingOfSegment(pointA, pointB))
-        else:
-            return self.orient(Vector(x, y))
-
-    def intersect(self, other, tried_reversed=False):
-        if needsSampling(other) or not isinstance(other, Polygonable):
-            return super().intersect(other, tried_reversed)
-
-        poly = other.to_poly()
-        intersection = self.lineString & poly
-        if (intersection.is_empty or
-                not isinstance(intersection, (shapely.geometry.LineString,
-                                              shapely.geometry.MultiLineString))):
-            # TODO handle points!
-            return nowhere
-        return PolylineRegion(polyline=intersection)
-
-    def contains_point(self, point):
-        return self.lineString.intersects(shapely.geometry.Point(point))
-
-    def contains_object(self, obj):
-        return False
-
-    def getAABB(self):
-        xmin, ymin, xmax, ymax = self.lineString.bounds
-        return ((xmin, ymin), (xmax, ymax))
-
-    def show(self, plt, style='r-'):
-        for pointA, pointB in self.segments:
-            plt.plot([pointA[0], pointB[0]], [pointA[1], pointB[1]], style)
-
-    def __str__(self):
-        return f'PolylineRegion({self.lineString})'
-
-    def __eq__(self, other):
-        if type(other) is not PolylineRegion:
-            return NotImplemented
-        return (other.lineString == self.lineString)
-
-    @cached
-    def __hash__(self):
-        return hash(str(self.lineString))
-
-
-class PolygonalRegion(Region, Polygonable):
-    """Region given by one or more polygons (possibly with holes)"""
-
-    def to_poly(self):
-        return self.polygons
-
-    def __init__(self, points=None, polygon=None, orientation=None):
-        super().__init__('Polygon', orientation=orientation)
-        if polygon is None and points is None:
-            raise RuntimeError('must specify points or polygon for PolygonalRegion')
-        if polygon is None:
-            points = tuple(points)
-            if len(points) == 0:
-                raise RuntimeError('tried to create PolygonalRegion from empty point list!')
-            for point in points:
-                if needsSampling(point):
-                    raise RuntimeError('only fixed PolygonalRegions are supported')
-            self.points = points
-            polygon = shapely.geometry.Polygon(points)
-
-        if isinstance(polygon, shapely.geometry.Polygon):
-            self.polygons = shapely.geometry.MultiPolygon([polygon])
-        elif isinstance(polygon, shapely.geometry.MultiPolygon):
-            self.polygons = polygon
-        else:
-            raise RuntimeError(f'tried to create PolygonalRegion from non-polygon {polygon}')
-        if not self.polygons.is_valid:
-            raise RuntimeError('tried to create PolygonalRegion with '
-                               f'invalid polygon {self.polygons}')
-
-        if points is None and len(self.polygons) == 1 and len(self.polygons[0].interiors) == 0:
-            self.points = tuple(self.polygons[0].exterior.coords[:-1])
-
-        if self.polygons.is_empty:
-            raise RuntimeError('tried to create empty PolygonalRegion')
-
-        triangles = []
-        for polygon in self.polygons:
-            triangles.extend(triangulatePolygon(polygon))
-        assert len(triangles) > 0, self.polygons
-        self.trianglesAndBounds = tuple((tri, tri.bounds) for tri in triangles)
-        areas = (triangle.area for triangle in triangles)
-        self.cumulativeTriangleAreas = tuple(itertools.accumulate(areas))
-
-    def uniform_point_inner(self):
-        triangle, bounds = random.choices(
-            self.trianglesAndBounds,
-            cum_weights=self.cumulativeTriangleAreas)[0]
-        minx, miny, maxx, maxy = bounds
-        # TODO improve?
-        while True:
-            x, y = random.uniform(minx, maxx), random.uniform(miny, maxy)
-            if triangle.intersects(shapely.geometry.Point(x, y)):
-                return self.orient(Vector(x, y))
-
-    def intersect(self, other, tried_reversed=False):
-        if not isinstance(other, Polygonable) or needsSampling(other):
-            return super().intersect(other, tried_reversed)
-
-        poly = other.to_poly()
-        orientation = other.orientation if self.orientation is None else self.orientation
-        intersection = self.polygons & poly
-        if intersection.is_empty:
-            return nowhere
-        elif isinstance(intersection, (shapely.geometry.Polygon,
-                                       shapely.geometry.MultiPolygon)):
-            return PolygonalRegion(polygon=intersection, orientation=orientation)
-        elif isinstance(intersection, shapely.geometry.GeometryCollection):
-            polys = []
-            for geom in intersection:
-                if isinstance(geom, shapely.geometry.Polygon):
-                    polys.append(geom)
-            if len(polys) == 0:
-                # TODO handle points, lines
-                raise RuntimeError('unhandled type of polygon intersection')
-            intersection = shapely.geometry.MultiPolygon(polys)
-            return PolygonalRegion(polygon=intersection, orientation=orientation)
-        else:
-            # TODO handle points, lines
-            raise RuntimeError('unhandled type of polygon intersection')
-
-    def union(self, other):
-        assert isinstance(other, Polygonable) and not needsSampling(other)
-        union = polygonUnion((self.polygons, other.to_poly()))
-        return PolygonalRegion(polygon=union)
-
-    def contains_point(self, point):
-        return self.polygons.intersects(shapely.geometry.Point(point))
-
-    def contains_object(self, obj):
-        objPoly = obj.polygon
-        if objPoly is None:
-            raise RuntimeError('tried to test containment of symbolic Object!')
-        # TODO improve boundary handling?
-        return self.polygons.contains(objPoly)
-
-    def getAABB(self):
-        xmin, xmax, ymin, ymax = self.polygons.bounds
-        return ((xmin, ymin), (xmax, ymax))
-
-    def show(self, plt, style='r-'):
-        plotPolygon(self.polygons, plt, style=style)
-
-    def __str__(self):
-        return '<PolygonalRegion>'
-
-    def __eq__(self, other):
-        if type(other) is not PolygonalRegion:
-            return NotImplemented
-        return (other.polygons == self.polygons
-                and other.orientation == self.orientation)
-
-    @cached
-    def __hash__(self):
-        # TODO better way to hash mutable Shapely geometries? (also for PolylineRegion)
-        return hash((str(self.polygons), self.orientation))
 
 
 class PointSetRegion(Region):
@@ -699,22 +442,9 @@ class PointSetRegion(Region):
     def uniform_point_inner(self):
         return self.orient(Vector(*random.choice(self.points)))
 
-    def intersect(self, other, tried_reversed=False):
-        def sampler(intRegion):
-            o = intRegion.regions[1]
-            center, radius = o.circumcircle
-            possibles = (Vector(*self.kdTree.data[i])
-                         for i in self.kdTree.query_ball_point(center, radius))
-            intersection = [p for p in possibles if o.contains_point(p)]
-            if len(intersection) == 0:
-                raise RejectionException(f'empty intersection of Regions {self} and {o}')
-            return self.orient(random.choice(intersection))
-
-        return IntersectionRegion(self, other, sampler=sampler, orientation=self.orientation)
-
     def contains_point(self, point):
         distance, location = self.kdTree.query(point)
-        return (distance <= self.tolerance)
+        return distance <= self.tolerance
 
     def contains_object(self, obj):
         raise NotImplementedError()
@@ -730,128 +460,145 @@ class PointSetRegion(Region):
         return hash((self.name, self.points, self.orientation))
 
 
-class GridRegion(PointSetRegion):
-    """A Region given by an obstacle grid.
+def intersect_cuboid_cuboid(c1: CuboidRegion, c2: CuboidRegion) -> Region:
+    if c1.contains_object(c2):
+        return c2
+    if c2.contains_object(c1):
+        return c1
 
-    A point is considered to be in a `GridRegion` if the nearest grid point is
-    not an obstacle.
+    hs_1 = cube_to_hsi(np.array(c1.position, dtype=float), c1.dimensions(), np.array(c1.orientation, dtype=float))
+    hs_2 = cube_to_hsi(np.array(c2.position, dtype=float), c2.dimensions(), np.array(c2.orientation, dtype=float))
+    hs_intersection = intersect_hsis(hs_1, hs_2)
 
-    Args:
-        name (str): name for debugging
-        grid: 2D list, tuple, or NumPy array of 0s and 1s, where 1 indicates an obstacle
-          and 0 indicates free space
-        Ax (float): spacing between grid points along X axis
-        Ay (float): spacing between grid points along Y axis
-        Bx (float): X coordinate of leftmost grid column
-        By (float): Y coordinate of lowest grid row
-        orientation (:obj:`~scenic3d.core.vectors.VectorField`, optional): orientation of region
-    """
+    if hs_intersection is None:
+        return EmptyRegion("Empty")
 
-    def __init__(self, name, grid, Ax, Ay, Bx, By, orientation=None):
-        self.grid = numpy.array(grid)
-        self.sizeY, self.sizeX = self.grid.shape
-        self.Ax, self.Ay = Ax, Ay
-        self.Bx, self.By = Bx, By
-        y, x = numpy.where(self.grid == 0)
-        points = [self.gridToPoint(point) for point in zip(x, y)]
-        super().__init__(name, points, orientation=orientation)
-
-    def gridToPoint(self, gp):
-        x, y = gp
-        return ((self.Ax * x) + self.Bx, (self.Ay * y) + self.By)
-
-    def pointToGrid(self, point):
-        x, y = point
-        x = (x - self.Bx) / self.Ax
-        y = (y - self.By) / self.Ay
-        nx = int(round(x))
-        if nx < 0 or nx >= self.sizeX:
-            return None
-        ny = int(round(y))
-        if ny < 0 or ny >= self.sizeY:
-            return None
-        return (nx, ny)
-
-    def contains_point(self, point):
-        gp = self.pointToGrid(point)
-        if gp is None:
-            return False
-        x, y = gp
-        return (self.grid[y, x] == 0)
-
-    def contains_object(self, obj):
-        # TODO improve this procedure!
-        # Fast check
-        for c in obj.corners:
-            if not self.contains_point(c):
-                return False
-        # Slow check
-        gps = [self.pointToGrid(corner) for corner in obj.corners]
-        x, y = zip(*gps)
-        minx, maxx = min_and_max(x)
-        miny, maxy = min_and_max(y)
-        for x in range(minx, maxx + 1):
-            for y in range(miny, maxy + 1):
-                p = self.gridToPoint((x, y))
-                if self.grid[y, x] == 1 and obj.contains_point(p):
-                    return False
-        return True
+    return ConvexPolyRegion(hs_intersection)
 
 
-class IntersectionRegion(Region):
-    def __init__(self, *regions, orientation=None, sampler=None):
-        self.regions = tuple(regions)
-        if len(self.regions) < 2:
-            raise RuntimeError('tried to take intersection of fewer than 2 regions')
-        super().__init__('Intersection', *self.regions, orientation=orientation)
-        if sampler is None:
-            sampler = self.genericSampler
-        self.sampler = sampler
+def intersect_cuboid_half_space(c1: CuboidRegion, c2: HalfSpaceRegion) -> Region:
+    if c2.contains_object(c1):
+        return c1
 
-    def sampleGiven(self, value):
-        regs = [value[reg] for reg in self.regions]
-        # Now that regions have been sampled, attempt intersection again in the hopes
-        # there is a specialized sampler to handle it (unless we already have one)
-        if self.sampler is self.genericSampler:
-            failed = False
-            intersection = regs[0]
-            for region in regs[1:]:
-                intersection = intersection.intersect(region)
-                if isinstance(intersection, IntersectionRegion):
-                    failed = True
-                    break
-            if not failed:
-                intersection.orientation = value[self.orientation]
-                return intersection
-        return IntersectionRegion(*regs, orientation=value[self.orientation],
-                                  sampler=self.sampler)
+    # Otherwise we have to actually do the work:
+    # So turn the cuboid into some halfspace inequalities, turn the halfspace class into the correct form, find a feasible point, and smoosh them all together
+    hs_1 = cube_to_hsi(np.array(c1.position), c1.dimensions(), np.array(c1.orientation)).halfspaces
+    hs_2 = halfspaces_to_inequalities(np.array(c2.normal), np.array(c2.point))
 
-    def evaluateInner(self, context):
-        regs = (value_in_context(reg, context) for reg in self.regions)
-        orientation = value_in_context(self.orientation, context)
-        return IntersectionRegion(*regs, orientation=orientation, sampler=self.sampler)
+    hs_intersection = intersect_hs_ineqs(np.vstack(hs_1, hs_2))
 
-    def contains_point(self, point):
-        return all(region.contains_point(point) for region in self.regions)
+    if hs_intersection is None:
+        return EmptyRegion("Empty")
 
-    def uniform_point_inner(self):
-        return self.orient(self.sampler(self))
+    return ConvexPolyRegion(hs_intersection)
 
-    @staticmethod
-    def genericSampler(intersection):
-        regs = intersection.regions
-        point = regs[0].uniform_point_inner()
-        for region in regs[1:]:
-            if not region.contains_point(point):
-                raise RejectionException(
-                    f'sampling intersection of Regions {regs[0]} and {region}')
-        return point
 
-    def isEquivalentTo(self, other):
-        if type(other) is not IntersectionRegion:
-            return False
-        return (areEquivalent(set(other.regions), set(self.regions))
-                and other.orientation == self.orientation)
+def intersect_cuboid_convpoly(r1: CuboidRegion, r2: ConvexPolyRegion) -> Region:
+    if r1.contains_object(r2):
+        return r2
+    if r2.contains_object(r1):
+        return r1
 
-    def __str__(self):
-        return f'IntersectionRegion({self.regions})'
+    hs_1 = cube_to_hsi(np.array(r1.position), r1.dimensions(), np.array(r1.orientation))
+    hs_2 = r2.hsi
+    hs_intersection = intersect_hsis(hs_1, hs_2)
+
+    if hs_intersection is None:
+        return EmptyRegion("Empty")
+
+    return ConvexPolyRegion(hs_intersection)
+
+
+def intersect_halfspaces(r1: HalfSpaceRegion, r2: HalfSpaceRegion) -> Region:
+    c1 = r1.to_cuboid_region()
+    c2 = r2.to_cuboid_region()
+
+    hs_1 = cube_to_hsi(np.array(c1.position), c1.dimensions(), np.array(c1.orientation))
+    hs_2 = cube_to_hsi(np.array(c2.position), c2.dimensions(), np.array(c2.orientation))
+
+    hs_intersection = intersect_hsis(hs_1, hs_2)
+
+    if hs_intersection is None:
+        return EmptyRegion("Empty")
+
+    return ConvexPolyRegion(hs_intersection)
+
+
+def intersect_halfspace_convpoly(r1: HalfSpaceRegion, r2: ConvexPolyRegion) -> Region:
+    r1_hs = halfspaces_to_inequalities(np.array([r1.normal]), np.array([r1.point]))
+    cp_halfspaces = r2.hsi.halfspaces
+    hs_intersection = intersect_hs_ineqs(np.vstack((r1_hs, cp_halfspaces)))
+
+    if hs_intersection is None:
+        return EmptyRegion("Empty")
+
+    return ConvexPolyRegion(hs_intersection)
+
+
+def intersect_convpolys(r1: ConvexPolyRegion, r2: ConvexPolyRegion) -> Region:
+    hs_intersection = intersect_hsis(r1.hsi, r2.hsi)
+
+    if hs_intersection is None:
+        return EmptyRegion("empty")
+
+    return ConvexPolyRegion(hs_intersection)
+
+
+def cube_to_hsi(cube_centre: np.ndarray, cube_dims: np.ndarray, cube_rot: np.ndarray) -> HalfspaceIntersection:
+    hs_norms, hs_origins = cube_to_normals(cube_centre, cube_dims, cube_rot)
+    hs_ineqs = halfspaces_to_inequalities(hs_norms, hs_origins)
+    return HalfspaceIntersection(hs_ineqs, cube_centre)
+
+
+def cube_to_normals(cube_centre: np.ndarray, cube_dims: np.ndarray, cube_rot: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
+    r = R.from_euler('zyx', cube_rot, degrees=False)
+    face_offsets = r.apply(np.vstack([
+        np.diag(cube_dims / 2.0),
+        np.diag(-cube_dims / 2.0)
+    ]))
+
+    halfspace_normals = r.apply(np.vstack([
+        np.diag(-np.ones(3)),
+        np.diag(np.ones(3))
+    ]))
+
+    halfspace_origins = np.tile(cube_centre, (6, 1)) + face_offsets
+
+    return halfspace_normals, halfspace_origins
+
+
+def halfspaces_to_inequalities(hs_normals: np.ndarray, hs_origins: np.ndarray) -> np.ndarray:
+    """ Converts halfspace normals and origins to Ax + b <= 0 format """
+    hs_bs = np.array([np.dot(hs_normals[i], hs_origins[i])
+                      for i in range(len(hs_normals))]).reshape((-1, 1))
+    return np.append(-hs_normals, hs_bs, axis=1)
+
+
+def feasible_point(hs_ineqs: np.ndarray) -> Optional[np.array]:
+    coefficients = np.zeros(hs_ineqs.shape[1])
+    coefficients[-1] = -1
+    bounds = [(None, None) for i in range(len(coefficients) - 1)] + [(1e-5, None)]  # Intersection must have non-zero volume
+    A = hs_ineqs[:, :-1]
+    A_row_norms = np.linalg.norm(A, axis=1).reshape(-1, 1)
+    b = -hs_ineqs[:, -1]
+
+    result = linprog(coefficients, A_ub=np.hstack((A, A_row_norms)), b_ub=b, bounds=bounds)
+
+    if result.success:
+        return result.x[:-1]
+    elif result.status == 2:  # Infeasible, empty intersection
+        return None
+    else:
+        raise ValueError("Feasible point finder failed! Likely because problem is unbounded (or too difficult?)")
+
+
+def intersect_hsis(hs_1: HalfspaceIntersection, hs_2: HalfspaceIntersection) -> Optional[HalfspaceIntersection]:
+    combined_halfspaces = np.vstack((hs_1.halfspaces, hs_2.halfspaces))
+    return intersect_hs_ineqs(combined_halfspaces)
+
+
+def intersect_hs_ineqs(hs_ineqs: np.ndarray) -> Optional[HalfspaceIntersection]:
+    fsp = feasible_point(hs_ineqs)
+    if fsp is None:
+        return None
+    return HalfspaceIntersection(hs_ineqs, fsp)

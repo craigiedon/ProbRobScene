@@ -9,7 +9,7 @@ import shapely.geos
 import scenic3d.core.regions as regions
 from scenic3d.core.distributions import (Samplable, MethodDistribution, OperatorDistribution,
                                          supportInterval, underlyingFunction)
-from scenic3d.core.geometry import normalizeAngle, polygonUnion, Polygonable
+from scenic3d.core.geometry import normalize_angle
 from scenic3d.core.utils import InvalidScenarioError
 from scenic3d.core.vectors import VectorField, PolygonalVectorField, VectorMethodDistribution
 from scenic3d.syntax.relations import RelativeHeadingRelation, DistanceRelation
@@ -75,47 +75,22 @@ def prune(scenario, verbosity=1):
         print(f'  Pruned scenario in {total_time:.4g} seconds.')
 
 
-def prunable(obj, scenario) -> bool:
-    return (isinstance(obj.position, regions.PointInRegionDistribution) and
-            isinstance(obj.position.region, Polygonable) and
-            isinstance(scenario.workspace.region, Polygonable))
-
-
 def prune_containment(scenario, verbosity):
-    """Prune based on the requirement that individual Objects fit within their container.
-
-    Specifically, if O is positioned uniformly in region B and has container C, then we
-    can instead pick a position uniformly in their intersection. If we can also lower
-    bound the radius of O, then we can first erode C by that distance.
-    """
-
-    for obj in (x for x in scenario.objects if prunable(x, scenario)):
+    prunable = [x for x in scenario.objects
+                if isinstance(x.position, regions.PointInRegionDistribution)
+                and isinstance(x.position.region, regions.Intersect)]
+    for obj in prunable:
         base = obj.position.region
-        base_poly = base.to_poly()
-        container = scenario.workspace.region
-        container_poly = container.to_poly()
+        container = scenario.workspace
+        new_base = base.intersect(container)
 
-        min_radius, _ = supportInterval(obj.inradius)
-        if min_radius is not None:  # if we can lower bound the radius, erode the container
-            container_poly = container_poly.buffer(-min_radius)
-        elif base is container:
-            continue
+        if isinstance(new_base, regions.EmptyRegion):
+            raise InvalidScenarioError(f'Object {obj} does not intersect with {container}')
 
-        # Here is actually the functionality of this function! Intersect the base poly region with the containing region
-        new_base_poly = base_poly & container_poly  # restrict the base Region to the container
-        if new_base_poly.is_empty:
-            raise InvalidScenarioError(f'Object {obj} does not fit in container')
+        # TODO: Calculate volume of convex poly? Probs not possible with infinite vol halfspaces...
+        # TODO: If we can lower-bound the radius of O, then we can first erode container by that distance...
 
-        if verbosity >= 1:
-            if base_poly.area > 0:
-                ratio = new_base_poly.area / base_poly.area
-            else:
-                ratio = new_base_poly.length / base_poly.length
-            percent = 100 * (1.0 - ratio)
-            print(f'    Region containment constraint pruned {percent:.1f}% of space.')
-
-        new_base = regions.regionFromShapelyObject(new_base_poly, orientation=base.orientation)
-        new_pos = regions.uniform_distribution_from_region(new_base)
+        new_pos = regions.PointInRegionDistribution(new_base)
         obj.position.conditionTo(new_pos)
 
 
@@ -175,7 +150,7 @@ def prune_relative_heading(scenario, verbosity):
         if newBasePoly is not basePoly:
             newBase = regions.PolygonalRegion(polygon=newBasePoly,
                                               orientation=base.orientation)
-            newPos = regions.uniform_distribution_from_region(newBase)
+            newPos = regions.PointInRegionDistribution(newBase)
             obj.position.conditionTo(newPos)
 
 
@@ -248,13 +223,13 @@ def relativeHeadingRange(baseHeading, offsetL, offsetR,
     """Lower/upper bound the possible RH between two headings with bounded disturbances."""
     if baseHeading is None or targetHeading is None:  # heading may not be constant within cell
         return -math.pi, math.pi
-    lower = normalizeAngle(baseHeading + offsetL)
-    upper = normalizeAngle(baseHeading + offsetR)
+    lower = normalize_angle(baseHeading + offsetL)
+    upper = normalize_angle(baseHeading + offsetR)
     points = [lower, upper]
     if upper < lower:
         points.extend((math.pi, -math.pi))
-    tLower = normalizeAngle(targetHeading + tOffsetL)
-    tUpper = normalizeAngle(targetHeading + tOffsetR)
+    tLower = normalize_angle(targetHeading + tOffsetL)
+    tUpper = normalize_angle(targetHeading + tOffsetR)
     tPoints = [tLower, tUpper]
     if tUpper < tLower:
         tPoints.extend((math.pi, -math.pi))

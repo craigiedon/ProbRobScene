@@ -6,8 +6,9 @@ from scenic3d.core.distributions import Samplable, RejectionException, needsSamp
 from scenic3d.core.external_params import ExternalSampler
 from scenic3d.core.geometry import cuboids_intersect
 from scenic3d.core.lazy_eval import needs_lazy_evaluation
-from scenic3d.core.utils import areEquivalent, InvalidScenarioError
-from scenic3d.core.workspaces import Workspace
+from scenic3d.core.regions import Region
+from scenic3d.core.utils import areEquivalent, InvalidScenarioError, RuntimeParseError
+import numpy as np
 
 
 class Scene:
@@ -31,7 +32,7 @@ class Scene:
         import matplotlib.pyplot as plt
         fig = plt.figure()
         ax = fig.add_subplot(111, projection='3d')
-        self.workspace.show_3d(ax)
+        show_3d_workspace(ax, self.workspace)
 
         print("Num objects:", len(self.objects))
         for obj in self.objects:
@@ -49,7 +50,7 @@ class Scene:
             obj.show(self.workspace, plt, highlight=(obj is self.egoObject))
         # zoom in if requested
         if zoom is not None:
-            self.workspace.zoomAround(plt, self.objects, expansion=zoom)
+            self.workspace.zoom_around(plt, self.objects, expansion=zoom)
         plt.show(block=block)
 
 
@@ -64,16 +65,13 @@ class Scenario:
                  objects, ego_object,
                  params, external_params,
                  requirements, requirement_deps):
-        if workspace is None:
-            workspace = Workspace()  # default empty workspace
+        assert workspace is not None
+
+        if needsSampling(workspace):
+            raise RuntimeParseError('workspace region must be fixed')
+
         self.workspace = workspace
-        ordered = []
-        for obj in objects:
-            ordered.append(obj)
-            if obj is ego_object:  # make ego the first object
-                ordered[0], ordered[-1] = ordered[-1], ordered[0]
-        assert ordered[0] is ego_object
-        self.objects = tuple(ordered)
+        self.objects = tuple([ego_object] + [o for o in objects if o is not ego_object]) # Make sure ego_object is first in order
         self.egoObject = ego_object
         self.params = dict(params)
         self.externalParams = tuple(external_params)
@@ -97,7 +95,6 @@ class Scenario:
     def validate(self):
         """Make some simple static checks for inconsistent built-in requirements."""
         objects = self.objects
-        static_visibility = not needsSampling(self.egoObject.visibleRegion)
         static_bounds = [has_static_bounds(obj) for obj in objects]
         for i in range(len(objects)):
             oi = objects[i]
@@ -162,9 +159,8 @@ def try_sample(external_sampler, dependencies, objects, workspace, active_reqs):
     collidable = [o for o in obj_samples if not o.allowCollisions]
 
     for o in obj_samples:
-        if not workspace.region.contains_object(o):
+        if not workspace.contains_object(o):
             return None, 'object containment'
-    # if any(not workspace.region.contains_object(o) for o in obj_samples):
 
     if any(cuboids_intersect(vi, vj) for (i, vi) in enumerate(collidable) for vj in collidable[:i]):
         return None, 'object intersection'
@@ -173,3 +169,29 @@ def try_sample(external_sampler, dependencies, objects, workspace, active_reqs):
         return None, 'user-specified requirement'
 
     return sample, None
+
+
+def show_3d_workspace(ax, workspace: Region):
+    aabb = workspace.getAABB()
+
+    min_coords, max_coords = aabb
+    total_min, total_max = np.min(min_coords), np.max(max_coords)
+
+    ax.set_xlim(total_min, total_max)
+    ax.set_ylim(total_min, total_max)
+    ax.set_zlim(total_min, total_max)
+
+# def zoom_around(workspace: Region, plt, objects, expansion=2):
+#     """Zoom the schematic around the specified objects"""
+#     positions = (obj.position for obj in objects)
+#     x, y = zip(*positions)
+#     minx, maxx = min_and_max(x)
+#     miny, maxy = min_and_max(y)
+#     sx = expansion * (maxx - minx)
+#     sy = expansion * (maxy - miny)
+#     s = max(sx, sy) / 2.0
+#     s += max(max(obj.width, obj.height) for obj in objects)  # TODO improve
+#     cx = (maxx + minx) / 2.0
+#     cy = (maxy + miny) / 2.0
+#     plt.xlim(cx - s, cx + s)
+#     plt.ylim(cy - s, cy + s)

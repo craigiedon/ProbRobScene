@@ -13,7 +13,7 @@ from scipy.spatial.transform import Rotation as R
 import scenic3d.core.utils as utils
 from scenic3d.core.distributions import (Samplable, Distribution, MethodDistribution,
                                          needsSampling, makeOperatorHandler, distributionMethod, distributionFunction)
-from scenic3d.core.geometry import normalizeAngle
+from scenic3d.core.geometry import normalize_angle
 from scenic3d.core.lazy_eval import value_in_context, needs_lazy_evaluation, makeDelayedFunctionCall
 
 
@@ -204,7 +204,7 @@ class Vector(Samplable, collections.abc.Sequence):
     @scalarOperator
     def angleTo(self, other):
         dx, dy = other.toVector() - self
-        return normalizeAngle(math.atan2(dy, dx) - (math.pi / 2))
+        return normalize_angle(math.atan2(dy, dx) - (math.pi / 2))
 
     @vectorOperator
     def __add__(self, other):
@@ -287,6 +287,20 @@ class Vector3D(Samplable, collections.abc.Sequence):
     @vectorOperator
     def __rsub__(self, other):
         return Vector3D(other[0] - self[0], other[1] - self[1], other[2] - self[2])
+
+    @vectorOperator
+    def __mul__(self, other):
+        if isinstance(other, (int, float)):
+            return Vector3D(self[0] * other, self[1] * other, self[2] * other)
+        raise ValueError(
+            f"Multiplication of Vector3D by {type(other)} --- Only multiplication by real scalars is currently supported")
+
+    @vectorOperator
+    def __rmul__(self, other):
+        if isinstance(other, (int, float)):
+            return Vector3D(self[0] * other, self[1] * other, self[2] * other)
+        raise ValueError(
+            f"Multiplication of Vector3D by {type(other)} --- Only multiplication by real scalars is currently supported")
 
     def __len__(self):
         return len(self.coordinates)

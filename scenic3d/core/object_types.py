@@ -10,7 +10,7 @@ import numpy as np
 from scenic3d.core.distributions import Samplable, needsSampling, to_distribution
 from scenic3d.core.geometry import averageVectors, hypot, min
 from scenic3d.core.lazy_eval import needs_lazy_evaluation
-from scenic3d.core.regions import CircularRegion, SectorRegion, SphericalRegion
+from scenic3d.core.regions import SphericalRegion
 from scenic3d.core.specifiers import Specifier, PropertyDefault
 from scenic3d.core.type_support import toVector, toScalar, toType
 from scenic3d.core.utils import areEquivalent, RuntimeParseError
@@ -396,7 +396,6 @@ class Object(OrientedPoint3D):
 
         self.corners = tuple(self.position + rotate_euler(Vector3D(*offset), self.orientation)
                              for offset in itertools.product((hw, -hw), (hl, -hl), (hh, -hh)))
-        # self.corners = (self.frontRight.toVector(), self.frontLeft.toVector(), self.backLeft.toVector(), self.backRight.toVector())
         # camera = self.position.offsetRotated(self.heading, self.cameraOffset)
         # self.visibleRegion = SectorRegion(camera, self.visibleDistance, self.heading, self.viewAngle)
         self._relations = []
@@ -408,41 +407,3 @@ class Object(OrientedPoint3D):
         color = self.color if hasattr(self, 'color') else (1, 0, 0)
         draw_cube(ax, np.array([*self.position]), np.array([self.width, self.length, self.height]),
                   np.array([*self.orientation]), color=color)
-
-        # # corners = self.corners  # TODO: Make a corners 3d to take in height, width, length etc.
-        # draw_cube(ax, np.array([*self.position, 0.0]), np.array([self.width, self.height, 1.0]),
-        #           np.array([self.heading, 0.0, 0.0]),
-        #           color=color)  # TODO: Can you do an api that works with corners? This seems like what scenic is going for...
-
-    def show(self, workspace, plt, highlight=False):
-        if needsSampling(self):
-            raise RuntimeError('tried to show() symbolic Object')
-        pos = self.position
-        spos = workspace.scenicToSchematicCoords(pos)
-
-        if highlight:
-            # Circle around object
-            rad = 1.5 * max(self.width, self.height)
-            c = plt.Circle(spos, rad, color='g', fill=False)
-            plt.gca().add_artist(c)
-            # View cone
-            ha = self.viewAngle / 2.0
-            camera = self.position.offsetRotated(self.heading, self.cameraOffset)
-            cpos = workspace.scenicToSchematicCoords(camera)
-            for angle in (-ha, ha):
-                p = camera.offsetRadially(20, self.heading + angle)
-                edge = [cpos, workspace.scenicToSchematicCoords(p)]
-                x, y = zip(*edge)
-                plt.plot(x, y, 'b:')
-
-        corners = [workspace.scenicToSchematicCoords(corner) for corner in self.corners]
-        x, y = zip(*corners)
-        color = self.color if hasattr(self, 'color') else (1, 0, 0)
-        plt.fill(x, y, color=color)
-
-        frontMid = averageVectors(corners[0], corners[1])
-        baseTriangle = [frontMid, corners[2], corners[3]]
-        triangle = [averageVectors(p, spos, weight=0.5) for p in baseTriangle]
-        x, y = zip(*triangle)
-        plt.fill(x, y, "w")
-        plt.plot(x + (x[0],), y + (y[0],), color="k", linewidth=1)

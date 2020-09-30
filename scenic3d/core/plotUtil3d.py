@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 from scipy.spatial.transform import Rotation as R
 
 from scenic3d.core.vectors import offset_beyond, Vector3D
@@ -22,6 +23,12 @@ def draw_cube(ax, pos: np.array, size: np.array, rot: np.array, color: str = 'b'
             rotated = np.moveaxis(rotated, 2, 0)
 
             ax.plot_surface(*rotated, alpha=0.5, color=color, edgecolor='black')
+
+
+def draw_polyhedron(ax, points: np.array, faces: np.array, color: str = 'b', alpha=1.0):
+    for face in faces:
+        face_points = np.array([points[i] for i in face])
+        ax.add_collection3d(Poly3DCollection(face_points, color=color, edgecolor='black', alpha=alpha))
 
 
 if __name__ == "__main__":
