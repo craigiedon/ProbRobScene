@@ -669,7 +669,6 @@ def OnTopOf(thing, dist=eps):
 
 
 def AheadRough(obj):
-    # new = DelayedArgument({'position', 'length', 'orientation'}, lambda s: uniform_distribution_from_region(front_plane(s)))
     new = PointInRegionDistribution(front_plane(obj))
     return Specifier('position', new)
 
@@ -677,7 +676,7 @@ def AheadRough(obj):
 def front_plane(obj: Object) -> HalfSpaceRegion:
     point = obj.position + rotate_euler(Vector3D(0, obj.length / 2.0, 0.0), obj.orientation)
     normal = rotate_euler(Vector3D(0, 1, 0), obj.orientation)
-    return HalfSpaceRegion(point, normal, dist=5)
+    return HalfSpaceRegion(point, normal)
 
 
 def top_surface_region(to_place, ref_obj, dist: float):

@@ -4,10 +4,6 @@ import math
 import warnings
 
 import numpy as np
-import pypoly2tri
-import shapely.geometry
-import shapely.ops
-
 import scenic3d.core.utils as utils
 from scenic3d.core.distributions import (needsSampling, distributionFunction,
                                          monotonicDistributionFunction)
@@ -26,7 +22,7 @@ def cos(x):
 
 @monotonicDistributionFunction
 def hypot(x, y, z):
-    return math.hypot(x, y, z)
+    return math.sqrt(x * x + y * y + z * z)
 
 
 @monotonicDistributionFunction
@@ -112,6 +108,8 @@ def cuboid_contains_point(obj, point):
     from scenic3d.core.vectors import rotate_euler
     from scenic3d.core.vectors import reverse_euler
     diff = point - obj.position
+    need_to_sample = needsSampling(obj)
+    need_to_lazy = needs_lazy_evaluation(obj)
     x, y, z = rotate_euler(diff, reverse_euler(obj.orientation))
     return abs(x) <= obj.hw and abs(y) <= obj.hl and abs(z) <= obj.hh
 

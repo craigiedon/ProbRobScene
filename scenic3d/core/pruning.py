@@ -3,9 +3,6 @@
 import math
 import time
 
-import shapely.geometry
-import shapely.geos
-
 import scenic3d.core.regions as regions
 from scenic3d.core.distributions import (Samplable, MethodDistribution, OperatorDistribution,
                                          supportInterval, underlyingFunction)
@@ -88,7 +85,10 @@ def prune_containment(scenario, verbosity):
             raise InvalidScenarioError(f'Object {obj} does not intersect with {container}')
 
         # TODO: Calculate volume of convex poly? Probs not possible with infinite vol halfspaces...
-        # TODO: If we can lower-bound the radius of O, then we can first erode container by that distance...
+
+        # TODO: if we can lower bound the radius, erode the container
+        # if (minRadius := supportInterval(obj.inradius)[0]) is not None:
+        #     container = erode(container, minRadius)
 
         new_pos = regions.PointInRegionDistribution(new_base)
         obj.position.conditionTo(new_pos)

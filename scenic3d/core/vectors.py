@@ -7,7 +7,6 @@ import math
 from math import sin, cos
 
 import numpy as np
-import shapely.geometry
 from scipy.spatial.transform import Rotation as R
 
 import scenic3d.core.utils as utils

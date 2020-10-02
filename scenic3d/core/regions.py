@@ -11,7 +11,7 @@ from scipy.optimize import linprog
 from scipy.spatial import ConvexHull, HalfspaceIntersection
 from scipy.spatial.transform import Rotation as R
 
-from scenic3d.core.distributions import Samplable, RejectionException, needsSampling
+from scenic3d.core.distributions import Samplable, RejectionException, needsSampling, distributionFunction
 from scenic3d.core.geometry import cuboid_contains_point
 from scenic3d.core.geometry import sin, cos, hypot, min_and_max
 from scenic3d.core.lazy_eval import value_in_context
@@ -460,6 +460,7 @@ class PointSetRegion(Region):
         return hash((self.name, self.points, self.orientation))
 
 
+@distributionFunction
 def intersect_cuboid_cuboid(c1: CuboidRegion, c2: CuboidRegion) -> Region:
     if c1.contains_object(c2):
         return c2
@@ -476,6 +477,7 @@ def intersect_cuboid_cuboid(c1: CuboidRegion, c2: CuboidRegion) -> Region:
     return ConvexPolyRegion(hs_intersection)
 
 
+@distributionFunction
 def intersect_cuboid_half_space(c1: CuboidRegion, c2: HalfSpaceRegion) -> Region:
     if c2.contains_object(c1):
         return c1
@@ -493,6 +495,7 @@ def intersect_cuboid_half_space(c1: CuboidRegion, c2: HalfSpaceRegion) -> Region
     return ConvexPolyRegion(hs_intersection)
 
 
+@distributionFunction
 def intersect_cuboid_convpoly(r1: CuboidRegion, r2: ConvexPolyRegion) -> Region:
     if r1.contains_object(r2):
         return r2
@@ -509,6 +512,7 @@ def intersect_cuboid_convpoly(r1: CuboidRegion, r2: ConvexPolyRegion) -> Region:
     return ConvexPolyRegion(hs_intersection)
 
 
+@distributionFunction
 def intersect_halfspaces(r1: HalfSpaceRegion, r2: HalfSpaceRegion) -> Region:
     c1 = r1.to_cuboid_region()
     c2 = r2.to_cuboid_region()
@@ -524,6 +528,7 @@ def intersect_halfspaces(r1: HalfSpaceRegion, r2: HalfSpaceRegion) -> Region:
     return ConvexPolyRegion(hs_intersection)
 
 
+@distributionFunction
 def intersect_halfspace_convpoly(r1: HalfSpaceRegion, r2: ConvexPolyRegion) -> Region:
     r1_hs = halfspaces_to_inequalities(np.array([r1.normal]), np.array([r1.point]))
     cp_halfspaces = r2.hsi.halfspaces
@@ -535,6 +540,7 @@ def intersect_halfspace_convpoly(r1: HalfSpaceRegion, r2: ConvexPolyRegion) -> R
     return ConvexPolyRegion(hs_intersection)
 
 
+@distributionFunction
 def intersect_convpolys(r1: ConvexPolyRegion, r2: ConvexPolyRegion) -> Region:
     hs_intersection = intersect_hsis(r1.hsi, r2.hsi)
 
