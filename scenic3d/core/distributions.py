@@ -1,11 +1,12 @@
 """Objects representing distributions that can be sampled from."""
-
+import abc
 import collections
 import functools
 import itertools
 import math
 import random
 import warnings
+from typing import Iterable
 
 import numpy
 import scipy
@@ -27,17 +28,17 @@ def needsSampling(thing):
     return isinstance(thing, Distribution) or dependencies(thing)
 
 
-def supportInterval(thing):
+def support_interval(thing):
     """Lower and upper bounds on this value, if known."""
-    if hasattr(thing, 'supportInterval'):
-        return thing.supportInterval()
+    if hasattr(thing, 'support_interval'):
+        return thing.support_interval()
     elif isinstance(thing, (int, float)):
         return thing, thing
     else:
         return None, None
 
 
-def underlyingFunction(thing):
+def underlying_function(thing):
     """Original function underlying a distribution wrapper."""
     return getattr(thing, '__wrapped__', thing)
 
@@ -61,7 +62,17 @@ class DefaultIdentityDict(dict):
         return key
 
 
-class Samplable(LazilyEvaluable):
+class Bucketable(abc.ABC):
+    @abc.abstractmethod
+    def bucket(self, buckets=None):
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def clone(self):
+        raise NotImplementedError
+
+
+class Samplable(LazilyEvaluable, abc.ABC):
     """Abstract class for values which can be sampled, possibly depending on other values.
 
     Samplables may specify a proxy object 'self._conditioned' which must have the same
@@ -80,41 +91,9 @@ class Samplable(LazilyEvaluable):
         self._dependencies = tuple(deps)  # fixed order for reproducibility
         self._conditioned = self  # version (partially) conditioned on requirements
 
-    @staticmethod
-    def sampleAll(quantities):
-        """Sample all the given Samplables, which may have dependencies in common.
-
-        Reproducibility note: the order in which the quantities are given can affect the
-        order in which calls to random are made, affecting the final result.
-        """
-        subsamples = DefaultIdentityDict()
-        for q in quantities:
-            if q not in subsamples:
-                subsamples[q] = q.sample(subsamples) if isinstance(q, Samplable) else q
-        return {q: subsamples[q] for q in quantities}
-
-    def sample(self, subsamples=None):
-        """Sample this value, optionally given some values already sampled."""
-        if subsamples is None:
-            subsamples = DefaultIdentityDict()
-        for child in self._conditioned._dependencies:
-            if child not in subsamples:
-                ch_sample = child.sample(subsamples)
-                subsamples[child] = ch_sample
-        return self._conditioned.sampleGiven(subsamples)
-
-    def sampleGiven(self, value):
-        """Sample this value, given values for all its dependencies.
-
-        The default implementation simply returns a dictionary of dependency values.
-        Subclasses must override this method to specify how actual sampling is done.
-        """
-        return DefaultIdentityDict({dep: value[dep] for dep in self._dependencies})
-
-    def conditionTo(self, value):
-        """Condition this value to another value with the same conditional distribution."""
-        assert isinstance(value, Samplable)
-        self._conditioned = value
+    @abc.abstractmethod
+    def sample_given_dependencies(self, dep_values):
+        raise NotImplementedError("Must specify how to sample class when given dependencies")
 
     def evaluateIn(self, context):
         """See LazilyEvaluable.evaluateIn."""
@@ -123,54 +102,60 @@ class Samplable(LazilyEvaluable):
         assert all(not needs_lazy_evaluation(dep) for dep in value._dependencies)
         return value
 
-    def dependencyTree(self):
-        """Debugging method to print the dependency tree of a Samplable."""
-        l = [str(self)]
-        for dep in dependencies(self):
-            for line in dep.dependencyTree():
-                l.append('  ' + line)
-        return l
+
+def conditionTo(s: Samplable, value: Samplable):
+    """Condition this value to another value with the same conditional distribution."""
+    assert isinstance(value, Samplable)
+    s._conditioned = value
 
 
-class Distribution(Samplable):
+def dependency_tree(s: Samplable):
+    """Debugging method to print the dependency tree of a Samplable."""
+    dep_tree = [str(s)]
+    for dep in dependencies(s):
+        for line in dep.dependency_tree():
+            dep_tree.append('  ' + line)
+    return dep_tree
+
+
+def sample(obj: Samplable, subsamples=None):
+    """Sample this value, optionally given some values already sampled."""
+    if subsamples is None:
+        subsamples = DefaultIdentityDict()
+    for child in obj._conditioned._dependencies:
+        if child not in subsamples:
+            ch_sample = child.sample(subsamples)
+            subsamples[child] = ch_sample
+    return obj._conditioned.sample_given_dependencies(subsamples)
+
+
+def sample_all(quantities: Iterable[Samplable]):
+    """Sample all the given Samplables, which may have dependencies in common.
+
+    Reproducibility note: the order in which the quantities are given can affect the
+    order in which calls to random are made, affecting the final result.
+    """
+    subsamples = DefaultIdentityDict()
+    for q in quantities:
+        if q not in subsamples:
+            subsamples[q] = q.sample(subsamples) if isinstance(q, Samplable) else q
+    return {q: subsamples[q] for q in quantities}
+
+
+class Distribution(Samplable, abc.ABC):
     """Abstract class for distributions."""
 
     defaultValueType = float
 
-    def __init__(self, *dependencies, valueType=None):
+    def __init__(self, *dependencies, value_type=None):
         super().__init__(dependencies)
-        if valueType is None:
-            valueType = self.defaultValueType
-        self.valueType = valueType
+        self.valueType = self.defaultValueType if value_type is None else value_type
 
-    def clone(self):
-        """Construct an independent copy of this Distribution."""
-        raise NotImplementedError('clone() not supported by this distribution')
-
-    @property
-    @cached
-    def isPrimitive(self):
-        """Whether this is a primitive Distribution."""
-        try:
-            self.clone()
-            return True
-        except NotImplementedError:
-            return False
-
-    def bucket(self, buckets=None):
-        """Construct a bucketed approximation of this Distribution.
-
-        This function factors a given Distribution into a discrete distribution over
-        buckets together with a distribution for each bucket. The argument *buckets*
-        controls how many buckets the domain of the original Distribution is split into.
-        Since the result is an independent distribution, the original must support
-        clone().
-        """
-        raise NotImplementedError('bucket() not supported by this distribution')
-
-    def supportInterval(self):
-        """Compute lower and upper bounds on the value of this Distribution."""
-        return None, None
+    @abc.abstractmethod
+    def support_interval(self):
+        raise NotImplementedError
+        # """Compute lower and upper bounds on the value of this Distribution."""
+        # return None, None
 
     def __getattr__(self, name):
         if name.startswith('__') and name.endswith('__'):  # ignore special attributes
@@ -189,8 +174,8 @@ class CustomDistribution(Distribution):
         self.name = name
         self.evaluator = evaluator
 
-    def sampleGiven(self, value):
-        return self.sampler(value)
+    def sample_given_dependencies(self, dep_values):
+        return self.sampler(dep_values)
 
     def evaluateInner(self, context):
         if self.evaluator is None:
@@ -222,8 +207,8 @@ class TupleDistribution(Distribution, collections.abc.Sequence):
     def __getitem__(self, index):
         return self.coordinates[index]
 
-    def sampleGiven(self, value):
-        return self.builder(value[coordinate] for coordinate in self.coordinates)
+    def sample_given_dependencies(self, dep_values):
+        return self.builder(dep_values[coordinate] for coordinate in self.coordinates)
 
     def evaluateInner(self, context):
         coordinates = (value_in_context(coord, context) for coord in self.coordinates)
@@ -268,9 +253,9 @@ class FunctionDistribution(Distribution):
         self.kwargs = kwargs
         self.support = support
 
-    def sampleGiven(self, value):
-        args = tuple(value[arg] for arg in self.arguments)
-        kwargs = {name: value[arg] for name, arg in self.kwargs.items()}
+    def sample_given_dependencies(self, dep_values):
+        args = tuple(dep_values[arg] for arg in self.arguments)
+        kwargs = {name: dep_values[arg] for name, arg in self.kwargs.items()}
         return self.function(*args, **kwargs)
 
     def evaluateInner(self, context):
@@ -279,11 +264,11 @@ class FunctionDistribution(Distribution):
         kwargs = {name: value_in_context(arg, context) for name, arg in self.kwargs.items()}
         return FunctionDistribution(function, arguments, kwargs)
 
-    def supportInterval(self):
+    def support_interval(self):
         if self.support is None:
             return None, None
-        subsupports = (supportInterval(arg) for arg in self.arguments)
-        kwss = {name: supportInterval(arg) for name, arg in self.kwargs.items()}
+        subsupports = (support_interval(arg) for arg in self.arguments)
+        kwss = {name: support_interval(arg) for name, arg in self.kwargs.items()}
         return self.support(*subsupports, **kwss)
 
     def isEquivalentTo(self, other):
@@ -345,9 +330,9 @@ class MethodDistribution(Distribution):
         self.arguments = args
         self.kwargs = kwargs
 
-    def sampleGiven(self, value):
-        args = (value[arg] for arg in self.arguments)
-        kwargs = {name: value[arg] for name, arg in self.kwargs.items()}
+    def sample_given_dependencies(self, dep_values):
+        args = (dep_values[arg] for arg in self.arguments)
+        kwargs = {name: dep_values[arg] for name, arg in self.kwargs.items()}
         return self.method(self.object, *args, **kwargs)
 
     def evaluateInner(self, context):
@@ -395,19 +380,19 @@ class AttributeDistribution(Distribution):
         self.attribute = attribute
         self.object = obj
 
-    def sampleGiven(self, value):
-        obj = value[self.object]
+    def sample_given_dependencies(self, dep_values):
+        obj = dep_values[self.object]
         return getattr(obj, self.attribute)
 
     def evaluateInner(self, context):
         obj = value_in_context(self.object, context)
         return AttributeDistribution(self.attribute, obj)
 
-    def supportInterval(self):
+    def support_interval(self):
         obj = self.object
         if isinstance(obj, Options):
             attrs = (getattr(opt, self.attribute) for opt in obj.options)
-            mins, maxes = zip(*(supportInterval(attr) for attr in attrs))
+            mins, maxes = zip(*(support_interval(attr) for attr in attrs))
             l = None if any(sl is None for sl in mins) else min(mins)
             r = None if any(sr is None for sr in maxes) else max(maxes)
             return l, r
@@ -433,9 +418,9 @@ class OperatorDistribution(Distribution):
         self.object = obj
         self.operands = operands
 
-    def sampleGiven(self, value):
-        first = value[self.object]
-        rest = [value[child] for child in self.operands]
+    def sample_given_dependencies(self, dep_values):
+        first = dep_values[self.object]
+        rest = [dep_values[child] for child in self.operands]
         op = getattr(first, self.operator)
         result = op(*rest)
         # handle horrible int/float mismatch
@@ -451,11 +436,11 @@ class OperatorDistribution(Distribution):
         operands = tuple(value_in_context(arg, context) for arg in self.operands)
         return OperatorDistribution(self.operator, obj, operands)
 
-    def supportInterval(self):
+    def support_interval(self):
         if self.operator in ('__add__', '__radd__', '__sub__', '__rsub__', '__truediv__'):
             assert len(self.operands) == 1
-            l1, r1 = supportInterval(self.object)
-            l2, r2 = supportInterval(self.operands[0])
+            l1, r1 = support_interval(self.object)
+            l2, r2 = support_interval(self.operands[0])
             if l1 is None or l2 is None or r1 is None or r2 is None:
                 return None, None
             if self.operator == '__add__' or self.operator == '__radd__':
@@ -530,12 +515,12 @@ class MultiplexerDistribution(Distribution):
         self.options = tuple(to_distribution(opt) for opt in options)
         assert len(self.options) > 0
         valueType = type_support.unifyingType(self.options)
-        super().__init__(index, *self.options, valueType=valueType)
+        super().__init__(index, *self.options, value_type=valueType)
 
-    def sampleGiven(self, value):
-        idx = value[self.index]
+    def sample_given_dependencies(self, dep_values):
+        idx = dep_values[self.index]
         assert 0 <= idx < len(self.options), (idx, len(self.options))
-        return value[self.options[idx]]
+        return dep_values[self.options[idx]]
 
     def evaluateInner(self, context):
         return type(self)(value_in_context(self.index, context),
@@ -564,7 +549,7 @@ class Range(Distribution):
         return self.low <= obj <= self.high
 
     def clone(self):
-        return type(self)(self.low, self.high)
+        return Range(self.low, self.high)
 
     def bucket(self, buckets=None):
         if buckets is None:
@@ -580,8 +565,8 @@ class Range(Distribution):
             ranges.append(Range(left, right))
         return Options(ranges)
 
-    def sampleGiven(self, value):
-        return random.uniform(value[self.low], value[self.high])
+    def sample_given_dependencies(self, dep_values):
+        return random.uniform(dep_values[self.low], dep_values[self.high])
 
     def evaluateInner(self, context):
         low = value_in_context(self.low, context)
@@ -617,7 +602,7 @@ class Normal(Distribution):
         return mean + (sqrt2 * stddev * scipy.special.erfinv(2 * x - 1))
 
     def clone(self):
-        return type(self)(self.mean, self.stddev)
+        return Normal(self.mean, self.stddev)
 
     def bucket(self, buckets=None):
         if not isinstance(self.stddev, float):  # TODO relax restriction?
@@ -656,8 +641,8 @@ class Normal(Distribution):
         assert math.isclose(math.fsum(probs), 1), probs
         return Options(dict(zip(pieces, probs)))
 
-    def sampleGiven(self, value):
-        return random.gauss(value[self.mean], value[self.stddev])
+    def sample_given_dependencies(self, dep_values):
+        return random.gauss(dep_values[self.mean], dep_values[self.stddev])
 
     def evaluateInner(self, context):
         mean = value_in_context(self.mean, context)
@@ -686,7 +671,7 @@ class TruncatedNormal(Normal):
         self.high = high
 
     def clone(self):
-        return type(self)(self.mean, self.stddev, self.low, self.high)
+        return TruncatedNormal(self.mean, self.stddev, self.low, self.high)
 
     def bucket(self, buckets=None):
         if not isinstance(self.stddev, float):  # TODO relax restriction?
@@ -719,9 +704,9 @@ class TruncatedNormal(Normal):
             probs.append(prob)
         return Options(dict(zip(pieces, probs)))
 
-    def sampleGiven(self, value):
+    def sample_given_dependencies(self, dep_values):
         # TODO switch to method less prone to underflow?
-        mean, stddev = value[self.mean], value[self.stddev]
+        mean, stddev = dep_values[self.mean], dep_values[self.stddev]
         alpha = (self.low - mean) / stddev
         beta = (self.high - mean) / stddev
         alpha_cdf = Normal.cdf(0, 1, alpha)
@@ -774,12 +759,12 @@ class DiscreteRange(Distribution):
         return self.low <= obj <= self.high
 
     def clone(self):
-        return type(self)(self.low, self.high, self.weights)
+        return DiscreteRange(self.low, self.high, self.weights)
 
     def bucket(self, buckets=None):
         return self.clone()  # already bucketed
 
-    def sampleGiven(self, value):
+    def sample_given_dependencies(self, dep_values):
         return random.choices(self.options, cum_weights=self.cumulativeWeights)[0]
 
     def isEquivalentTo(self, other):
@@ -827,7 +812,7 @@ class Options(MultiplexerDistribution):
         return DiscreteRange(0, n, weights)
 
     def clone(self):
-        return type(self)(self.optWeights if self.optWeights else self.options)
+        return Options(self.optWeights if self.optWeights else self.options)
 
     def bucket(self, buckets=None):
         return self.clone()  # already bucketed

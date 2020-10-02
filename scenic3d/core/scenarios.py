@@ -2,7 +2,7 @@
 
 import random
 
-from scenic3d.core.distributions import Samplable, RejectionException, needsSampling
+from scenic3d.core.distributions import Samplable, RejectionException, needsSampling, sample_all
 from scenic3d.core.external_params import ExternalSampler
 from scenic3d.core.geometry import cuboids_intersect
 from scenic3d.core.lazy_eval import needs_lazy_evaluation
@@ -151,7 +151,7 @@ def try_sample(external_sampler, dependencies, objects, workspace, active_reqs):
     try:
         if external_sampler is not None:
             external_sampler.sample(external_sampler.rejectionFeedback)
-        sample = Samplable.sampleAll(dependencies)
+        sample = sample_all(dependencies)
     except RejectionException as e:
         return None, e
 

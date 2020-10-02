@@ -33,14 +33,14 @@ class PointInRegionDistribution(VectorDistribution):
         super().__init__(region)
         self.region = region
 
-    def sampleGiven(self, value):
-        return value[self.region].uniform_point_inner()
+    def sample_given_dependencies(self, dep_values):
+        return dep_values[self.region].uniform_point_inner()
 
     def __str__(self):
         return f'PointIn({self.region})'
 
 
-class Region(Samplable):
+class Region(Samplable, abc.ABC):
     """Abstract class for regions."""
 
     def __init__(self, name, *dependencies, orientation=None):
@@ -48,13 +48,12 @@ class Region(Samplable):
         self.name = name
         self.orientation = orientation
 
-    def sampleGiven(self, value):
-        return self
-
+    @abc.abstractmethod
     def uniform_point_inner(self):
         """Do the actual random sampling. Implemented by subclasses."""
         raise NotImplementedError()
 
+    @abc.abstractmethod
     def contains_point(self, point):
         """Check if the `Region` contains a point. Implemented by subclasses."""
         raise NotImplementedError()
@@ -141,8 +140,8 @@ class SphericalRegion(Region):
         self.circumsphere = (self.center, self.radius)
         self.resolution = resolution
 
-    def sampleGiven(self, value):
-        return SphericalRegion(value[self.center], value[self.radius])
+    def sample_given_dependencies(self, dep_values):
+        return SphericalRegion(dep_values[self.center], dep_values[self.radius])
 
     def evaluateInner(self, context):
         center = value_in_context(self.center, context)
@@ -196,9 +195,9 @@ class RectangularRegion(Region):
     def contains_point(self, point):
         raise NotImplementedError("Put in the geometry stuff!")
 
-    def sampleGiven(self, value):
-        return RectangularRegion(value[self.position], value[self.heading],
-                                 value[self.width], value[self.height])
+    def sample_given_dependencies(self, dep_values):
+        return RectangularRegion(dep_values[self.position], dep_values[self.heading],
+                                 dep_values[self.width], dep_values[self.height])
 
     def evaluateInner(self, context):
         position = value_in_context(self.position, context)
@@ -370,9 +369,9 @@ class CuboidRegion(Region, Intersect):
     def contains_point(self, point):
         return cuboid_contains_point(self, point)
 
-    def sampleGiven(self, value):
-        s = CuboidRegion(value[self.position], value[self.orientation], value[self.width], value[self.length],
-                         value[self.height])
+    def sample_given_dependencies(self, dep_values):
+        s = CuboidRegion(dep_values[self.position], dep_values[self.orientation], dep_values[self.width], dep_values[self.length],
+                         dep_values[self.height])
         return s
 
     def evaluateInner(self, context):

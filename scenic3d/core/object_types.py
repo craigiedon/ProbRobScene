@@ -128,8 +128,8 @@ class Constructible(Samplable):
         super().__init__(dependencies=[getattr(self, p) for p in properties if needsSampling(getattr(self, p))])
         self.properties = set(properties)
 
-    def sampleGiven(self, value):
-        return self.withProperties({prop: value[getattr(self, prop)]
+    def sample_given_dependencies(self, dep_values):
+        return self.withProperties({prop: dep_values[getattr(self, prop)]
                                     for prop in self.properties})
 
     def allProperties(self):
@@ -258,8 +258,8 @@ class Point(Constructible):
                 return True
         return False
 
-    def sampleGiven(self, value):
-        sample = super().sampleGiven(value)
+    def sample_given_dependencies(self, dep_values):
+        sample = super().sample_given_dependencies(dep_values)
         if self.mutationEnabled:
             for mutator in self.mutator:
                 if mutator is None:
@@ -293,8 +293,8 @@ class Point3D(Constructible):
     def to_vector_3d(self):
         return self.position.to_vector_3d()
 
-    def sampleGiven(self, value):
-        sample = super().sampleGiven(value)
+    def sample_given_dependencies(self, dep_values):
+        sample = super().sample_given_dependencies(dep_values)
         # TODO: Mutation stuff here?
         return sample
 

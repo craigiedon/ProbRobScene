@@ -1,7 +1,7 @@
 import numpy
 from dotmap import DotMap
 
-from scenic3d.core.distributions import Distribution, Options
+from scenic3d.core.distributions import Distribution, Options, Bucketable
 from scenic3d.core.utils import InvalidScenarioError
 
 
@@ -147,7 +147,7 @@ class ExternalParameter(Distribution):
         import scenic3d.syntax.veneer as veneer  # TODO improve?
         veneer.registerExternalParameter(self)
 
-    def sampleGiven(self, value):
+    def sample_given_dependencies(self, dep_values):
         """Specialization of  `Samplable.sampleGiven` for external parameters.
 
         By default, this method simply looks up the value previously sampled by
@@ -173,7 +173,7 @@ class VerifaiParameter(ExternalParameter):
         built-in distributions, the approximation is exact: for a particular distribution,
         check its `bucket` method.
         """
-        if not dist.isPrimitive:
+        if not isinstance(dist, Bucketable):
             raise RuntimeError('VerifaiParameter.withPrior called on '
                                f'non-primitive distribution {dist}')
         bucketed = dist.bucket(buckets=buckets)
@@ -199,10 +199,10 @@ class VerifaiRange(VerifaiParameter):
         total = sum(weights)
         self.probs = tuple(wt / total for wt in weights)
 
-    def sampleGiven(self, value):
-        value = super().sampleGiven(value)
-        assert len(value) == 1
-        return value[0]
+    def sample_given_dependencies(self, dep_values):
+        dep_values = super().sample_given_dependencies(dep_values)
+        assert len(dep_values) == 1
+        return dep_values[0]
 
 
 class VerifaiDiscreteRange(VerifaiParameter):
@@ -220,10 +220,10 @@ class VerifaiDiscreteRange(VerifaiParameter):
         else:
             self.probs = None
 
-    def sampleGiven(self, value):
-        value = super().sampleGiven(value)
-        assert len(value) == 1
-        return value[0]
+    def sample_given_dependencies(self, dep_values):
+        dep_values = super().sample_given_dependencies(dep_values)
+        assert len(dep_values) == 1
+        return dep_values[0]
 
 
 class VerifaiOptions(Options):

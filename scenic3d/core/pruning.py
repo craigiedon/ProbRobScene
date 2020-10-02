@@ -5,7 +5,7 @@ import time
 
 import scenic3d.core.regions as regions
 from scenic3d.core.distributions import (Samplable, MethodDistribution, OperatorDistribution,
-                                         supportInterval, underlyingFunction)
+                                         support_interval, underlying_function)
 from scenic3d.core.geometry import normalize_angle
 from scenic3d.core.utils import InvalidScenarioError
 from scenic3d.core.vectors import VectorField, PolygonalVectorField, VectorMethodDistribution
@@ -24,7 +24,7 @@ def isMethodCall(thing, method):
     """Match calls to a given method, taking into account distribution decorators."""
     if not isinstance(thing, (MethodDistribution, VectorMethodDistribution)):
         return False
-    return thing.method is underlyingFunction(method)
+    return thing.method is underlying_function(method)
 
 
 # def match_in_region(position):
@@ -53,7 +53,7 @@ def matchPolygonalField(heading, position):
         if field is not None:
             assert len(heading.operands) == 1
             offset = heading.operands[0]
-            ol, oh = supportInterval(offset)
+            ol, oh = support_interval(offset)
             if ol is not None and oh is not None:
                 return field, lower + ol, upper + oh
     return None, 0, 0
@@ -179,17 +179,17 @@ def visibilityBound(obj, target):
     """Upper bound the distance from an Object to another it can see."""
     # Upper bound on visible distance is a sum of several terms:
     # 1. obj.visibleDistance
-    _, maxVisibleDistance = supportInterval(obj.visibleDistance)
+    _, maxVisibleDistance = support_interval(obj.visibleDistance)
     if maxVisibleDistance is None:
         return None
     # 2. distance from obj's center to its camera
-    _, maxCameraX = supportInterval(obj.cameraOffset.x)
-    _, maxCameraY = supportInterval(obj.cameraOffset.y)
+    _, maxCameraX = support_interval(obj.cameraOffset.x)
+    _, maxCameraY = support_interval(obj.cameraOffset.y)
     if maxCameraX is None or maxCameraY is None:
         return None
     maxVisibleDistance += math.hypot(maxCameraX, maxCameraY)
     # 3. radius of target
-    _, maxRadius = supportInterval(target.radius)
+    _, maxRadius = support_interval(target.radius)
     if maxRadius is None:
         return None
     maxVisibleDistance += maxRadius

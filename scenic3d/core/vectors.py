@@ -33,8 +33,8 @@ class CustomVectorDistribution(VectorDistribution):
         self.name = name
         self.evaluator = evaluator
 
-    def sampleGiven(self, value):
-        return self.sampler(value)
+    def sample_given_dependencies(self, dep_values):
+        return self.sampler(dep_values)
 
     def evaluateInner(self, context):
         if self.evaluator is None:
@@ -55,9 +55,9 @@ class VectorOperatorDistribution(VectorDistribution):
         self.object = obj
         self.operands = operands
 
-    def sampleGiven(self, value):
-        first = value[self.object]
-        rest = (value[child] for child in self.operands)
+    def sample_given_dependencies(self, dep_values):
+        first = dep_values[self.object]
+        rest = (dep_values[child] for child in self.operands)
         op = getattr(first, self.operator)
         return op(*rest)
 
@@ -81,9 +81,9 @@ class VectorMethodDistribution(VectorDistribution):
         self.arguments = args
         self.kwargs = kwargs
 
-    def sampleGiven(self, value):
-        args = (value[arg] for arg in self.arguments)
-        kwargs = {name: value[arg] for name, arg in self.kwargs.items()}
+    def sample_given_dependencies(self, dep_values):
+        args = (dep_values[arg] for arg in self.arguments)
+        kwargs = {name: dep_values[arg] for name, arg in self.kwargs.items()}
         return self.method(self.object, *args, **kwargs)
 
     def evaluateInner(self, context):
@@ -173,8 +173,8 @@ class Vector(Samplable, collections.abc.Sequence):
     def toVector(self):
         return self
 
-    def sampleGiven(self, value):
-        return Vector(*(value[coord] for coord in self.coordinates))
+    def sample_given_dependencies(self, dep_values):
+        return Vector(*(dep_values[coord] for coord in self.coordinates))
 
     def evaluateInner(self, context):
         return Vector(*(value_in_context(coord, context) for coord in self.coordinates))
@@ -264,8 +264,8 @@ class Vector3D(Samplable, collections.abc.Sequence):
     def to_vector_3d(self):
         return self
 
-    def sampleGiven(self, value):
-        return Vector3D(*(value[coord] for coord in self.coordinates))
+    def sample_given_dependencies(self, dep_values):
+        return Vector3D(*(dep_values[coord] for coord in self.coordinates))
 
     def evaluateInner(self, context):
         return Vector3D(*(value_in_context(coord, context) for coord in self.coordinates))
