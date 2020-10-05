@@ -91,7 +91,7 @@ def prune_containment(scenario, verbosity):
         #     container = erode(container, minRadius)
 
         new_pos = regions.PointInRegionDistribution(new_base)
-        obj.position.conditionTo(new_pos)
+        obj.position.condition_to(new_pos)
 
 
 def prune_relative_heading(scenario, verbosity):
@@ -151,20 +151,11 @@ def prune_relative_heading(scenario, verbosity):
             newBase = regions.PolygonalRegion(polygon=newBasePoly,
                                               orientation=base.orientation)
             newPos = regions.PointInRegionDistribution(newBase)
-            obj.position.conditionTo(newPos)
+            obj.position.condition_to(newPos)
 
 
 def max_distance_between(scenario, obj, target):
     """Upper bound the distance between the given Objects."""
-    # If one of the objects is the ego, use visibility requirements
-    ego = scenario.egoObject
-    if obj is ego and target.requireVisible:
-        visDist = visibilityBound(ego, target)
-    elif target is ego and obj.requireVisible:
-        visDist = visibilityBound(ego, obj)
-    else:
-        visDist = float('inf')
-
     # Check for any distance bounds implied by user-specified requirements
     reqDist = float('inf')
     for rel in obj._relations:
@@ -172,7 +163,7 @@ def max_distance_between(scenario, obj, target):
             if rel.upper < reqDist:
                 reqDist = rel.upper
 
-    return min(visDist, reqDist)
+    return reqDist
 
 
 def visibilityBound(obj, target):
@@ -210,7 +201,7 @@ def feasibleRHPolygon(field, offsetL, offsetR,
         for expandedTargetCell, targetHeading in expanded:
             lower, upper = relativeHeadingRange(baseHeading, offsetL, offsetR,
                                                 targetHeading, tOffsetL, tOffsetR)
-            if (upper >= lowerBound and lower <= upperBound):  # RH intervals overlap
+            if upper >= lowerBound and lower <= upperBound:  # RH intervals overlap
                 intersection = baseCell & expandedTargetCell
                 if not intersection.is_empty:
                     assert isinstance(intersection, shapely.geometry.Polygon), intersection

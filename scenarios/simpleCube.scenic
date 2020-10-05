@@ -2,7 +2,7 @@ from model import *
 
 """
 
-- ego should be a robot arm manipulator with
+- Robot arm manipulator with
     - a starting postition
     - a robot type
     - certain degrees of freedom
@@ -26,13 +26,13 @@ c1 = Cube on t_1
 c2 = Cube on t_1
 c3 = Cube on t_1
 
-ego = Robot ahead of table by 1.1, facing toward table
+robot = Robot ahead of table by 1.1, facing toward table
 """
 
 table = Table on floor
-ego = Robot aheadRough of table
+robot = Robot aheadRough of table
 
-# ego = BCube in CuboidRegion(Vector3D(width / 2.0, length / 2.0, height / 2.0), Vector3D(0, 0, 0), width * 2, length * 2, height * 2)
+# robot = BCube in CuboidRegion(Vector3D(width / 2.0, length / 2.0, height / 2.0), Vector3D(0, 0, 0), width * 2, length * 2, height * 2)
 # c1 = BCube in CuboidRegion(Vector3D(1,1,1), Vector3D(0,0,0), 0.2, 0.2, 0.2)
 # c2 = BCube in CuboidRegion(Vector3D((0, 2), 2, 2), Vector3D(0.2, 0.4, 0.1), 3, 3, 3)
 

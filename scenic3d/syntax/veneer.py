@@ -7,27 +7,26 @@ global state such as the list of all created Scenic objects.
 
 __all__ = (
     # Primitive statements and functions
-    'ego', 'require', 'resample', 'param', 'mutate', 'verbosePrint',
+    'require', 'resample', 'param', 'mutate', 'verbosePrint',
     'sin', 'cos', 'hypot', 'max', 'min',
     # Prefix operators
-    'Visible',
     'Front', 'Back', 'Left', 'Right',
     'FrontLeft', 'FrontRight', 'BackLeft', 'BackRight',
     # Infix operators
     'FieldAt', 'RelativeTo', 'OffsetAlong', 'RelativePosition',
     'RelativeHeading', 'ApparentHeading',
-    'DistanceFrom', 'AngleTo', 'AngleFrom', 'Follow', 'CanSee',
+    'DistanceFrom', 'CanSee',
     # Primitive types
     'Vector', 'VectorField', 'PolygonalVectorField', 'Point3D', 'Vector3D',
-    'Region', 'PointSetRegion', 'RectangularRegion', 'CuboidRegion', 'SphericalRegion',
+    'Region', 'PointSetRegion', 'CuboidRegion', 'SphericalRegion',
     'Mutator',
     'Range', 'Options', 'Uniform', 'Discrete', 'Normal',
     'VerifaiParameter', 'VerifaiRange', 'VerifaiDiscreteRange', 'VerifaiOptions',
     # Constructible types
-    'Point', 'OrientedPoint', 'Object', 'OrientedPoint3D',
+    'Object', 'OrientedPoint3D',
     # Specifiers
     'With',
-    'At', 'In', 'Beyond', 'VisibleFrom', 'VisibleSpec', 'OffsetBy', 'OffsetAlongSpec',
+    'At', 'In', 'Beyond', 'VisibleFrom', 'OffsetAlongSpec',
     'Facing', 'FacingToward', 'ApparentlyFacing',
     'LeftSpec', 'RightSpec', 'Ahead', 'Behind',
     'Following',
@@ -49,7 +48,7 @@ __all__ = (
 from scenic3d.core.distributions import Range, Options, Normal, distributionFunction
 # various Python types and functions used in the language but defined elsewhere
 from scenic3d.core.geometry import sin, cos, hypot, max, min
-from scenic3d.core.regions import (Region, PointSetRegion, RectangularRegion,
+from scenic3d.core.regions import (Region, PointSetRegion,
                                    everywhere, nowhere, CuboidRegion, SphericalRegion,
                                    HalfSpaceRegion, PointInRegionDistribution)
 from scenic3d.core.vectors import Vector, VectorField, PolygonalVectorField, Vector3D, offset_beyond, \
@@ -59,7 +58,7 @@ Uniform = lambda *opts: Options(opts)  # TODO separate these?
 Discrete = Options
 from scenic3d.core.external_params import (VerifaiParameter, VerifaiRange, VerifaiDiscreteRange,
                                            VerifaiOptions)
-from scenic3d.core.object_types import Mutator, Point, OrientedPoint, Object, Point3D, OrientedPoint3D
+from scenic3d.core.object_types import Mutator, Object, Point3D, OrientedPoint3D
 from scenic3d.core.specifiers import PropertyDefault  # TODO remove
 
 # everything that should not be directly accessible from the language is imported here:
@@ -79,7 +78,6 @@ from scenic3d.core.external_params import ExternalParameter
 activity = 0
 evaluatingRequirement = False
 allObjects = []  # ordered for reproducibility
-egoObject = None
 globalParameters = {}
 externalParameters = []  # ordered for reproducibility
 pendingRequirements = {}
@@ -103,13 +101,12 @@ def activate():
 
 def deactivate():
     """Deactivate the veneer after compiling a Scenic module."""
-    global activity, allObjects, egoObject, globalParameters, externalParameters
+    global activity, allObjects, globalParameters, externalParameters
     global pendingRequirements, inheritedReqs
     activity -= 1
     assert activity >= 0
     assert not evaluatingRequirement
     allObjects = []
-    egoObject = None
     globalParameters = {}
     externalParameters = []
     pendingRequirements = {}
@@ -137,23 +134,6 @@ def registerExternalParameter(value):
 
 ### Primitive statements and functions
 
-def ego(obj=None):
-    """Function implementing loads and stores to the 'ego' pseudo-variable.
-
-    The translator calls this with no arguments for loads, and with the source
-    value for stores.
-    """
-    global egoObject
-    if obj is None:
-        if egoObject is None:
-            raise RuntimeParseError('referred to ego object not yet assigned')
-    elif not isinstance(obj, Object):
-        raise RuntimeParseError('tried to make non-object the ego object')
-    else:
-        egoObject = obj
-    return egoObject
-
-
 def require(reqID, req, line, prob=1):
     """Function implementing the require statement."""
     if evaluatingRequirement:
@@ -177,11 +157,11 @@ def getAllGlobals(req, restrictTo=None):
         globs[name] = value
         if inspect.isfunction(value):
             subglobs = getAllGlobals(value, restrictTo=namespace)
-            for name, value in subglobs.items():
-                if name in globs:
-                    assert value is globs[name]
+            for n, v in subglobs.items():
+                if n in globs:
+                    assert v is globs[n]
                 else:
-                    globs[name] = value
+                    globs[n] = v
     return globs
 
 
@@ -223,12 +203,6 @@ def mutate(*objects):  # TODO update syntax
 
 
 ### Prefix operators
-
-def Visible(region):
-    """The 'visible <region>' operator."""
-    if not isinstance(region, Region):
-        raise RuntimeParseError('"visible X" with X not a Region')
-    return region.intersect(ego().visibleRegion)
 
 
 # front of <object>, etc.
@@ -321,78 +295,34 @@ def OffsetAlong(X, H, Y):
     return X.offsetRotated(H, Y)
 
 
-def RelativePosition(X, Y=None):
-    """The 'relative position of <vector> [from <vector>]' operator.
-
-    If the 'from <vector>' is omitted, the position of ego is used.
-    """
+def RelativePosition(X, Y):
+    """The 'relative position of <vector> [from <vector>]' operator."""
     X = toVector(X, '"relative position of X from Y" with X not a vector')
-    if Y is None:
-        Y = ego()
     Y = toVector(Y, '"relative position of X from Y" with Y not a vector')
     return X - Y
 
 
-def RelativeHeading(X, Y=None):
+def RelativeHeading(X, Y):
     """The 'relative heading of <heading> [from <heading>]' operator.
-
-    If the 'from <heading>' is omitted, the heading of ego is used.
     """
     X = toHeading(X, '"relative heading of X from Y" with X not a heading')
-    if Y is None:
-        Y = ego().heading
-    else:
-        Y = toHeading(Y, '"relative heading of X from Y" with Y not a heading')
+    Y = toHeading(Y, '"relative heading of X from Y" with Y not a heading')
     return normalize_angle(X - Y)
 
 
-def ApparentHeading(X, Y=None):
-    """The 'apparent heading of <oriented point> [from <vector>]' operator.
-
-    If the 'from <vector>' is omitted, the position of ego is used.
-    """
+def ApparentHeading(X, Y):
+    """The 'apparent heading of <oriented point> [from <vector>]' operator."""
     if not isinstance(X, OrientedPoint):
         raise RuntimeParseError('"apparent heading of X from Y" with X not an OrientedPoint')
-    if Y is None:
-        Y = ego()
     Y = toVector(Y, '"relative heading of X from Y" with Y not a vector')
     return apparentHeadingAtPoint(X.position, X.heading, Y)
 
 
-def DistanceFrom(X, Y=None):
-    """The 'distance from <vector> [to <vector>]' operator.
-
-    If the 'to <vector>' is omitted, the position of ego is used.
-    """
+def DistanceFrom(X, Y):
+    """The 'distance from <vector> [to <vector>]' operator."""
     X = toVector(X, '"distance from X to Y" with X not a vector')
-    if Y is None:
-        Y = ego()
     Y = toVector(Y, '"distance from X to Y" with Y not a vector')
     return X.distanceTo(Y)
-
-
-def AngleTo(X):
-    """The 'angle to <vector>' operator (using the position of ego as the reference)."""
-    X = toVector(X, '"angle to X" with X not a vector')
-    return ego().angleTo(X)
-
-
-def AngleFrom(X, Y):
-    """The 'angle from <vector> to <vector>' operator."""
-    X = toVector(X, '"angle from X to Y" with X not a vector')
-    Y = toVector(Y, '"angle from X to Y" with Y not a vector')
-    return X.angleTo(Y)
-
-
-def Follow(F, X, D):
-    """The 'follow <field> from <vector> for <number>' operator."""
-    if not isinstance(F, VectorField):
-        raise RuntimeParseError('"follow F from X for D" with F not a vector field')
-    X = toVector(X, '"follow F from X for D" with X not a vector')
-    D = toScalar(D, '"follow F from X for D" with D not a number')
-    pos = F.followFrom(X, D)
-    heading = F[pos]
-    return OrientedPoint(position=pos, heading=heading)
 
 
 def CanSee(X, Y):
@@ -464,7 +394,7 @@ def alwaysProvidesOrientation(region):
         return False
 
 
-def Beyond(pos, offset, fromPt=None):
+def Beyond(pos, offset, fromPt):
     """The 'beyond X by Y [from Z]' polymorphic specifier.
 
     Specifies 'position', with no dependencies.
@@ -472,8 +402,6 @@ def Beyond(pos, offset, fromPt=None):
     Allowed forms:
         beyond <vector> by <number> [from <vector>]
         beyond <vector> by <vector> [from <vector>]
-
-    If the 'from <vector>' is omitted, the position of ego is used.
     """
     pos = toVector(pos, 'specifier "beyond X by Y" with X not a vector')
     dType = underlyingType(offset)
@@ -481,22 +409,18 @@ def Beyond(pos, offset, fromPt=None):
         offset = Vector(0, offset)
     elif dType is not Vector:
         raise RuntimeParseError('specifier "beyond X by Y" with Y not a number or vector')
-    if fromPt is None:
-        fromPt = ego()
     fromPt = toVector(fromPt, 'specifier "beyond X by Y from Z" with Z not a vector')
     lineOfSight = fromPt.angleTo(pos)
     return Specifier('position', pos.offsetRotated(lineOfSight, offset))
 
 
-def Beyond3D(pos, offset, from_pt=None):
+def Beyond3D(pos, offset, from_pt):
     pos = toType(pos, Vector3D)
     d_type = underlyingType(offset)
     if d_type is float or d_type is int:
         offset = Vector3D(offset, 0, 0)
     elif d_type is not Vector3D:
         raise RuntimeParseError('specifier "beyond X by Y from Z" with Z not a vector')
-    if from_pt is None:
-        from_pt = ego()
     from_pt = toType(from_pt, Vector3D)
     new_pos = offset_beyond(pos, offset, from_pt)
     return Specifier('position', new_pos)
@@ -513,24 +437,6 @@ def VisibleFrom(base):
     if not isinstance(base, Point):
         raise RuntimeParseError('specifier "visible from O" with O not a Point')
     return Specifier('position', PointInRegionDistribution(base.visibleRegion))
-
-
-def VisibleSpec():
-    """The 'visible' specifier (equivalent to 'visible from ego').
-
-    Specifies 'position', with no dependencies.
-    """
-    return VisibleFrom(ego())
-
-
-def OffsetBy(offset):
-    """The 'offset by <vector>' specifier.
-
-    Specifies 'position', with no dependencies.
-    """
-    offset = toVector(offset, 'specifier "offset by X" with X not a vector')
-    pos = RelativeTo(offset, ego()).toVector()
-    return Specifier('position', pos)
 
 
 def OffsetBy3D(offset):
@@ -588,16 +494,12 @@ def FacingToward3D(pos):
                                                                                                            2]) - s.position)))  # rotation_to_euler(s.orientation, pos)))
 
 
-def ApparentlyFacing(heading, fromPt=None):
+def ApparentlyFacing(heading, fromPt):
     """The 'apparently facing <heading> [from <vector>]' specifier.
 
     Specifies 'heading', depending on 'position'.
-
-    If the 'from <vector>' is omitted, the position of ego is used.
     """
     heading = toHeading(heading, 'specifier "apparently facing X" with X not a heading')
-    if fromPt is None:
-        fromPt = ego()
     fromPt = toVector(fromPt, 'specifier "apparently facing X from Y" with Y not a vector')
     value = lambda self: fromPt.angleTo(self.position) + heading
     return Specifier('heading', DelayedArgument({'position'}, value))
@@ -727,20 +629,15 @@ def directional_spec_helper(syntax, pos, dist, axis, to_components, make_offset)
     return Specifier('position', new, optionals=extras)
 
 
-def Following(field, dist, fromPt=None):
+def Following(field, dist, fromPt):
     """The 'following F [from X] for D' specifier.
 
     Specifies 'position', and optionally 'heading', with no dependencies.
 
     Allowed forms:
         following <field> [from <vector>] for <number>
-
-    If the 'from <vector>' is omitted, the position of ego is used.
     """
-    if fromPt is None:
-        fromPt = ego()
-    else:
-        dist, fromPt = fromPt, dist
+    dist, fromPt = fromPt, dist
     if not isinstance(field, VectorField):
         raise RuntimeParseError('"following F" specifier with F not a vector field')
     fromPt = toVector(fromPt, '"following F from X for D" with X not a vector')
@@ -751,11 +648,8 @@ def Following(field, dist, fromPt=None):
     return Specifier('position', val, optionals={'heading'})
 
 
-def Following3D(field: VectorField3D, dist: float, from_pt=None):
+def Following3D(field: VectorField3D, dist: float, from_pt):
     assert isinstance(field, VectorField3D)
-
-    if from_pt is None:
-        from_pt = ego()
 
     from_pt = toType(from_pt, Vector3D)
     dist = float(dist)

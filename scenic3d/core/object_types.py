@@ -30,6 +30,9 @@ class Constructible(Samplable):
     by objects.
     """
 
+    def evaluateInner(self, context):
+        return self
+
     @classmethod
     def defaults(cls):  # TODO improve so this need only be done once?
         # find all defaults provided by the class or its superclasses
@@ -183,12 +186,12 @@ class PositionMutator(Mutator):
         noise = Vector(random.gauss(0, self.stddev), random.gauss(0, self.stddev))
         pos = toVector(obj.position, '"position" not a vector')
         pos = pos + noise
-        return (obj.copyWith(position=pos), True)  # allow further mutation
+        return obj.copyWith(position=pos), True  # allow further mutation
 
     def __eq__(self, other):
         if type(other) is not type(self):
             return NotImplemented
-        return (other.stddev == self.stddev)
+        return other.stddev == self.stddev
 
     def __hash__(self):
         return hash(self.stddev)
@@ -207,74 +210,15 @@ class HeadingMutator(Mutator):
     def appliedTo(self, obj):
         noise = random.gauss(0, self.stddev)
         h = obj.heading + noise
-        return (obj.copyWith(heading=h), True)  # allow further mutation
+        return obj.copyWith(heading=h), True  # allow further mutation
 
     def __eq__(self, other):
         if type(other) is not type(self):
             return NotImplemented
-        return (other.stddev == self.stddev)
+        return other.stddev == self.stddev
 
     def __hash__(self):
         return hash(self.stddev)
-
-
-## Point
-
-class Point(Constructible):
-    """Implementation of the Scenic class ``Point``.
-
-    The default mutator for `Point` adds Gaussian noise to ``position`` with
-    a standard deviation given by the ``positionStdDev`` property.
-
-    Attributes:
-        position (`Vector`): Position of the point. Default value is the origin.
-        visibleDistance (float): Distance for ``can see`` operator. Default value 50.
-        width (float): Default value zero (only provided for compatibility with
-          operators that expect an `Object`).
-        height (float): Default value zero.
-    """
-    position: Vector(0, 0)
-    width: 0
-    height: 0
-    visibleDistance: 50
-
-    mutationEnabled: False
-    mutator: PropertyDefault({'positionStdDev'}, {'additive'},
-                             lambda self: PositionMutator(self.positionStdDev))
-    positionStdDev: 1
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.position = toVector(self.position, f'"position" of {self} not a vector')
-        self.corners = (self.position,)
-        self.visibleRegion = CircularRegion(self.position, self.visibleDistance)
-
-    def toVector(self):
-        return self.position.toVector()
-
-    def canSee(self, other):  # TODO improve approximation?
-        for corner in other.corners:
-            if self.visibleRegion.contains_point(corner):
-                return True
-        return False
-
-    def sample_given_dependencies(self, dep_values):
-        sample = super().sample_given_dependencies(dep_values)
-        if self.mutationEnabled:
-            for mutator in self.mutator:
-                if mutator is None:
-                    continue
-                sample, proceed = mutator.appliedTo(sample)
-                if not proceed:
-                    break
-        return sample
-
-    # Points automatically convert to Vectors when needed
-    def __getattr__(self, attr):
-        if hasattr(Vector, attr):
-            return getattr(self.toVector(), attr)
-        else:
-            raise AttributeError(f"'{type(self).__name__}' object has no attribute '{attr}'")
 
 
 ## Point 3D
@@ -303,46 +247,6 @@ class Point3D(Constructible):
             return getattr(self.to_vector_3d(), attr)
         else:
             raise AttributeError(f"'{type(self).__name__}' object has no attribute '{attr}'")
-
-
-## OrientedPoint
-
-class OrientedPoint(Point):
-    """Implementation of the Scenic class ``OrientedPoint``.
-
-    The default mutator for `OrientedPoint` adds Gaussian noise to ``heading``
-    with a standard deviation given by the ``headingStdDev`` property, then
-    applies the mutator for `Point`.
-
-    Attributes:
-        heading (float): Heading of the `OrientedPoint`. Default value 0 (North).
-        viewAngle (float): View cone angle for ``can see`` operator. Default
-          value :math:`2\\pi`.
-    """
-    heading: 0
-    viewAngle: math.tau
-
-    mutator: PropertyDefault({'headingStdDev'}, {'additive'},
-                             lambda self: HeadingMutator(self.headingStdDev))
-    headingStdDev: math.radians(5)
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.heading = toScalar(self.heading, f'"heading" of {self} not a scalar')
-        self.visibleRegion = SectorRegion(self.position, self.visibleDistance,
-                                          self.heading, self.viewAngle)
-
-    def relativize(self, vec):
-        pos = self.relativePosition(vec)
-        return OrientedPoint(position=pos, heading=self.heading)
-
-    def relativePosition(self, x, y=None):
-        vec = x if y is None else Vector(x, y)
-        pos = self.position.offsetRotated(self.heading, vec)
-        return OrientedPoint(position=pos, heading=self.heading)
-
-    def toHeading(self):
-        return self.heading
 
 
 class OrientedPoint3D(Point3D):

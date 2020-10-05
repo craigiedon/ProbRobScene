@@ -1,9 +1,9 @@
 """Support for lazy evaluation of expressions and specifiers."""
-
+import abc
 import itertools
 
 
-class LazilyEvaluable:
+class LazilyEvaluable(abc.ABC):
     """Values which may require evaluation in the context of an object being constructed.
 
     If a LazilyEvaluable specifies any properties it depends on, then it cannot be evaluated to a
@@ -25,9 +25,10 @@ class LazilyEvaluable:
         assert not needs_lazy_evaluation(value)  # value should not require further evaluation
         return value
 
+    @abc.abstractmethod
     def evaluateInner(self, context):
         """Actually evaluate in the given context, which provides all required properties."""
-        return self
+        raise NotImplementedError
 
 
 class DelayedArgument(LazilyEvaluable):

@@ -6,7 +6,7 @@ import itertools
 import math
 import random
 import warnings
-from typing import Iterable
+from typing import Iterable, Tuple
 
 import numpy
 import scipy
@@ -30,12 +30,12 @@ def needsSampling(thing):
 
 def support_interval(thing):
     """Lower and upper bounds on this value, if known."""
-    if hasattr(thing, 'support_interval'):
+    if hasattr(thing, "support_interval"):
         return thing.support_interval()
-    elif isinstance(thing, (int, float)):
+    if isinstance(thing, (int, float)):
         return thing, thing
-    else:
-        return None, None
+
+    return None, None
 
 
 def underlying_function(thing):
@@ -60,7 +60,6 @@ class DefaultIdentityDict(dict):
 
     def __missing__(self, key):
         return key
-
 
 class Bucketable(abc.ABC):
     @abc.abstractmethod
@@ -103,7 +102,7 @@ class Samplable(LazilyEvaluable, abc.ABC):
         return value
 
 
-def conditionTo(s: Samplable, value: Samplable):
+def condition_to(s: Samplable, value: Samplable):
     """Condition this value to another value with the same conditional distribution."""
     assert isinstance(value, Samplable)
     s._conditioned = value
@@ -124,7 +123,7 @@ def sample(obj: Samplable, subsamples=None):
         subsamples = DefaultIdentityDict()
     for child in obj._conditioned._dependencies:
         if child not in subsamples:
-            ch_sample = child.sample(subsamples)
+            ch_sample = sample(child, subsamples)
             subsamples[child] = ch_sample
     return obj._conditioned.sample_given_dependencies(subsamples)
 
@@ -138,7 +137,7 @@ def sample_all(quantities: Iterable[Samplable]):
     subsamples = DefaultIdentityDict()
     for q in quantities:
         if q not in subsamples:
-            subsamples[q] = q.sample(subsamples) if isinstance(q, Samplable) else q
+            subsamples[q] = sample(q, subsamples) if isinstance(q, Samplable) else q
     return {q: subsamples[q] for q in quantities}
 
 
@@ -150,12 +149,6 @@ class Distribution(Samplable, abc.ABC):
     def __init__(self, *dependencies, value_type=None):
         super().__init__(dependencies)
         self.valueType = self.defaultValueType if value_type is None else value_type
-
-    @abc.abstractmethod
-    def support_interval(self):
-        raise NotImplementedError
-        # """Compute lower and upper bounds on the value of this Distribution."""
-        # return None, None
 
     def __getattr__(self, name):
         if name.startswith('__') and name.endswith('__'):  # ignore special attributes
@@ -535,8 +528,11 @@ class MultiplexerDistribution(Distribution):
 
 ## Simple distributions
 
-class Range(Distribution):
+class Range(Distribution, Bucketable):
     """Uniform distribution over a range"""
+
+    def support_interval(self):
+        return self.low, self.high
 
     def __init__(self, low, high):
         low = type_support.toScalar(low, f'Range endpoint {low} is not a scalar')
@@ -583,9 +579,8 @@ class Range(Distribution):
         return f'Range({self.low}, {self.high})'
 
 
-class Normal(Distribution):
+class Normal(Distribution, Bucketable):
     """Normal distribution"""
-
     def __init__(self, mean, stddev):
         mean = type_support.toScalar(mean, f'Normal mean {mean} is not a scalar')
         stddev = type_support.toScalar(stddev, f'Normal stddev {stddev} is not a scalar')
@@ -659,7 +654,7 @@ class Normal(Distribution):
         return f'Normal({self.mean}, {self.stddev})'
 
 
-class TruncatedNormal(Normal):
+class TruncatedNormal(Normal, Bucketable):
     """Truncated normal distribution."""
 
     def __init__(self, mean, stddev, low, high):
@@ -669,6 +664,9 @@ class TruncatedNormal(Normal):
         super().__init__(mean, stddev)
         self.low = low
         self.high = high
+
+    def support_interval(self):
+        return self.low, self.high
 
     def clone(self):
         return TruncatedNormal(self.mean, self.stddev, self.low, self.high)
@@ -733,9 +731,8 @@ class TruncatedNormal(Normal):
         return f'TruncatedNormal({self.mean}, {self.stddev}, {self.low}, {self.high})'
 
 
-class DiscreteRange(Distribution):
+class DiscreteRange(Distribution, Bucketable):
     """Distribution over a range of integers."""
-
     def __init__(self, low, high, weights=None):
         if not isinstance(low, int):
             raise RuntimeError(f'DiscreteRange endpoint {low} is not a constant integer')
@@ -777,12 +774,11 @@ class DiscreteRange(Distribution):
         return f'DiscreteRange({self.low}, {self.high}, {self.weights})'
 
 
-class Options(MultiplexerDistribution):
+class Options(MultiplexerDistribution, Bucketable):
     """Distribution over a finite list of options.
 
     Specified by a dict giving probabilities; otherwise uniform over a given iterable.
     """
-
     def __init__(self, opts):
         if isinstance(opts, dict):
             options, weights = [], []

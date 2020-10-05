@@ -3,7 +3,7 @@ import abc
 import itertools
 import math
 import random
-from typing import Optional, Tuple
+from typing import Optional, Tuple, List
 
 import numpy as np
 import scipy.spatial
@@ -18,26 +18,6 @@ from scenic3d.core.lazy_eval import value_in_context
 from scenic3d.core.type_support import toVector
 from scenic3d.core.utils import areEquivalent
 from scenic3d.core.vectors import Vector, OrientedVector, VectorDistribution, Vector3D, rotate_euler, rotation_to_euler
-
-
-class Intersect(abc.ABC):
-    @abc.abstractmethod
-    def intersect(self, other):
-        raise NotImplementedError()
-
-
-class PointInRegionDistribution(VectorDistribution):
-    """Uniform distribution over points in a Region"""
-
-    def __init__(self, region):
-        super().__init__(region)
-        self.region = region
-
-    def sample_given_dependencies(self, dep_values):
-        return dep_values[self.region].uniform_point_inner()
-
-    def __str__(self):
-        return f'PointIn({self.region})'
 
 
 class Region(Samplable, abc.ABC):
@@ -69,23 +49,63 @@ class Region(Samplable, abc.ABC):
         vec = toVector(thing, '"X in Y" with X not an Object or a vector')
         return self.contains_point(vec)
 
-    def getAABB(self):
-        """Axis-aligned bounding box for this `Region`. Implemented by some subclasses."""
-        raise NotImplementedError()
-
-    def orient(self, vec):
-        """Orient the given vector along the region's orientation, if any."""
-        if self.orientation is None:
-            return vec
-        else:
-            return OrientedVector(vec.x, vec.y, self.orientation[vec])
-
     def __str__(self):
         return f'<Region {self.name}>'
 
 
+class PointInRegionDistribution(VectorDistribution):
+    """Uniform distribution over points in a Region"""
+
+    def support_interval(self):
+        return None, None
+
+    def evaluateInner(self, context):
+        r = value_in_context(self.region, context)
+        return PointInRegionDistribution(r)
+
+    def __init__(self, region):
+        super().__init__(region)
+        self.region = region
+
+    def sample_given_dependencies(self, dep_values):
+        return dep_values[self.region].uniform_point_inner()
+
+    def __str__(self):
+        return f'PointIn({self.region})'
+
+
+class Intersect(abc.ABC):
+    @abc.abstractmethod
+    def intersect(self, other):
+        raise NotImplementedError()
+
+
+class BoundingBox(abc.ABC):
+    @abc.abstractmethod
+    def getAABB(self):
+        """Axis-aligned bounding box"""
+        raise NotImplementedError()
+
+
+def orient_along_region(region: Region, vec):
+    """Orient the given vector along the region's orientation, if any."""
+    if region.orientation is None:
+        return vec
+    else:
+        return OrientedVector(vec.x, vec.y, region.orientation[vec])
+
+
 class AllRegion(Region, Intersect):
     """Region consisting of all space."""
+
+    def uniform_point_inner(self):
+        raise RuntimeError("Should not be sampling from the all region")
+
+    def sample_given_dependencies(self, dep_values):
+        raise RuntimeError("Should not be sampling from the all region")
+
+    def evaluateInner(self, context):
+        return self
 
     def intersect(self, other):
         return other
@@ -105,6 +125,12 @@ class AllRegion(Region, Intersect):
 
 class EmptyRegion(Region, Intersect):
     """Region containing no points."""
+
+    def sample_given_dependencies(self, dep_values):
+        raise RejectionException(f'sampling from empty Region')
+
+    def evaluateInner(self, context):
+        return self
 
     def intersect(self, other):
         return self
@@ -132,7 +158,7 @@ everywhere = AllRegion('everywhere')
 nowhere = EmptyRegion('nowhere')
 
 
-class SphericalRegion(Region):
+class SphericalRegion(Region, BoundingBox):
     def __init__(self, center, radius, resolution=32):
         super().__init__('Sphere', center, radius)
         self.center = center.to_vector_3d()
@@ -177,61 +203,16 @@ class SphericalRegion(Region):
         return f'SphericalRegion({self.center}, {self.radius})'
 
 
-class RectangularRegion(Region):
-
-    def __init__(self, position, heading, width, height):
-        super().__init__('Rectangle', position, heading, width, height)
-        self.position = position.toVector()
-        self.heading = heading
-        self.width = width
-        self.height = height
-        self.hw = hw = width / 2
-        self.hh = hh = height / 2
-        self.radius = hypot(hw, hh)  # circumcircle; for collision detection
-        self.corners = tuple(position.offsetRotated(heading, Vector(*offset))
-                             for offset in ((hw, hh), (-hw, hh), (-hw, -hh), (hw, -hh)))
-        self.circumcircle = (self.position, self.radius)
-
-    def contains_point(self, point):
-        raise NotImplementedError("Put in the geometry stuff!")
-
+class HalfSpaceRegion(Region, Intersect):
     def sample_given_dependencies(self, dep_values):
-        return RectangularRegion(dep_values[self.position], dep_values[self.heading],
-                                 dep_values[self.width], dep_values[self.height])
+        return HalfSpaceRegion(dep_values[self.point], dep_values[self.normal], dep_values[self.dist])
 
     def evaluateInner(self, context):
-        position = value_in_context(self.position, context)
-        heading = value_in_context(self.heading, context)
-        width = value_in_context(self.width, context)
-        height = value_in_context(self.height, context)
-        return RectangularRegion(position, heading, width, height)
+        point = value_in_context(self.point, context)
+        normal = value_in_context(self.normal, context)
+        dist = value_in_context(self.dist, context)
+        return HalfSpaceRegion(point, normal, dist)
 
-    def uniform_point_inner(self):
-        hw, hh = self.hw, self.hh
-        rx = random.uniform(-hw, hw)
-        ry = random.uniform(-hh, hh)
-        pt = self.position.offsetRotated(self.heading, Vector(rx, ry))
-        return self.orient(pt)
-
-    def getAABB(self):
-        x, y = zip(*self.corners)
-        minx, maxx = min_and_max(x)
-        miny, maxy = min_and_max(y)
-        return (minx, miny), (maxx, maxy)
-
-    def isEquivalentTo(self, other):
-        if type(other) is not RectangularRegion:
-            return False
-        return (areEquivalent(other.position, self.position)
-                and areEquivalent(other.heading, self.heading)
-                and areEquivalent(other.width, self.width)
-                and areEquivalent(other.height, self.height))
-
-    def __str__(self):
-        return f'RectangularRegion({self.position},{self.heading},{self.width},{self.height})'
-
-
-class HalfSpaceRegion(Region, Intersect):
     def intersect(self, other):
         if isinstance(other, CuboidRegion):
             return intersect_cuboid_half_space(other, self)
@@ -264,16 +245,20 @@ class HalfSpaceRegion(Region, Intersect):
     def contains_point(self, p):
         return np.dot(self.normal, p - self.point) >= 0
 
-    def getAABB(self):
-        pass
-
     def to_cuboid_region(self):
         pos = self.point + self.normal * self.dist / 2.0
         orientation = rotation_to_euler(Vector3D(0, 1, 0), self.normal)  # TODO: Confirm this is correct
         return CuboidRegion(pos, orientation, self.dist, self.dist, self.dist)
 
 
-class ConvexPolyRegion(Region, Intersect):
+class ConvexPolyRegion(Region, Intersect, BoundingBox):
+    def sample_given_dependencies(self, dep_values):
+        return ConvexPolyRegion(dep_values[self.hsi])
+
+    def evaluateInner(self, context):
+        hsi = value_in_context(self.hsi, context)
+        return ConvexPolyRegion(hsi)
+
     def intersect(self, other):
         # Cuboid, Halfspace, convexpoly, empty, any, other
         if isinstance(other, CuboidRegion):
@@ -332,7 +317,7 @@ class ConvexPolyRegion(Region, Intersect):
         return np.min(cs, axis=0), np.max(cs, axis=0)
 
 
-class CuboidRegion(Region, Intersect):
+class CuboidRegion(Region, Intersect, BoundingBox):
 
     def intersect(self, other: Intersect):
         if isinstance(other, CuboidRegion):
@@ -369,10 +354,8 @@ class CuboidRegion(Region, Intersect):
     def contains_point(self, point):
         return cuboid_contains_point(self, point)
 
-    def sample_given_dependencies(self, dep_values):
-        s = CuboidRegion(dep_values[self.position], dep_values[self.orientation], dep_values[self.width], dep_values[self.length],
-                         dep_values[self.height])
-        return s
+    def sample_given_dependencies(self, dep_vals):
+        return CuboidRegion(dep_vals[self.position], dep_vals[self.orientation], dep_vals[self.width], dep_vals[self.length], dep_vals[self.height])
 
     def evaluateInner(self, context):
         position = value_in_context(self.position, context)
@@ -420,7 +403,7 @@ class PointSetRegion(Region):
     Args:
         name (str): name for debugging
         points (iterable): set of points comprising the region
-        kdtree (:obj:`scipy.spatial.KDTree`, optional): k-D tree for the points (one will
+        kd_tree (:obj:`scipy.spatial.KDTree`, optional): k-D tree for the points (one will
           be computed if none is provided)
         orientation (:obj:`~scenic3d.core.vectors.VectorField`, optional): orientation for
           the region
@@ -428,21 +411,21 @@ class PointSetRegion(Region):
           in the region
     """
 
-    def __init__(self, name, points, kdTree=None, orientation=None, tolerance=1e-6):
+    def __init__(self, name, points, kd_tree=None, orientation=None, tolerance=1e-6):
         super().__init__(name, orientation=orientation)
         self.points = tuple(points)
         for point in self.points:
             if needsSampling(point):
                 raise RuntimeError('only fixed PointSetRegions are supported')
-        self.kdTree = scipy.spatial.cKDTree(self.points) if kdTree is None else kdTree
+        self.kd_tree = scipy.spatial.cKDTree(self.points) if kd_tree is None else kd_tree
         self.orientation = orientation
         self.tolerance = tolerance
 
     def uniform_point_inner(self):
-        return self.orient(Vector(*random.choice(self.points)))
+        return orient_along_region(self, Vector(*random.choice(self.points)))
 
     def contains_point(self, point):
-        distance, location = self.kdTree.query(point)
+        distance, location = self.kd_tree.query(point)
         return distance <= self.tolerance
 
     def contains_object(self, obj):
@@ -582,7 +565,7 @@ def halfspaces_to_inequalities(hs_normals: np.ndarray, hs_origins: np.ndarray) -
 def feasible_point(hs_ineqs: np.ndarray) -> Optional[np.array]:
     coefficients = np.zeros(hs_ineqs.shape[1])
     coefficients[-1] = -1
-    bounds = [(None, None) for i in range(len(coefficients) - 1)] + [(1e-5, None)]  # Intersection must have non-zero volume
+    bounds = [(None, None) for _ in range(len(coefficients) - 1)] + [(1e-5, None)]  # Intersection must have non-zero volume
     A = hs_ineqs[:, :-1]
     A_row_norms = np.linalg.norm(A, axis=1).reshape(-1, 1)
     b = -hs_ineqs[:, -1]

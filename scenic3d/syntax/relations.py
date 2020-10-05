@@ -162,7 +162,7 @@ class RequirementMatcher:
         arg = node.args[0]
         target = matchAtom(arg)
         if target is not None:  # abs(QUANTITY) </= CONST
-            return (-const, const, target)
+            return -const, const, target
         elif isinstance(arg, BinOp) and isinstance(arg.op, (Add, Sub)):  # abs(X +/- Y) </= CONST
             match = None
             slconst = self.matchConstant(arg.left)
@@ -178,9 +178,9 @@ class RequirementMatcher:
                     match = srconst
             if match is not None:
                 if isinstance(arg.op, Add):  # abs(QUANTITY + CONST) </= CONST
-                    return (-const - match, const - match, target)
+                    return -const - match, const - match, target
                 else:  # abs(QUANTITY - CONST) </= CONST
-                    return (-const + match, const + match, target)
+                    return -const + match, const + match, target
         return None
 
     def matchConstant(self, node):

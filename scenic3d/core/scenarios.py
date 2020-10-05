@@ -12,20 +12,9 @@ import numpy as np
 
 
 class Scene:
-    """A scene generated from a Scenic scenario.
-
-    Attributes:
-        objects (tuple(:obj:`~scenic3d.core.object_types.Object`)): All objects in the
-          scene. The ``ego`` object is first.
-        ego_object (:obj:`~scenic3d.core.object_types.Object`): The ``ego`` object.
-        params (dict): Dictionary mapping the name of each global parameter to its value.
-        workspace (:obj:`~scenic3d.core.workspaces.Workspace`): Workspace for the scenario.
-    """
-
-    def __init__(self, workspace, objects, ego_object, params):
+    def __init__(self, workspace, objects, params):
         self.workspace = workspace
         self.objects = tuple(objects)
-        self.egoObject = ego_object
         self.params = params
 
     def show_3d(self, block=True):
@@ -36,7 +25,7 @@ class Scene:
 
         print("Num objects:", len(self.objects))
         for obj in self.objects:
-            obj.show_3d(ax, highlight=(obj is self.egoObject))
+            obj.show_3d(ax)
 
         plt.show(block=block)
 
@@ -47,7 +36,7 @@ class Scene:
         self.workspace.show(plt)
         # draw objects
         for obj in self.objects:
-            obj.show(self.workspace, plt, highlight=(obj is self.egoObject))
+            obj.show(self.workspace, plt)
         # zoom in if requested
         if zoom is not None:
             self.workspace.zoom_around(plt, self.objects, expansion=zoom)
@@ -62,7 +51,7 @@ class Scenario:
     """A compiled Scenic scenario, from which scenes can be sampled."""
 
     def __init__(self, workspace,
-                 objects, ego_object,
+                 objects,
                  params, external_params,
                  requirements, requirement_deps):
         assert workspace is not None
@@ -71,8 +60,7 @@ class Scenario:
             raise RuntimeParseError('workspace region must be fixed')
 
         self.workspace = workspace
-        self.objects = tuple([ego_object] + [o for o in objects if o is not ego_object]) # Make sure ego_object is first in order
-        self.egoObject = ego_object
+        self.objects = tuple(objects)
         self.params = dict(params)
         self.externalParams = tuple(external_params)
         self.requirements = tuple(requirements)
@@ -126,7 +114,7 @@ class Scenario:
             sampled_value = sample[value] if isinstance(value, Samplable) else value
             assert not needs_lazy_evaluation(sampled_value)
             sampled_params[param] = sampled_value
-        scene = Scene(self.workspace, sampled_objects, self.egoObject, sampled_params)
+        scene = Scene(self.workspace, sampled_objects, sampled_params)
         return scene, iterations
 
     def reset_external_sampler(self):

@@ -265,27 +265,6 @@ constructorStatements = ('class', 'constructor')
 
 Constructor = namedtuple('Constructor', ('name', 'parent', 'specifiers'))
 
-pointSpecifiers = {
-    ('visible', 'from'): 'VisibleFrom',
-    ('offset', 'by'): 'OffsetBy',
-    ('offset', 'along'): 'OffsetAlongSpec',
-    ('at',): 'At',
-    ('in',): 'In',
-    ('on',): 'In',
-    ('beyond',): 'Beyond',
-    ('visible',): 'VisibleSpec',
-    ('left', 'of'): 'LeftSpec',
-    ('right', 'of'): 'RightSpec',
-    ('ahead', 'of'): 'Ahead',
-    ('behind',): 'Behind',
-    ('following',): 'Following',
-}
-orientedPointSpecifiers = {
-    ('apparently', 'facing'): 'ApparentlyFacing',
-    ('facing', 'toward'): 'FacingToward',
-    ('facing',): 'Facing'
-}
-
 point3dSpecifiers = {
     ('at',): 'At3D',
     ('in',): 'In3D',
@@ -313,19 +292,13 @@ objectSpecifiers = {
 }
 
 # sanity check: implementations of specifiers actually exist
-for imp in pointSpecifiers.values():
-    assert imp in api, imp
-for imp in orientedPointSpecifiers.values():
-    assert imp in api, imp
 for imp in objectSpecifiers.values():
     assert imp in api, imp
 for imp in point3dSpecifiers.values():
     assert imp in api, imp
 
 builtinConstructors = {
-    'Point': Constructor('Point', None, pointSpecifiers),
     'Point3D': Constructor('Point3D', None, point3dSpecifiers),
-    'OrientedPoint': Constructor('OrientedPoint', 'Point', orientedPointSpecifiers),
     'OrientedPoint3D': Constructor('OrientedPoint3D', 'Point3D', orientedPoint3DSpecifiers),
     'Object': Constructor('Object', 'OrientedPoint3D', objectSpecifiers)
 }
@@ -343,9 +316,6 @@ prefixOperators = {
     ('apparent', 'heading'): 'ApparentHeading',
     ('distance', 'from'): 'DistanceFrom',
     ('distance', 'to'): 'DistanceFrom',
-    ('angle', 'from'): 'AngleFrom',
-    ('angle', 'to'): 'AngleTo',
-    ('ego', '='): 'ego',
     ('front', 'left'): 'FrontLeft',
     ('front', 'right'): 'FrontRight',
     ('back', 'left'): 'BackLeft',
@@ -354,8 +324,6 @@ prefixOperators = {
     ('back',): 'Back',
     ('left',): 'Left',
     ('right',): 'Right',
-    ('follow',): 'Follow',
-    ('visible',): 'Visible',
     ('top',): 'Top',
     ('bottom',): 'Bottom'
 }
@@ -424,7 +392,6 @@ allIncipits = prefixIncipits | infixIncipits
 replacements = {  # TODO police the usage of these? could yield bizarre error messages
     'of': tuple(),
     'deg': ((STAR, '*'), (NUMBER, '0.01745329252')),
-    'ego': ((NAME, 'ego'), (LPAR, '('), (RPAR, ')'))
 }
 
 ## Illegal and reserved syntax
@@ -637,7 +604,9 @@ class TokenTranslator:
             self.constructors[name] = constructor
             self.functions.add(name)
 
-    def createConstructor(self, name, parent, specs={}):
+    def createConstructor(self, name, parent, specs=None):
+        if specs is None:
+            specs = {}
         if parent is None:
             parent = 'Object'  # default superclass
         self.constructors[name] = Constructor(name, parent, specs)
@@ -1230,7 +1199,6 @@ def storeScenarioStateIn(namespace, requirementSyntax, filename):
     """Post-process an executed Scenic module, extracting state from the veneer."""
     # Extract created Objects
     namespace['_objects'] = tuple(veneer.allObjects)
-    namespace['_egoObject'] = veneer.egoObject
 
     # Extract global parameters
     namespace['_params'] = veneer.globalParameters
@@ -1300,10 +1268,6 @@ def storeScenarioStateIn(namespace, requirementSyntax, filename):
 
 def constructScenarioFrom(namespace):
     """Build a Scenario object from an executed Scenic module."""
-    # Extract ego object
-    if namespace['_egoObject'] is None:
-        raise InvalidScenarioError('did not specify ego object')
-
     # Extract workspace, if one is specified
     if 'workspace' in namespace:
         workspace = namespace['workspace']
@@ -1319,7 +1283,7 @@ def constructScenarioFrom(namespace):
 
     # Create Scenario object
     scenario = Scenario(workspace,
-                        namespace['_objects'], namespace['_egoObject'],
+                        namespace['_objects'],
                         namespace['_params'], namespace['_externalParams'],
                         namespace['_requirements'], namespace['_requirementDeps'])
 
