@@ -23,7 +23,7 @@ def dependencies(thing):
     return getattr(thing, '_dependencies', ())
 
 
-def needsSampling(thing):
+def needs_sampling(thing):
     """Whether this value requires sampling."""
     return isinstance(thing, Distribution) or dependencies(thing)
 
@@ -61,6 +61,7 @@ class DefaultIdentityDict(dict):
     def __missing__(self, key):
         return key
 
+
 class Bucketable(abc.ABC):
     @abc.abstractmethod
     def bucket(self, buckets=None):
@@ -83,7 +84,7 @@ class Samplable(LazilyEvaluable, abc.ABC):
         deps = []
         props = set()
         for dep in dependencies:
-            if needsSampling(dep) or needs_lazy_evaluation(dep):
+            if needs_sampling(dep) or needs_lazy_evaluation(dep):
                 deps.append(dep)
                 props.update(requiredProperties(dep))
         super().__init__(props)
@@ -225,7 +226,7 @@ def to_distribution(val):
     in order to keep track of dependencies properly."""
     if isinstance(val, (tuple, list)):
         coords = [to_distribution(c) for c in val]
-        if any(needsSampling(c) or needs_lazy_evaluation(c) for c in coords):
+        if any(needs_sampling(c) or needs_lazy_evaluation(c) for c in coords):
             if isinstance(val, tuple) and hasattr(val, '_fields'):  # namedtuple
                 builder = type(val)._make
             else:
@@ -284,7 +285,7 @@ def distributionFunction(method, support=None):
     def helper(*args, **kwargs):
         args = tuple(to_distribution(arg) for arg in args)
         kwargs = {name: to_distribution(arg) for name, arg in kwargs.items()}
-        if any(needsSampling(arg) for arg in itertools.chain(args, kwargs.values())):
+        if any(needs_sampling(arg) for arg in itertools.chain(args, kwargs.values())):
             return FunctionDistribution(method, args, kwargs, support)
         elif any(needs_lazy_evaluation(arg) for arg in itertools.chain(args, kwargs.values())):
             # recursively call this helper (not the original function), since the delayed
@@ -354,7 +355,7 @@ def distributionMethod(method):
     def helper(self, *args, **kwargs):
         args = tuple(to_distribution(arg) for arg in args)
         kwargs = {name: to_distribution(arg) for name, arg in kwargs.items()}
-        if any(needsSampling(arg) for arg in itertools.chain(args, kwargs.values())):
+        if any(needs_sampling(arg) for arg in itertools.chain(args, kwargs.values())):
             return MethodDistribution(method, self, args, kwargs)
         elif any(needs_lazy_evaluation(arg) for arg in itertools.chain(args, kwargs.values())):
             # see analogous comment in distributionFunction
@@ -581,6 +582,7 @@ class Range(Distribution, Bucketable):
 
 class Normal(Distribution, Bucketable):
     """Normal distribution"""
+
     def __init__(self, mean, stddev):
         mean = type_support.toScalar(mean, f'Normal mean {mean} is not a scalar')
         stddev = type_support.toScalar(stddev, f'Normal stddev {stddev} is not a scalar')
@@ -733,6 +735,7 @@ class TruncatedNormal(Normal, Bucketable):
 
 class DiscreteRange(Distribution, Bucketable):
     """Distribution over a range of integers."""
+
     def __init__(self, low, high, weights=None):
         if not isinstance(low, int):
             raise RuntimeError(f'DiscreteRange endpoint {low} is not a constant integer')
@@ -779,6 +782,7 @@ class Options(MultiplexerDistribution, Bucketable):
 
     Specified by a dict giving probabilities; otherwise uniform over a given iterable.
     """
+
     def __init__(self, opts):
         if isinstance(opts, dict):
             options, weights = [], []

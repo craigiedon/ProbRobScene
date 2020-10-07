@@ -2,7 +2,7 @@
 
 import random
 
-from scenic3d.core.distributions import Samplable, RejectionException, needsSampling, sample_all
+from scenic3d.core.distributions import Samplable, RejectionException, needs_sampling, sample_all
 from scenic3d.core.external_params import ExternalSampler
 from scenic3d.core.geometry import cuboids_intersect
 from scenic3d.core.lazy_eval import needs_lazy_evaluation
@@ -44,7 +44,7 @@ class Scene:
 
 
 def has_static_bounds(obj):
-    return not (needsSampling(obj.position) or any(needsSampling(corner) for corner in obj.corners))
+    return not (needs_sampling(obj.position) or any(needs_sampling(corner) for corner in obj.corners))
 
 
 class Scenario:
@@ -56,7 +56,7 @@ class Scenario:
                  requirements, requirement_deps):
         assert workspace is not None
 
-        if needsSampling(workspace):
+        if needs_sampling(workspace):
             raise RuntimeParseError('workspace region must be fixed')
 
         self.workspace = workspace
@@ -91,7 +91,7 @@ class Scenario:
                 continue
             # Require object to be contained in the workspace/valid region
             container = self.workspace.region
-            if not needsSampling(container) and not container.contains_object(oi):
+            if not needs_sampling(container) and not container.contains_object(oi):
                 raise InvalidScenarioError(f'Object at {oi.position} does not fit in container')
             for j in range(i):
                 oj = objects[j]

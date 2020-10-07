@@ -30,7 +30,7 @@ robot = Robot ahead of table by 1.1, facing toward table
 """
 
 table = Table on floor
-robot = Robot aheadRough of table
+# robot = Robot aheadRough of table
 
 # robot = BCube in CuboidRegion(Vector3D(width / 2.0, length / 2.0, height / 2.0), Vector3D(0, 0, 0), width * 2, length * 2, height * 2)
 # c1 = BCube in CuboidRegion(Vector3D(1,1,1), Vector3D(0,0,0), 0.2, 0.2, 0.2)

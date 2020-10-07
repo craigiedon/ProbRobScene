@@ -48,7 +48,7 @@ from tokenize import NAME, NL, NEWLINE, ENDMARKER, NUMBER, COLON, COMMENT, ENCOD
 import scenic3d.core.pruning as pruning
 import scenic3d.syntax.relations as relations
 import scenic3d.syntax.veneer as veneer
-from scenic3d.core.distributions import Samplable, needsSampling
+from scenic3d.core.distributions import Samplable, needs_sampling
 from scenic3d.core.lazy_eval import needs_lazy_evaluation
 from scenic3d.core.object_types import Constructible
 from scenic3d.core.regions import Region
@@ -1222,7 +1222,7 @@ def storeScenarioStateIn(namespace, requirementSyntax, filename):
 
         def evaluator():
             result = req()
-            assert not needsSampling(result)
+            assert not needs_sampling(result)
             if needs_lazy_evaluation(result):
                 raise InvalidScenarioError(f'requirement on line {line} uses value'
                                            ' undefined outside of object definition')
@@ -1254,7 +1254,7 @@ def storeScenarioStateIn(namespace, requirementSyntax, filename):
         relations.inferRelationsFrom(reqNode, bindings, ego, line)
         # Gather dependencies of the requirement
         for value in bindings.values():
-            if needsSampling(value):
+            if needs_sampling(value):
                 requirementDeps.add(value)
             if needs_lazy_evaluation(value):
                 raise InvalidScenarioError(f'requirement on line {line} uses value {value}'
@@ -1273,7 +1273,7 @@ def constructScenarioFrom(namespace):
         workspace = namespace['workspace']
         if not isinstance(workspace, Region):
             raise InvalidScenarioError(f'workspace {workspace} is not a Workspace')
-        if needsSampling(workspace):
+        if needs_sampling(workspace):
             raise InvalidScenarioError('workspace must be a fixed region')
         if needs_lazy_evaluation(workspace):
             raise InvalidScenarioError('workspace uses value undefined '

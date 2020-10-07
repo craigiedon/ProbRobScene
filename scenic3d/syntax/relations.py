@@ -4,7 +4,7 @@ import math
 from ast import Compare, BinOp, Eq, Lt, LtE, Gt, GtE, Call, Add, Sub, Expression, Name
 from collections import defaultdict
 
-from scenic3d.core.distributions import needsSampling
+from scenic3d.core.distributions import needs_sampling
 from scenic3d.core.object_types import Object
 from scenic3d.core.utils import InvalidScenarioError, InconsistentScenarioError
 
@@ -186,7 +186,7 @@ class RequirementMatcher:
     def matchConstant(self, node):
         """Match constant values, i.e. values known prior to sampling."""
         value = self.matchValue(node)
-        return None if needsSampling(value) else value
+        return None if needs_sampling(value) else value
 
     def matchValue(self, node):
         """Match any expression which can be evaluated, returning its value.

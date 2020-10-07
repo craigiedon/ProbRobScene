@@ -11,7 +11,7 @@ from scipy.optimize import linprog
 from scipy.spatial import ConvexHull, HalfspaceIntersection
 from scipy.spatial.transform import Rotation as R
 
-from scenic3d.core.distributions import Samplable, RejectionException, needsSampling, distributionFunction
+from scenic3d.core.distributions import Samplable, RejectionException, needs_sampling, distributionFunction
 from scenic3d.core.geometry import cuboid_contains_point
 from scenic3d.core.geometry import sin, cos, hypot, min_and_max
 from scenic3d.core.lazy_eval import value_in_context
@@ -415,7 +415,7 @@ class PointSetRegion(Region):
         super().__init__(name, orientation=orientation)
         self.points = tuple(points)
         for point in self.points:
-            if needsSampling(point):
+            if needs_sampling(point):
                 raise RuntimeError('only fixed PointSetRegions are supported')
         self.kd_tree = scipy.spatial.cKDTree(self.points) if kd_tree is None else kd_tree
         self.orientation = orientation

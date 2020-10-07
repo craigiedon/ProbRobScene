@@ -5,7 +5,7 @@ import warnings
 
 import numpy as np
 import scenic3d.core.utils as utils
-from scenic3d.core.distributions import (needsSampling, distributionFunction,
+from scenic3d.core.distributions import (needs_sampling, distributionFunction,
                                          monotonicDistributionFunction)
 from scenic3d.core.lazy_eval import needs_lazy_evaluation
 
@@ -108,7 +108,7 @@ def cuboid_contains_point(obj, point):
     from scenic3d.core.vectors import rotate_euler
     from scenic3d.core.vectors import reverse_euler
     diff = point - obj.position
-    need_to_sample = needsSampling(obj)
+    need_to_sample = needs_sampling(obj)
     need_to_lazy = needs_lazy_evaluation(obj)
     x, y, z = rotate_euler(diff, reverse_euler(obj.orientation))
     return abs(x) <= obj.hw and abs(y) <= obj.hl and abs(z) <= obj.hh
@@ -155,6 +155,6 @@ def cube_edge_separates(cuboid_a, cuboid_b):
 
 
 def get_constant_polygon(cuboid):
-    assert not any(needsSampling(c) or needs_lazy_evaluation(c) for c in cuboid.corners)
+    assert not any(needs_sampling(c) or needs_lazy_evaluation(c) for c in cuboid.corners)
     corners = [(x, y, z) for x, y, z in cuboid.corners]  # convert Vectors to tuples
     return shapely.geometry.Polygon(corners)

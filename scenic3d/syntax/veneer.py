@@ -58,7 +58,7 @@ Uniform = lambda *opts: Options(opts)  # TODO separate these?
 Discrete = Options
 from scenic3d.core.external_params import (VerifaiParameter, VerifaiRange, VerifaiDiscreteRange,
                                            VerifaiOptions)
-from scenic3d.core.object_types import Mutator, Object, Point3D, OrientedPoint3D
+from scenic3d.core.object_types import Mutator, Object, Point3D, OrientedPoint3D, Oriented
 from scenic3d.core.specifiers import PropertyDefault  # TODO remove
 
 # everything that should not be directly accessible from the language is imported here:
@@ -619,12 +619,12 @@ def directional_spec_helper(syntax, pos, dist, axis, to_components, make_offset)
     else:
         raise RuntimeParseError(f'"{syntax} X by D" with D not a number or vector3d')
 
-    if isinstance(pos, OrientedPoint3D):
+    if isinstance(pos, Oriented):
         val = lambda self: pos.position + rotate_euler(make_offset(self, *offset_vec), pos.orientation)
         new = DelayedArgument({axis}, val)
     else:
         pos = toType(pos, Vector3D)
-        val = lambda self: pos + rotate_euler(make_offset(self, *offset_vec), self.orientation)
+        val = lambda self: pos + make_offset(self, *offset_vec)
         new = DelayedArgument({axis, 'orientation'}, val)
     return Specifier('position', new, optionals=extras)
 

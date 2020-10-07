@@ -11,7 +11,7 @@ from scipy.spatial.transform import Rotation as R
 
 import scenic3d.core.utils as utils
 from scenic3d.core.distributions import (Samplable, Distribution, MethodDistribution,
-                                         needsSampling, makeOperatorHandler, distributionMethod, distributionFunction)
+                                         needs_sampling, makeOperatorHandler, distributionMethod, distributionFunction)
 from scenic3d.core.geometry import normalize_angle
 from scenic3d.core.lazy_eval import value_in_context, needs_lazy_evaluation, makeDelayedFunctionCall
 
@@ -104,7 +104,7 @@ def scalarOperator(method):
 
     @functools.wraps(method)
     def handler2(self, *args, **kwargs):
-        if any(needsSampling(arg) for arg in itertools.chain(args, kwargs.values())):
+        if any(needs_sampling(arg) for arg in itertools.chain(args, kwargs.values())):
             return MethodDistribution(method, self, args, kwargs)
         else:
             return method(self, *args, **kwargs)
@@ -126,9 +126,9 @@ def vectorOperator(method):
 
     @functools.wraps(method)
     def handler2(self, *args):
-        if needsSampling(self):
+        if needs_sampling(self):
             return VectorOperatorDistribution(op, self, args)
-        elif any(needsSampling(arg) for arg in args):
+        elif any(needs_sampling(arg) for arg in args):
             return VectorMethodDistribution(method, self, args, {})
         elif any(needs_lazy_evaluation(arg) for arg in args):
             # see analogous comment in distributionFunction
@@ -144,7 +144,7 @@ def vectorDistributionMethod(method):
 
     @functools.wraps(method)
     def helper(self, *args, **kwargs):
-        if any(needsSampling(arg) for arg in itertools.chain(args, kwargs.values())):
+        if any(needs_sampling(arg) for arg in itertools.chain(args, kwargs.values())):
             return VectorMethodDistribution(method, self, args, kwargs)
         elif any(needs_lazy_evaluation(arg) for arg in itertools.chain(args, kwargs.values())):
             # see analogous comment in distributionFunction

@@ -1,5 +1,5 @@
 """Implementations of the built-in Scenic classes."""
-
+import abc
 import collections
 import inspect
 import itertools
@@ -7,7 +7,7 @@ import math
 import random
 import numpy as np
 
-from scenic3d.core.distributions import Samplable, needsSampling, to_distribution
+from scenic3d.core.distributions import Samplable, needs_sampling, to_distribution
 from scenic3d.core.geometry import averageVectors, hypot, min
 from scenic3d.core.lazy_eval import needs_lazy_evaluation
 from scenic3d.core.regions import SphericalRegion
@@ -128,7 +128,7 @@ class Constructible(Samplable):
                 setattr(self, opt, getattr(v, opt))
 
         # Set up dependencies
-        super().__init__(dependencies=[getattr(self, p) for p in properties if needsSampling(getattr(self, p))])
+        super().__init__(dependencies=[getattr(self, p) for p in properties if needs_sampling(getattr(self, p))])
         self.properties = set(properties)
 
     def sample_given_dependencies(self, dep_values):
@@ -229,8 +229,6 @@ class Point3D(Constructible):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # TODO: Wtf does this line even mean?
-        # self.position = to_vector_3d(self.position, f'"position" of {self} not a vector3d')
         self.corners = (self.position,)
         self.visibleRegion = SphericalRegion(self.position, self.visibleDistance)
 
@@ -249,7 +247,13 @@ class Point3D(Constructible):
             raise AttributeError(f"'{type(self).__name__}' object has no attribute '{attr}'")
 
 
-class OrientedPoint3D(Point3D):
+class Oriented(abc.ABC):
+    @abc.abstractmethod
+    def to_orientation(self):
+        raise NotImplementedError
+
+
+class OrientedPoint3D(Point3D, Oriented):
     orientation: Vector3D(0, 0, 0)
 
     def __init__(self, *args, **kwargs):
@@ -260,18 +264,23 @@ class OrientedPoint3D(Point3D):
         return self.orientation
 
 
+
 def relative_position_3d(rel_pos, reference_pos, reference_orientation):
     pos = reference_pos + rotate_euler(rel_pos, reference_orientation)
     return OrientedPoint3D(position=pos, orientation=reference_orientation)
 
 
-class Object(OrientedPoint3D):
+class Object(Point3D, Oriented):
     width: 1
     height: 1
     length: 1
+    orientation: Vector3D(0, 0, 0)
     allowCollisions: False
     requireVisible: True
     cameraOffset: Vector(0, 0)
+
+    def to_orientation(self):
+        return self.orientation
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -305,7 +314,7 @@ class Object(OrientedPoint3D):
         self._relations = []
 
     def show_3d(self, ax, highlight=False):
-        if needsSampling(self):
+        if needs_sampling(self):
             raise RuntimeError('tried to show_3d() symbolic Object')
 
         color = self.color if hasattr(self, 'color') else (1, 0, 0)
