@@ -14,7 +14,7 @@ from scenic3d.core.regions import SphericalRegion
 from scenic3d.core.specifiers import Specifier, PropertyDefault
 from scenic3d.core.type_support import toVector, toScalar, toType
 from scenic3d.core.utils import areEquivalent, RuntimeParseError
-from scenic3d.core.vectors import Vector, Vector3D, rotate_euler
+from scenic3d.core.vectors import Vector, Vector3D, rotate_euler_v3d
 from scenic3d.core.plotUtil3d import draw_cube
 
 
@@ -264,9 +264,8 @@ class OrientedPoint3D(Point3D, Oriented):
         return self.orientation
 
 
-
 def relative_position_3d(rel_pos, reference_pos, reference_orientation):
-    pos = reference_pos + rotate_euler(rel_pos, reference_orientation)
+    pos = reference_pos + rotate_euler_v3d(rel_pos, reference_orientation)
     return OrientedPoint3D(position=pos, orientation=reference_orientation)
 
 
@@ -307,11 +306,14 @@ class Object(Point3D, Oriented):
         self.backLeft = relative_position_3d(Vector3D(-hw, -hl, 0), self.position, self.orientation)
         self.backRight = relative_position_3d(Vector3D(-hw, hl, 0), self.position, self.orientation)
 
-        self.corners = tuple(self.position + rotate_euler(Vector3D(*offset), self.orientation)
+        self.corners = tuple(self.position + rotate_euler_v3d(Vector3D(*offset), self.orientation)
                              for offset in itertools.product((hw, -hw), (hl, -hl), (hh, -hh)))
         # camera = self.position.offsetRotated(self.heading, self.cameraOffset)
         # self.visibleRegion = SectorRegion(camera, self.visibleDistance, self.heading, self.viewAngle)
         self._relations = []
+
+    def dimensions(self) -> np.array:
+        return np.array([self.width, self.length, self.height])
 
     def show_3d(self, ax, highlight=False):
         if needs_sampling(self):

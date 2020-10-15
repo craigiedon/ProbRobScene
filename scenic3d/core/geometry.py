@@ -20,6 +20,11 @@ def cos(x):
     return math.cos(x)
 
 
+@distributionFunction
+def normalize(x):
+    return x / np.linalg.norm(x)
+
+
 @monotonicDistributionFunction
 def hypot(x, y, z):
     return math.sqrt(x * x + y * y + z * z)
@@ -105,12 +110,12 @@ def apparentHeadingAtPoint(point, heading, base):
 
 
 def cuboid_contains_point(obj, point):
-    from scenic3d.core.vectors import rotate_euler
+    from scenic3d.core.vectors import rotate_euler_v3d
     from scenic3d.core.vectors import reverse_euler
     diff = point - obj.position
     need_to_sample = needs_sampling(obj)
     need_to_lazy = needs_lazy_evaluation(obj)
-    x, y, z = rotate_euler(diff, reverse_euler(obj.orientation))
+    x, y, z = rotate_euler_v3d(diff, reverse_euler(obj.orientation))
     return abs(x) <= obj.hw and abs(y) <= obj.hl and abs(z) <= obj.hh
 
 
@@ -129,7 +134,7 @@ def cuboids_intersect(cuboid_a, cuboid_b):
 
 def cube_edge_separates(cuboid_a, cuboid_b):
     from scenic3d.core.vectors import reverse_euler
-    from scenic3d.core.vectors import rotate_euler
+    from scenic3d.core.vectors import rotate_euler_v3d
     base = cuboid_a.position.to_vector_3d()
 
     # A reversal of the first one's rotation
@@ -137,7 +142,7 @@ def cube_edge_separates(cuboid_a, cuboid_b):
 
     # Take each of cube_b's corners, then get the relative vector from the position of cube_a to each of these corners
     # Then take each of these relative vectors and undo the rotation of A
-    rc = [rotate_euler(corner - base, rot) for corner in cuboid_b.corners]
+    rc = [rotate_euler_v3d(corner - base, rot) for corner in cuboid_b.corners]
     xs, ys, zs = zip(*rc)
 
     min_x, max_x = min_and_max(xs)

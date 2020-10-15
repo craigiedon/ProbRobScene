@@ -52,7 +52,7 @@ from scenic3d.core.regions import (Region, PointSetRegion,
                                    everywhere, nowhere, CuboidRegion, SphericalRegion,
                                    HalfSpaceRegion, PointInRegionDistribution)
 from scenic3d.core.vectors import Vector, VectorField, PolygonalVectorField, Vector3D, offset_beyond, \
-    rotation_to_euler, rotate_euler, VectorField3D
+    rotation_to_euler, rotate_euler_v3d, VectorField3D
 
 Uniform = lambda *opts: Options(opts)  # TODO separate these?
 Discrete = Options
@@ -576,14 +576,14 @@ def AheadRough(obj):
 
 
 def front_plane(obj: Object) -> HalfSpaceRegion:
-    point = obj.position + rotate_euler(Vector3D(0, obj.length / 2.0, 0.0), obj.orientation)
-    normal = rotate_euler(Vector3D(0, 1, 0), obj.orientation)
+    point = obj.position + rotate_euler_v3d(Vector3D(0, obj.length / 2.0, 0.0), obj.orientation)
+    normal = rotate_euler_v3d(Vector3D(0, 1, 0), obj.orientation)
     return HalfSpaceRegion(point, normal)
 
 
 def top_surface_region(to_place, ref_obj, dist: float):
-    ref_top_surface = ref_obj.position + rotate_euler(Vector3D(0, 0, ref_obj.height / 2.0), ref_obj.orientation)
-    rotated_offset = rotate_euler(Vector3D(0, 0, dist + to_place.height / 2.0), ref_obj.orientation)
+    ref_top_surface = ref_obj.position + rotate_euler_v3d(Vector3D(0, 0, ref_obj.height / 2.0), ref_obj.orientation)
+    rotated_offset = rotate_euler_v3d(Vector3D(0, 0, dist + to_place.height / 2.0), ref_obj.orientation)
     region_pos = rotated_offset + ref_top_surface
     return CuboidRegion(region_pos, ref_obj.orientation, ref_obj.width, ref_obj.length, 0.0)
 
@@ -620,7 +620,7 @@ def directional_spec_helper(syntax, pos, dist, axis, to_components, make_offset)
         raise RuntimeParseError(f'"{syntax} X by D" with D not a number or vector3d')
 
     if isinstance(pos, Oriented):
-        val = lambda self: pos.position + rotate_euler(make_offset(self, *offset_vec), pos.orientation)
+        val = lambda self: pos.position + rotate_euler_v3d(make_offset(self, *offset_vec), pos.orientation)
         new = DelayedArgument({axis}, val)
     else:
         pos = toType(pos, Vector3D)

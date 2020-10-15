@@ -373,7 +373,7 @@ class VectorField3D:
         step_size = dist / steps
         followed_pos = pos
         for i in range(steps):
-            followed_pos += rotate_euler(Vector3D(step_size, 0.0, 0.0), self[pos])
+            followed_pos += rotate_euler_v3d(Vector3D(step_size, 0.0, 0.0), self[pos])
         return followed_pos
 
     def __str__(self):
@@ -436,9 +436,13 @@ def offset_beyond(origin: Vector3D, offset: Vector3D, from_perspective_pos: Vect
 
 
 @distributionFunction
-def rotate_euler(vec: Vector3D, euler_rot: Vector3D) -> Vector3D:
+def rotate_euler_v3d(vec: Vector3D, euler_rot: Vector3D) -> Vector3D:
+    return Vector3D(*rotate_euler(vec, euler_rot))
+
+
+def rotate_euler(v: np.array, euler_rot: np.array) -> np.array:
     rot = R.from_euler('zyx', euler_rot)
-    return Vector3D(*rot.apply(vec))
+    return rot.apply(v)
 
 
 @distributionFunction

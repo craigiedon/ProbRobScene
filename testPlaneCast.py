@@ -11,12 +11,12 @@ if __name__ == "__main__":
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
 
-    ego = np.array([0.3, 0.4, 0.2])
+    robot = np.array([0.3, 0.4, 0.2])
     cube = np.array([0.5, 0.6, -0.2])
 
-    # draw_cube(ax, ego, 0.1 * np.ones(3), np.zeros(3), 'g')
+    # draw_cube(ax, robot, 0.1 * np.ones(3), np.zeros(3), 'g')
     # draw_cube(ax, cube, 0.1 * np.ones(3), np.zeros(3), 'b')
-    # new_pos = offset_beyond(Vector3D(*cube), Vector3D(0.4, 0.0, 0.0), Vector3D(*ego))
+    # new_pos = offset_beyond(Vector3D(*cube), Vector3D(0.4, 0.0, 0.0), Vector3D(*robot))
     # draw_cube(ax, new_pos, 0.1 * np.ones(3), np.zeros(3), 'y')
 
     ax.quiver(*v.point, *v.normal, color='b')

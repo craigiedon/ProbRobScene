@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 from scipy.spatial.transform import Rotation as R
 
-from scenic3d.core.vectors import offset_beyond, Vector3D
+from scenic3d.core.vectors import offset_beyond, Vector3D, rotate_euler_v3d
 
 
 def draw_cube(ax, pos: np.array, size: np.array, rot: np.array, color: str = 'b'):
@@ -29,6 +29,17 @@ def draw_polyhedron(ax, points: np.array, faces: np.array, color: str = 'b', alp
     for face in faces:
         face_points = np.array([points[i] for i in face])
         ax.add_collection3d(Poly3DCollection(face_points, color=color, edgecolor='black', alpha=alpha))
+
+
+def draw_polygon_3d(ax, points: np.array, vertice_indices: np.array, pos: np.array = None, rot: np.array = None, color: str = 'b', alpha: float = 1.0):
+    ordered_verts = np.array([np.append(points[i], 0) for i in vertice_indices])
+    r = R.from_euler('zyx', rot) if rot is not None else R.from_euler('zyx', np.zeros(3))
+    pos = pos if pos is not None else np.zeros(3)
+
+    rotated_verts = r.apply(ordered_verts)
+    translated_verts = rotated_verts + pos
+    X, Y, Z = translated_verts.transpose()
+    ax.plot_trisurf(X, Y, Z, color=color, alpha=alpha, edgecolor='black')
 
 
 if __name__ == "__main__":
