@@ -18,7 +18,7 @@ __all__ = (
     'DistanceFrom', 'CanSee',
     # Primitive types
     'Vector', 'VectorField', 'PolygonalVectorField', 'Point3D', 'Vector3D',
-    'Region', 'PointSetRegion', 'CuboidRegion', 'SphericalRegion',
+    'Region', 'PointSetRegion', 'CuboidRegion', 'SphericalRegion', 'Rectangle3DRegion',
     'Mutator',
     'Range', 'Options', 'Uniform', 'Discrete', 'Normal',
     'VerifaiParameter', 'VerifaiRange', 'VerifaiDiscreteRange', 'VerifaiOptions',
@@ -34,7 +34,7 @@ __all__ = (
     'At3D', 'In3D', 'Beyond3D', 'OffsetBy3D',
     'Facing3D', 'FacingToward3D',
     'LeftSpec3D', 'RightSpec3D', 'Ahead3D', 'Behind3D', 'Above3D', 'Below3D',
-    'Following3D', 'OnTopOf', 'AheadRough',
+    'Following3D', 'OnTopOf', 'OnTopOfStrict', 'AheadRough',
     # 3D Prefix Ops
     'Top', 'Bottom',
     # 3D Infix Operators
@@ -45,12 +45,14 @@ __all__ = (
     'PropertyDefault'
 )
 
+from typing import Union
+
 from scenic3d.core.distributions import Range, Options, Normal, distributionFunction
 # various Python types and functions used in the language but defined elsewhere
 from scenic3d.core.geometry import sin, cos, hypot, max, min
 from scenic3d.core.regions import (Region, PointSetRegion,
                                    everywhere, nowhere, CuboidRegion, SphericalRegion,
-                                   HalfSpaceRegion, PointInRegionDistribution)
+                                   HalfSpaceRegion, PointInRegionDistribution, Rectangle3DRegion)
 from scenic3d.core.vectors import Vector, VectorField, PolygonalVectorField, Vector3D, offset_beyond, \
     rotation_to_euler, rotate_euler_v3d, VectorField3D
 
@@ -472,7 +474,8 @@ def Facing(heading):
         return Specifier('heading', heading)
 
 
-def Facing3D(orientation):
+def Facing3D(direction: Vector3D) -> Specifier:
+    orientation = rotation_to_euler(Vector3D(0, 1, 0), direction)
     return Specifier('orientation', orientation)
 
 
@@ -488,10 +491,7 @@ def FacingToward(pos):
 
 def FacingToward3D(pos):
     pos = toType(pos, Vector3D)
-    return Specifier('orientation', DelayedArgument({'position'}, lambda s: rotation_to_euler(Vector3D(0, 1, 0),
-                                                                                              Vector3D(pos[0], pos[1],
-                                                                                                       s.position[
-                                                                                                           2]) - s.position)))  # rotation_to_euler(s.orientation, pos)))
+    return Specifier('orientation', DelayedArgument({'position'}, lambda s: rotation_to_euler(Vector3D(0, 1, 0), Vector3D(pos[0], pos[1], s.position[2]) - s.position)))
 
 
 def ApparentlyFacing(heading, fromPt):
@@ -528,88 +528,41 @@ def Behind(pos, dist=0):
 eps = 1e-9
 
 
-def LeftSpec3D(pos, dist=eps):
-    return directional_spec_helper('left of', pos, dist, 'width', lambda dist: (dist, 0, 0),
-                                   lambda self, dx, dy, dz: Vector3D(-self.width / 2.0 - dx, dy, dz))
+def LeftSpec3D(pos, dist=eps) -> Specifier:
+    return directional_spec_helper(syntax='left of',
+                                   pos=pos,
+                                   dist=dist,
+                                   axis='width',
+                                   to_components=lambda d: (d, 0, 0),
+                                   make_offset=lambda self, dx, dy, dz: Vector3D(-self.width / 2.0 - dx, dy, dz))
 
 
-def RightSpec3D(pos, dist=eps):
+def RightSpec3D(pos, dist=eps) -> Specifier:
     return directional_spec_helper('right of', pos, dist, 'width', lambda dist: (dist, 0, 0),
                                    lambda self, dx, dy, dz: Vector3D(self.width / 2.0 + dx, dy, dz))
 
 
-def Ahead3D(pos, dist=eps):
+def Ahead3D(pos, dist=eps) -> Specifier:
     return directional_spec_helper('ahead of', pos, dist, 'length', lambda dist: (0, dist, 0),
                                    lambda self, dx, dy, dz: Vector3D(dx, self.length / 2.0 + dy, dz))
 
 
-def Behind3D(pos, dist=eps):
+def Behind3D(pos, dist=eps) -> Specifier:
     return directional_spec_helper('behind', pos, dist, 'length', lambda dist: (0, dist, 0),
                                    lambda self, dx, dy, dz: Vector3D(dx, -self.length / 2.0 - dy, dz))
 
 
-def Above3D(pos, dist=eps):
+def Above3D(pos, dist=eps) -> Specifier:
     return directional_spec_helper('above', pos, dist, 'height', lambda dist: (0, 0, dist),
                                    lambda self, dx, dy, dz: Vector3D(dx, dy, self.height / 2.0 + dz))
 
 
-def Below3D(pos, dist=eps):
+def Below3D(pos, dist=eps) -> Specifier:
     return directional_spec_helper('below', pos, dist, 'height', lambda dist: (0, 0, dist),
                                    lambda self, dx, dy, dz: Vector3D(dx, dy, -self.height / 2.0 - dz))
 
 
-def OnTopOf(thing, dist=eps):
-    # So...if it is a point ... then we can proceed as for above/below etc: just set the spec position of the object to be above this point based on the half height...
-    if isinstance(thing, Point3D):
-        new = DelayedArgument({'height'}, lambda s: thing.position + Vector3D(0, 0, dist + s.height / 2.0))
-    if isinstance(thing, Vector3D):
-        new = DelayedArgument({'height'}, lambda s: thing + Vector3D(0, 0, dist + s.height / 2.0))
-    else:
-        new = DelayedArgument({'height'},
-                              lambda s: PointInRegionDistribution(top_surface_region(s, thing, dist)))
-    return Specifier('position', new)
-
-
-def AheadRough(obj):
-    new = PointInRegionDistribution(front_plane(obj))
-    return Specifier('position', new)
-
-
-def front_plane(obj: Object) -> HalfSpaceRegion:
-    point = obj.position + rotate_euler_v3d(Vector3D(0, obj.length / 2.0, 0.0), obj.orientation)
-    normal = rotate_euler_v3d(Vector3D(0, 1, 0), obj.orientation)
-    return HalfSpaceRegion(point, normal)
-
-
-def top_surface_region(to_place, ref_obj, dist: float):
-    ref_top_surface = ref_obj.position + rotate_euler_v3d(Vector3D(0, 0, ref_obj.height / 2.0), ref_obj.orientation)
-    rotated_offset = rotate_euler_v3d(Vector3D(0, 0, dist + to_place.height / 2.0), ref_obj.orientation)
-    region_pos = rotated_offset + ref_top_surface
-    return CuboidRegion(region_pos, ref_obj.orientation, ref_obj.width, ref_obj.length, 0.0)
-
-
-def left_spec_helper(syntax, pos, dist, axis, to_components, make_offset):
-    raise NotImplementedError
-    # extras = set()
-    # dType = underlyingType(dist)
-    # if dType is float or dType is int:
-    #     dx, dy = to_components(dist)
-    # elif dType is Vector:
-    #     dx, dy = dist
-    # else:
-    #     raise RuntimeParseError(f'"{syntax} X by D" with D not a number or vector')
-    # if isinstance(pos, OrientedPoint):  # TODO too strict?
-    #     val = lambda self: pos.relativePosition(make_offset(self, dx, dy))
-    #     new = DelayedArgument({axis}, val)
-    #     extras.add('heading')
-    # else:
-    #     pos = toVector(pos, f'specifier "{syntax} X" with X not a vector')
-    #     val = lambda self: pos.offsetRotated(self.heading, make_offset(self, dx, dy))
-    #     new = DelayedArgument({axis, 'heading'}, val)
-    # return Specifier('position', new, optionals=extras)
-
-
-def directional_spec_helper(syntax, pos, dist, axis, to_components, make_offset):
+def directional_spec_helper(syntax, pos, dist, axis, to_components, make_offset) -> Specifier:
     extras = set()
     d_type = underlyingType(dist)
     if d_type is float or d_type is int:
@@ -627,6 +580,71 @@ def directional_spec_helper(syntax, pos, dist, axis, to_components, make_offset)
         val = lambda self: pos + make_offset(self, *offset_vec)
         new = DelayedArgument({axis, 'orientation'}, val)
     return Specifier('position', new, optionals=extras)
+
+
+def OnTopOf(thing: Union[Point3D, Vector3D, Object, Rectangle3DRegion], dist: float = eps, strict: bool = False) -> Specifier:
+    if isinstance(thing, Rectangle3DRegion):
+        if strict:
+            new = DelayedArgument({'width', 'length', 'height'}, lambda s: PointInRegionDistribution(on_top_of_rect(s, thing, dist, strict)))
+        else:
+            new = DelayedArgument({'height'}, lambda s: PointInRegionDistribution(on_top_of_rect(s, thing, dist)))
+    elif isinstance(thing, Object):
+        if strict:
+            new = DelayedArgument({'width', 'length', 'height'}, lambda s: PointInRegionDistribution(top_surface_region(s, thing, dist, strict)))
+        else:
+            new = DelayedArgument({'height'}, lambda s: PointInRegionDistribution(top_surface_region(s, thing, dist)))
+    elif isinstance(thing, Point3D):
+        new = DelayedArgument({'height'}, lambda s: thing.position + Vector3D(0, 0, dist + s.height / 2.0))
+    elif isinstance(thing, Vector3D):
+        new = DelayedArgument({'height'}, lambda s: thing + Vector3D(0, 0, dist + s.height / 2.0))
+    else:
+        raise TypeError(f'Asking to be on top of {thing} which has unsupported type {type(thing)}')
+    return Specifier('position', new)
+
+
+def OnTopOfStrict(thing: Union[Point3D, Vector3D, Object, Rectangle3DRegion], dist=eps) -> Specifier:
+    return OnTopOf(thing, dist, True)
+
+
+def AheadRough(obj: Union[Object, Point3D], min_amount: float = 0.0, max_amount: float = 1000.0):
+    if isinstance(obj, Object):
+        new = PointInRegionDistribution(front_plane(obj, min_amount, max_amount))
+    elif isinstance(obj, Point3D):
+        new = PointInRegionDistribution(HalfSpaceRegion(obj.position + Vector3D(0, min_amount, 0), Vector3D(0, 1, 0), max_amount - min_amount))
+    else:
+        raise TypeError(f'Object {obj} of type {type(obj)} not supported by Ahead. Only supports Point3D and Object types')
+
+    return Specifier('position', new)
+
+
+def front_plane(ref_obj: Object, min_amount: float, max_amount: float) -> HalfSpaceRegion:
+    point = ref_obj.position + rotate_euler_v3d(Vector3D(0, ref_obj.length / 2.0 + min_amount, 0.0), ref_obj.orientation)
+    normal = rotate_euler_v3d(Vector3D(0, 1, 0), ref_obj.orientation)
+    return HalfSpaceRegion(point, normal, max_amount - min_amount)
+
+
+def on_top_of_rect(obj_to_place: Object, r: Rectangle3DRegion, dist: float, strict: bool = False) -> Rectangle3DRegion:
+    offset = rotate_euler_v3d(Vector3D(0, 0, dist + obj_to_place.height / 2.0), r.rot)
+    if strict:
+        assert r.width > obj_to_place.width and r.length > obj_to_place.length
+        return Rectangle3DRegion(r.width - obj_to_place.width, r.length - obj_to_place.length, r.origin + offset, r.rot)
+
+    return Rectangle3DRegion(r.width, r.length, r.origin + offset, r.rot)
+
+
+def top_surface_region(obj_to_place: Object, ref_obj: Object, dist: float, strict: bool = False) -> Rectangle3DRegion:
+    ref_top_surface = ref_obj.position + rotate_euler_v3d(Vector3D(0, 0, ref_obj.height / 2.0), ref_obj.orientation)
+    rotated_offset = rotate_euler_v3d(Vector3D(0, 0, dist + obj_to_place.height / 2.0), ref_obj.orientation)
+    region_pos = rotated_offset + ref_top_surface
+
+    if strict:
+        assert ref_obj.width > obj_to_place.width and ref_obj.length > obj_to_place.length
+        return Rectangle3DRegion(ref_obj.width - obj_to_place.width, ref_obj.length - obj_to_place.length, region_pos, ref_obj.orientation)
+    return Rectangle3DRegion(ref_obj.width, ref_obj.length, region_pos, ref_obj.orientation)
+
+
+def left_spec_helper(syntax, pos, dist, axis, to_components, make_offset):
+    raise NotImplementedError
 
 
 def Following(field, dist, fromPt):

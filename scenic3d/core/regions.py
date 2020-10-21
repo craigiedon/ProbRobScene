@@ -3,10 +3,11 @@ import abc
 import itertools
 import math
 import random
-from typing import Optional, Tuple, List
+from typing import Optional, Tuple, List, Union, TYPE_CHECKING
 
 import numpy as np
 import scipy.spatial
+from scipy.linalg import inv
 from scipy.optimize import linprog
 from scipy.spatial import ConvexHull, HalfspaceIntersection
 from scipy.spatial.transform import Rotation as R
@@ -82,7 +83,7 @@ class Intersect(abc.ABC):
 
 class BoundingBox(abc.ABC):
     @abc.abstractmethod
-    def getAABB(self):
+    def getAABB(self) -> Tuple[np.array]:
         """Axis-aligned bounding box"""
         raise NotImplementedError()
 
@@ -90,6 +91,12 @@ class BoundingBox(abc.ABC):
 class Convex(abc.ABC):
     @abc.abstractmethod
     def to_hsi(self) -> HalfspaceIntersection:
+        raise NotImplementedError
+
+
+class Oriented(abc.ABC):
+    @abc.abstractmethod
+    def to_orientation(self):
         raise NotImplementedError
 
 
@@ -198,7 +205,7 @@ class SphericalRegion(Region, BoundingBox):
     def getAABB(self):
         x, y, z = self.center
         r = self.radius
-        return (x - r, y - r, z - r), (x + r, y + r, z + r)
+        return np.array((x - r, y - r, z - r)), np.array((x + r, y + r, z + r))
 
     def isEquivalentTo(self, other):
         if type(other) is not SphericalRegion:
@@ -209,11 +216,30 @@ class SphericalRegion(Region, BoundingBox):
         return f'SphericalRegion({self.center}, {self.radius})'
 
 
+class IntersectionRegion(Region):
+
+    def __init__(self, r1: Region, r2: Region):
+        super().__init__('Intersection', r1, r2)
+        self.r1 = r1
+        self.r2 = r2
+
+    def uniform_point_inner(self):
+        raise RuntimeError("Should not be sampling from this region. Prune out")
+
+    def contains_point(self, point):
+        raise NotImplementedError
+
+    def sample_given_dependencies(self, dep_values):
+        raise NotImplementedError
+
+    def evaluateInner(self, context):
+        raise NotImplementedError
+
+
 class HalfSpaceRegion(Region, Intersect, Convex):
     def to_hsi(self) -> HalfspaceIntersection:
-        return HalfspaceIntersection(
-            halfspaces_to_inequalities(np.array([self.normal]), np.array([self.point])),
-            np.array(self.point + self.normal))
+        pos = np.array(self.point + self.normal * (self.dist / 2.0))
+        return cube_to_hsi(pos, self.dist * np.ones(3), np.array(self.rot))
 
     def sample_given_dependencies(self, dep_values):
         return HalfSpaceRegion(dep_values[self.point], dep_values[self.normal], dep_values[self.dist])
@@ -231,7 +257,9 @@ class HalfSpaceRegion(Region, Intersect, Convex):
             return intersect_halfspaces(self, other)
         if isinstance(other, ConvexPolyhedronRegion):
             return intersect_halfspace_convpoly(self, other)
-        if isinstance(other, EmptyRegion) or isinstance(other, AllRegion):
+        if isinstance(other, (ConvexPolygon3DRegion, Rectangle3DRegion)):
+            return intersect_poly_convex(other, self)
+        if isinstance(other, (EmptyRegion, AllRegion)):
             return other.intersect(self)
 
         raise NotImplementedError("Havent yet filled in the intersection code")
@@ -241,25 +269,14 @@ class HalfSpaceRegion(Region, Intersect, Convex):
         self.point = point
         self.normal = normal
         self.dist = dist
-        rot = rotation_to_euler(Vector3D(0, 1, 0), self.normal)
-        self.ax_1 = rotate_euler_v3d(Vector3D(1, 0, 0), rot)
-        self.ax_2 = rotate_euler_v3d(Vector3D(0, 0, 1), rot)
+        self.rot = rotation_to_euler(Vector3D(0, 0, 1), self.normal)
 
     def uniform_point_inner(self) -> Vector3D:
-        rx_1 = random.uniform(-self.dist / 2.0, self.dist / 2.0)
-        rx_2 = random.uniform(-self.dist / 2.0, self.dist / 2.0)
-        rn = random.uniform(0, self.dist)
-        plane_point = self.point + rx_1 * self.ax_1 + rx_2 * self.ax_2
-        cast_point = plane_point + rn * self.normal
-        return cast_point
+        untransformed_point = Vector3D(np.random.uniform(0, self.dist, 3))
+        return rotate_euler_v3d(untransformed_point, self.rot) + self.point
 
     def contains_point(self, p):
         return np.dot(self.normal, p - self.point) >= 0
-
-    def to_cuboid_region(self):
-        pos = self.point + self.normal * self.dist / 2.0
-        orientation = rotation_to_euler(Vector3D(0, 1, 0), self.normal)  # TODO: Confirm this is correct
-        return CuboidRegion(pos, orientation, self.dist, self.dist, self.dist)
 
 
 class ConvexPolyhedronRegion(Region, Intersect, BoundingBox, Convex):
@@ -281,7 +298,9 @@ class ConvexPolyhedronRegion(Region, Intersect, BoundingBox, Convex):
             return intersect_halfspace_convpoly(other, self)
         if isinstance(other, ConvexPolyhedronRegion):
             return intersect_convpolys(self, other)
-        if isinstance(other, EmptyRegion) or isinstance(other, AllRegion):
+        if isinstance(other, (ConvexPolygon3DRegion, Rectangle3DRegion)):
+            return intersect_poly_convex(other, self)
+        if isinstance(other, (EmptyRegion, AllRegion)):
             return other.intersect(self)
 
         raise NotImplementedError
@@ -306,7 +325,10 @@ class ConvexPolyhedronRegion(Region, Intersect, BoundingBox, Convex):
         return np.min(cs, axis=0), np.max(cs, axis=0)
 
 
-class CuboidRegion(Region, Intersect, BoundingBox, Convex):
+class CuboidRegion(Region, Intersect, BoundingBox, Convex, Oriented):
+
+    def to_orientation(self):
+        return self.orientation
 
     def to_hsi(self) -> HalfspaceIntersection:
         return cube_to_hsi(np.array(self.position), self.dimensions(), np.array(self.orientation))
@@ -318,7 +340,9 @@ class CuboidRegion(Region, Intersect, BoundingBox, Convex):
             return intersect_cuboid_half_space(self, other)
         if isinstance(other, ConvexPolyhedronRegion):
             return intersect_cuboid_convpoly(self, other)
-        if isinstance(other, EmptyRegion) or isinstance(other, AllRegion):
+        if isinstance(other, (ConvexPolygon3DRegion, Rectangle3DRegion)):
+            return intersect_poly_convex(other, self)
+        if isinstance(other, (EmptyRegion, AllRegion)):
             return other.intersect(self)
 
         raise NotImplementedError(f'Have forgotten to implement intersection between {type(self)} and {type(other)}')
@@ -370,7 +394,7 @@ class CuboidRegion(Region, Intersect, BoundingBox, Convex):
         min_x, max_x = min_and_max(xs)
         min_y, max_y = min_and_max(ys)
         min_z, max_z = min_and_max(zs)
-        return (min_x, min_y, min_z), (max_x, max_y, max_z)
+        return (np.array((min_x, min_y, min_z))), (np.array((max_x, max_y, max_z)))
 
     def isEquivalentTo(self, other):
         if type(other) is not CuboidRegion:
@@ -385,65 +409,27 @@ class CuboidRegion(Region, Intersect, BoundingBox, Convex):
         return f'CuboidRegion({self.position},{self.orientation},{self.width},{self.length},{self.height}'
 
 
-class PlaneRegion(Region, Intersect):
+class Rectangle3DRegion(Region, Convex, Intersect, Oriented):
 
-    def __init__(self, origin: Vector3D, normal: Vector3D, dist: float = 100.0):
-        super().__init__('Plane', origin, normal, dist)
-        self.origin = origin
-        self.normal = Vector3D(*normalize(normal))
-        self.dist = dist
+    def to_orientation(self):
+        return self.rot
 
-        self.rot: Vector3D = rotation_to_euler(Vector3D(0, 0, 1), self.normal)
-        self.rev_rot: Vector3D = reverse_euler(self.rot)
+    def to_hsi(self) -> HalfspaceIntersection:
+        hs_origins = np.array([[self.width / 2.0, 0], [0, self.length / 2.0], [-self.width / 2.0, 0], [0, -self.length / 2.0]])
+        hs_norms = np.array([[-1, 0], [0, -1], [1, 0], [0, 1]])
 
-        self.ax_1: Vector3D = rotate_euler_v3d(Vector3D(1, 0, 0), self.rot)
-        self.ax_2: Vector3D = rotate_euler_v3d(Vector3D(0, 1, 0), self.rot)
+        hs_ineqs = halfspaces_to_inequalities(hs_norms, hs_origins)
+        return HalfspaceIntersection(hs_ineqs, np.array([0.0, 0.0]))
 
-    def uniform_point_inner(self):
-        rx_1 = random.uniform(-self.dist / 2.0, self.dist / 2.0)
-        rx_2 = random.uniform(-self.dist / 2.0, self.dist / 2.0)
-        plane_point = self.origin + rx_1 * self.ax_1 + rx_2 * self.ax_2
-        return plane_point
-
-    def contains_point(self, point):
-        dp = np.dot(point - self.origin, self.normal)
-        return np.abs(dp) <= 1e-8  # Dot product "roughly equals" 0, then its on plane
-
-    def sample_given_dependencies(self, dep_values):
-        return PlaneRegion(dep_values[self.origin], dep_values[self.normal], dep_values[self.dist])
-
-    def evaluateInner(self, context):
-        origin = value_in_context(self.origin, context)
-        normal = value_in_context(self.normal, context)
-        dist = value_in_context(self.dist, context)
-        return PlaneRegion(origin, normal, dist)
-
-    def intersect(self, other):
-        if isinstance(other, PlaneRegion):
-            raise NotImplementedError("Plane/Plane intersection not yet supported")
-        if isinstance(other, CuboidRegion):
-            return intersect_plane_cuboid(self, other)
-        if isinstance(other, HalfSpaceRegion):
-            raise NotImplementedError
-        if isinstance(other, ConvexPolyhedronRegion):
-            return intersect_plane_polyhedron
-        if isinstance(other, EmptyRegion) or isinstance(other, AllRegion):
-            return other.intersect(self)
-
-        raise NotImplementedError("Havent yet filled in the intersection code")
-
-
-class Rectangle3DRegion(Region, Intersect):
-
-    def __init__(self, width, length, origin, normal):
-        super().__init__('Rectangle3D', width, length, origin, normal)
+    def __init__(self, width, length, origin, rot):
+        super().__init__('Rectangle3D', width, length, origin, rot)
         self.width = width
         self.length = length
         self.origin = origin
-        self.normal = Vector3D(*normalize(normal))
 
-        self.rot: Vector3D = rotate_euler_v3d(Vector3D(0, 0, 1), self.normal)
+        self.rot = rot
         self.rev_rot: Vector3D = reverse_euler(self.rot)
+        self.normal = rotate_euler_v3d(Vector3D(0, 0, 1), rot)
 
     def uniform_point_inner(self):
         x = random.uniform(-self.width / 2.0, self.width / 2.0)
@@ -461,33 +447,33 @@ class Rectangle3DRegion(Region, Intersect):
         return Rectangle3DRegion(dep_values[self.width],
                                  dep_values[self.length],
                                  dep_values[self.origin],
-                                 dep_values[self.normal])
+                                 dep_values[self.rot])
 
     def evaluateInner(self, context):
         width = value_in_context(self.width, context)
         length = value_in_context(self.length, context)
         origin = value_in_context(self.origin, context)
-        normal = value_in_context(self.normal, context)
-        return Rectangle3DRegion(width, length, origin, normal)
+        rot = value_in_context(self.rot, context)
+        return Rectangle3DRegion(width, length, origin, rot)
 
     def intersect(self, other):
-        if isinstance(other, CuboidRegion):
-            raise NotImplementedError
-        if isinstance(other, HalfSpaceRegion):
-            raise NotImplementedError
-        if isinstance(other, ConvexPolyhedronRegion):
-            raise NotImplementedError
-        if isinstance(other, Rectangle3DRegion):
-            raise NotImplementedError
-        if isinstance(other, ConvexPolygon3DRegion):
-            raise NotImplementedError
-        if isinstance(other, EmptyRegion) or isinstance(other, AllRegion):
+        if isinstance(other, (CuboidRegion, HalfSpaceRegion, ConvexPolyhedronRegion)):
+            return intersect_poly_convex(self, other)
+        if isinstance(other, (ConvexPolygon3DRegion, Rectangle3DRegion)):
+            raise NotImplementedError("intersections resulting in lines not supported")
+        if isinstance(other, (EmptyRegion, AllRegion)):
             return other.intersect(self)
 
         raise NotImplementedError("Havent yet filled in the intersection code")
 
 
-class ConvexPolygon3DRegion(Region, Intersect):
+class ConvexPolygon3DRegion(Region, Convex, Intersect, Oriented):
+
+    def to_orientation(self):
+        return self.rot
+
+    def to_hsi(self) -> HalfspaceIntersection:
+        return self.hsi
 
     def __init__(self, hsi, origin, normal):
         super().__init__("ConvexPolygon3D", hsi, origin, normal)
@@ -495,7 +481,7 @@ class ConvexPolygon3DRegion(Region, Intersect):
         self.origin = origin
         self.normal = normal
 
-        self.rot: Vector3D = rotate_euler_v3d(Vector3D(0, 0, 1), self.normal)
+        self.rot: Vector3D = rotation_to_euler(Vector3D(0, 0, 1), self.normal)
         self.rev_rot: Vector3D = reverse_euler(self.rot)
 
     def uniform_point_inner(self):
@@ -522,17 +508,11 @@ class ConvexPolygon3DRegion(Region, Intersect):
         return ConvexPolygon3DRegion(hsi, origin, normal)
 
     def intersect(self, other):
-        if isinstance(other, CuboidRegion):
-            raise NotImplementedError
-        if isinstance(other, HalfSpaceRegion):
-            raise NotImplementedError
-        if isinstance(other, ConvexPolyhedronRegion):
-            raise NotImplementedError
-        if isinstance(other, Rectangle3DRegion):
-            raise NotImplementedError
-        if isinstance(other, ConvexPolygon3DRegion):
-            raise NotImplementedError
-        if isinstance(other, EmptyRegion) or isinstance(other, AllRegion):
+        if isinstance(other, (CuboidRegion, HalfSpaceRegion, ConvexPolyhedronRegion)):
+            return intersect_poly_convex(self, other)
+        if isinstance(other, (Rectangle3DRegion, ConvexPolygon3DRegion)):
+            raise NotImplementedError("Intersections which produce lines are not yet supported")
+        if isinstance(other, (EmptyRegion, AllRegion)):
             return other.intersect(self)
 
         raise NotImplementedError("Havent yet filled in the intersection code")
@@ -617,25 +597,26 @@ class PointSetRegion(Region):
 
 
 @distributionFunction
-def intersect_plane_cuboid(p: PlaneRegion, c: CuboidRegion) -> Region:
-    cube_hsis = cube_to_hsi(np.array(c.position), c.dimensions(), np.array(c.orientation))
-
-    projected_hsis = proj_hsi_to_plane(cube_hsis, p)
-
-    if projected_hsis is None:
-        return EmptyRegion("Empty")
-
-    return ConvexPoly2DRegion(projected_hsis, p.origin, p.normal)
+def intersect_two(r1, r2) -> Region:
+    # intersection = AllRegion("All")
+    # for r in regions:
+    #     intersection = intersection.intersect(r)
+    intersection = r1.intersect(r2)
+    return intersection
 
 
 @distributionFunction
-def intersect_plane_polyhedron(p: PlaneRegion, c: ConvexPolyhedronRegion) -> Region:
-    projected_hsis = proj_hsi_to_plane(c.hsi, p)
+def intersect_poly_convex(c1: Union[ConvexPolygon3DRegion, Rectangle3DRegion], c2: Convex):
+    projected_hsis = proj_hsi_to_plane(c2.to_hsi(), c1.normal, c1.origin)
 
     if projected_hsis is None:
         return EmptyRegion("Empty")
 
-    return ConvexPoly2DRegion(projected_hsis, p.origin, p.normal)
+    hsi = intersect_hsis(projected_hsis, c1.to_hsi())
+
+    if hsi is None:
+        return EmptyRegion("Empty")
+    return ConvexPolygon3DRegion(hsi, c1.origin, c1.normal)
 
 
 @distributionFunction
@@ -692,8 +673,8 @@ def intersect_cuboid_convpoly(r1: CuboidRegion, r2: ConvexPolyhedronRegion) -> R
 
 @distributionFunction
 def intersect_halfspaces(r1: HalfSpaceRegion, r2: HalfSpaceRegion) -> Region:
-    c1 = r1.to_cuboid_region()
-    c2 = r2.to_cuboid_region()
+    c1 = r1.to_hsi()
+    c2 = r2.to_hsi()
 
     hs_1 = cube_to_hsi(np.array(c1.position), c1.dimensions(), np.array(c1.orientation))
     hs_2 = cube_to_hsi(np.array(c2.position), c2.dimensions(), np.array(c2.orientation))
@@ -766,7 +747,7 @@ def feasible_point(hs_ineqs: np.ndarray) -> Optional[np.array]:
     A_row_norms = np.linalg.norm(A, axis=1).reshape(-1, 1)
     b = -hs_ineqs[:, -1]
 
-    result = linprog(coefficients, A_ub=np.hstack((A, A_row_norms)), b_ub=b, bounds=bounds)
+    result = linprog(coefficients, A_ub=np.hstack((A, A_row_norms)), b_ub=b, bounds=bounds, method='revised simplex')
 
     if result.success:
         return result.x[:-1]
@@ -848,20 +829,22 @@ def project_to_plane_intersection(p, p1_norm, p1_origin, p2_norm, p2_origin):
     return projected_point
 
 
-def proj_hsi_to_plane(hsi: HalfspaceIntersection, p: PlaneRegion) -> Optional[HalfspaceIntersection]:
+def proj_hsi_to_plane(hsi: HalfspaceIntersection, p_norm: Vector3D, p_origin: Vector3D) -> Optional[HalfspaceIntersection]:
     projected_halfspaces = []
+    rev_rot = rotation_to_euler(p_norm, Vector3D(0, 0, 1))
+
     for hs in hsi.halfspaces:
         hs_norm = hs[:-1]
-        dp = np.dot(hs_norm, p.normal)
+        dp = np.dot(hs_norm, p_norm)
         if 1.0 - np.abs(dp) >= 1e-9:
             hs_origin = -hs[-1] * hs[:-1]
-            projected_origin = project_to_plane_intersection(hs_origin, hs_norm, hs_origin, p.normal, p.origin)
+            projected_origin = project_to_plane_intersection(hs_origin, hs_norm, hs_origin, p_norm, p_origin)
 
-            projected_norm = hs_norm - dp * p.normal
+            projected_norm = hs_norm - dp * p_norm
             projected_norm = projected_norm / np.linalg.norm(projected_norm)
-            aa_norm = rotate_euler(projected_norm, p.rev_rot)
+            aa_norm = rotate_euler(projected_norm, rev_rot)
 
-            new_b = -np.dot(projected_origin - p.origin, projected_norm)
+            new_b = -np.dot(projected_origin - p_origin, projected_norm)
 
             projected_halfspaces.append(np.append(aa_norm[:-1], new_b))
     projected_halfspaces = np.array(projected_halfspaces)

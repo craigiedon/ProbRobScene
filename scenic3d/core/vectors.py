@@ -411,6 +411,7 @@ def rotation_to_vec(from_vec: Vector3D, to_vec: Vector3D) -> R:
     cross_prod = np.cross(from_vec, to_vec)
 
     if np.linalg.norm(cross_prod) == 0.0:
+        # TODO: Then actually, do the arbitrary orthogonal swappy thing that david outlines
         rot_vec = R.identity()
     else:
         rot_vec = R.from_rotvec(cross_prod / np.linalg.norm(cross_prod) * angle_rad)

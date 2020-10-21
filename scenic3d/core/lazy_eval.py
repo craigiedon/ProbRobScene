@@ -22,6 +22,9 @@ class LazilyEvaluable(abc.ABC):
         """
         assert all(hasattr(context, prop) for prop in self._requiredProperties)
         value = self.evaluateInner(context)
+        if needs_lazy_evaluation(value):
+            print(needs_lazy_evaluation(value))
+            print(self.evaluateInner(context))
         assert not needs_lazy_evaluation(value)  # value should not require further evaluation
         return value
 

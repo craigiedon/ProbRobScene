@@ -6,7 +6,7 @@ from scipy.spatial.transform import Rotation as R
 from scenic3d.core.vectors import offset_beyond, Vector3D, rotate_euler_v3d
 
 
-def draw_cube(ax, pos: np.array, size: np.array, rot: np.array, color: str = 'b'):
+def draw_cube(ax, pos: np.array, size: np.array, rot: np.array, color: str = 'b', alpha: float = 0.5):
     r = R.from_euler('zyx', rot, degrees=False)
 
     global_bounds = np.transpose(np.stack([pos - size / 2.0, pos + size / 2.0]))
@@ -22,7 +22,7 @@ def draw_cube(ax, pos: np.array, size: np.array, rot: np.array, color: str = 'b'
             rotated = r.apply(np.moveaxis(full_surface, 0, 2).reshape(4, 3) - pos).reshape(2, 2, 3) + pos
             rotated = np.moveaxis(rotated, 2, 0)
 
-            ax.plot_surface(*rotated, alpha=0.5, color=color, edgecolor='black')
+            ax.plot_surface(*rotated, alpha=alpha, color=color, edgecolor='black')
 
 
 def draw_polyhedron(ax, points: np.array, faces: np.array, color: str = 'b', alpha=1.0):

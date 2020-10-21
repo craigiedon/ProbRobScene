@@ -269,6 +269,7 @@ point3dSpecifiers = {
     ('at',): 'At3D',
     ('in',): 'In3D',
     ('on',): 'OnTopOf',
+    ('completely', 'on'): 'OnTopOfStrict',
     ('beyond',): 'Beyond3D',
     ('offset', 'by'): 'OffsetBy3D',
     ('facing',): 'Facing3D',

@@ -2,18 +2,18 @@
 import abc
 import collections
 import inspect
-import itertools
+import itertools as it
 import math
 import random
 import numpy as np
 
 from scenic3d.core.distributions import Samplable, needs_sampling, to_distribution
 from scenic3d.core.geometry import averageVectors, hypot, min
-from scenic3d.core.lazy_eval import needs_lazy_evaluation
-from scenic3d.core.regions import SphericalRegion
+from scenic3d.core.lazy_eval import needs_lazy_evaluation, makeDelayedFunctionCall
+from scenic3d.core.regions import SphericalRegion, Oriented, intersect_two, PointInRegionDistribution, IntersectionRegion
 from scenic3d.core.specifiers import Specifier, PropertyDefault
 from scenic3d.core.type_support import toVector, toScalar, toType
-from scenic3d.core.utils import areEquivalent, RuntimeParseError
+from scenic3d.core.utils import areEquivalent, RuntimeParseError, group_by
 from scenic3d.core.vectors import Vector, Vector3D, rotate_euler_v3d
 from scenic3d.core.plotUtil3d import draw_cube
 
@@ -60,21 +60,35 @@ class Constructible(Samplable):
     def __init__(self, *args, **kwargs):
         # Validate specifiers
         name = type(self).__name__
-        specifiers = list(args)
-        for prop, val in kwargs.items():
-            specifiers.append(Specifier(prop, val))
-        properties = dict()
-        optionals = collections.defaultdict(list)
         defs = self.defaults()
-        for spec in specifiers:
-            assert isinstance(spec, Specifier), (name, spec)
-            prop = spec.property
-            if prop in properties:
-                raise RuntimeParseError(f'property "{prop}" of {name} specified twice')
-            properties[prop] = spec
-            for opt in spec.optionals:
-                if opt in defs:  # do not apply optionals for properties this object lacks
-                    optionals[opt].append(spec)
+
+        specifiers = list(args) + [Specifier(p, v) for p, v in kwargs.items()]
+
+        properties = group_by(specifiers, lambda s: s.property)
+        for p, specs in properties.items():
+            if len(specs) == 1:
+                properties[p] = specs[0]
+            elif len(specs) == 2:
+                spec_vals = [s.value for s in specs]
+                # TODO: So, this doesn't actually work. try creating a new "Intersection" object or similar?
+                r1 = spec_vals[0].region
+                r2 = spec_vals[1].region
+                delayed_intersection = makeDelayedFunctionCall(lambda a, b: PointInRegionDistribution(IntersectionRegion(a, b)), [r1, r2], {})
+                intersect_spec = Specifier(p, delayed_intersection)
+                properties[p] = intersect_spec
+                specifiers.append(intersect_spec)
+                for s in specs:
+                    specifiers.remove(s)
+            else:
+                raise RuntimeParseError(f'property "{p}" of {name} specified twice (non combinable)')
+
+        # TODO: dealing with duplicates part using intersections
+
+        optionals = collections.defaultdict(list)
+        for s in specifiers:
+            relevant_opts = [o for o in s.optionals if o in defs]
+            for opt in relevant_opts:
+                optionals[opt].append(s)
 
         # Decide which optionals to use
         optionals_for_spec = collections.defaultdict(set)
@@ -156,8 +170,6 @@ class Constructible(Samplable):
         return f'{type(self).__name__}({all_props})'
 
 
-## Mutators
-
 class Mutator:
     """An object controlling how the ``mutate`` statement affects an `Object`.
 
@@ -171,57 +183,6 @@ class Mutator:
         """Return a mutated copy of the object. Implemented by subclasses."""
         raise NotImplementedError
 
-
-class PositionMutator(Mutator):
-    """Mutator adding Gaussian noise to ``position``. Used by `Point`.
-
-    Attributes:
-        stddev (float): standard deviation of noise
-    """
-
-    def __init__(self, stddev):
-        self.stddev = stddev
-
-    def appliedTo(self, obj):
-        noise = Vector(random.gauss(0, self.stddev), random.gauss(0, self.stddev))
-        pos = toVector(obj.position, '"position" not a vector')
-        pos = pos + noise
-        return obj.copyWith(position=pos), True  # allow further mutation
-
-    def __eq__(self, other):
-        if type(other) is not type(self):
-            return NotImplemented
-        return other.stddev == self.stddev
-
-    def __hash__(self):
-        return hash(self.stddev)
-
-
-class HeadingMutator(Mutator):
-    """Mutator adding Gaussian noise to ``heading``. Used by `OrientedPoint`.
-
-    Attributes:
-        stddev (float): standard deviation of noise
-    """
-
-    def __init__(self, stddev):
-        self.stddev = stddev
-
-    def appliedTo(self, obj):
-        noise = random.gauss(0, self.stddev)
-        h = obj.heading + noise
-        return obj.copyWith(heading=h), True  # allow further mutation
-
-    def __eq__(self, other):
-        if type(other) is not type(self):
-            return NotImplemented
-        return other.stddev == self.stddev
-
-    def __hash__(self):
-        return hash(self.stddev)
-
-
-## Point 3D
 
 class Point3D(Constructible):
     position: Vector3D(0, 0, 0)
@@ -245,12 +206,6 @@ class Point3D(Constructible):
             return getattr(self.to_vector_3d(), attr)
         else:
             raise AttributeError(f"'{type(self).__name__}' object has no attribute '{attr}'")
-
-
-class Oriented(abc.ABC):
-    @abc.abstractmethod
-    def to_orientation(self):
-        raise NotImplementedError
 
 
 class OrientedPoint3D(Point3D, Oriented):
@@ -307,7 +262,8 @@ class Object(Point3D, Oriented):
         self.backRight = relative_position_3d(Vector3D(-hw, hl, 0), self.position, self.orientation)
 
         self.corners = tuple(self.position + rotate_euler_v3d(Vector3D(*offset), self.orientation)
-                             for offset in itertools.product((hw, -hw), (hl, -hl), (hh, -hh)))
+                             for offset in it.product((hw, -hw), (hl, -hl), (hh, -hh)))
+        self.forward = rotate_euler_v3d(Vector3D(0, 1, 0), self.orientation)
         # camera = self.position.offsetRotated(self.heading, self.cameraOffset)
         # self.visibleRegion = SectorRegion(camera, self.visibleDistance, self.heading, self.viewAngle)
         self._relations = []
@@ -322,3 +278,4 @@ class Object(Point3D, Oriented):
         color = self.color if hasattr(self, 'color') else (1, 0, 0)
         draw_cube(ax, np.array([*self.position]), np.array([self.width, self.length, self.height]),
                   np.array([*self.orientation]), color=color)
+        ax.quiver(self.position[0], self.position[1], self.position[2], self.forward[0], self.forward[1], self.forward[2], length=0.2, normalize=True)

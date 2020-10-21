@@ -1,9 +1,20 @@
 """Assorted utility functions and common exceptions."""
-
+import collections
 import functools
 import math
+from typing import List, TypeVar, Callable, Dict
 
 sqrt2 = math.sqrt(2)
+
+T = TypeVar('T')
+S = TypeVar('S')
+
+
+def group_by(xs: List[T], key_func: Callable[[T], S]) -> Dict[S, List[T]]:
+    result = collections.defaultdict(list)
+    for x in xs:
+        result[key_func(x)].append(x)
+    return result
 
 
 def cached(oldMethod):

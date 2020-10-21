@@ -5,12 +5,12 @@ from typing import List
 import numpy as np
 
 from scenic3d.core.distributions import (Samplable, MethodDistribution, OperatorDistribution,
-                                         support_interval, underlying_function, distributionFunction, condition_to)
+                                         support_interval, underlying_function, distributionFunction, condition_to, needs_sampling)
 from scenic3d.core.geometry import normalize_angle
 from scenic3d.core.object_types import Object
-from scenic3d.core.regions import PointInRegionDistribution, Intersect, cube_to_hsi, Region, EmptyRegion, erode_hsis, Convex, ConvexPolyhedronRegion
+from scenic3d.core.regions import PointInRegionDistribution, Intersect, cube_to_hsi, Region, EmptyRegion, erode_hsis, Convex, ConvexPolyhedronRegion, IntersectionRegion, intersect_two
 from scenic3d.core.utils import InvalidScenarioError
-from scenic3d.core.vectors import VectorField, PolygonalVectorField, VectorMethodDistribution
+from scenic3d.core.vectors import VectorField, PolygonalVectorField, VectorMethodDistribution, Vector3D
 from scenic3d.syntax.relations import RelativeHeadingRelation, DistanceRelation
 
 
@@ -28,28 +28,44 @@ def prune(scenario, verbosity=1):
 
 
 def prune_containment(scenario, verbosity):
-    prunable: List[Object] = [x for x in scenario.objects
-                              if isinstance(x.position, PointInRegionDistribution)
-                              and isinstance(x.position.region, Intersect)]
+    prunable : List[Object] = []
+    for obj in scenario.objects:
+        if isinstance(obj.position, PointInRegionDistribution):
+            r = obj.position.region
+            if isinstance(r, (Intersect, IntersectionRegion)):
+                prunable.append(obj)
+
+    # prunable: List[Object] = [x for x in scenario.objects
+    #                           if isinstance(x.position, PointInRegionDistribution)
+    #                           and isinstance(x.position.region, Intersect)]
     for obj in prunable:
-        new_base = erode_container_and_prune(scenario.workspace, obj)
+        if isinstance(obj.position.region, IntersectionRegion):
+            r_intersected = intersect_two(obj.position.region.r1, obj.position.region.r2)
+            condition_to(obj.position, PointInRegionDistribution(r_intersected))
+
+        if not needs_sampling(obj.to_orientation()):
+            eroded_container = erode_container(scenario.workspace, obj.dimensions(), obj.to_orientation())
+        else:
+            eroded_container = erode_container(scenario.workspace, obj.dimensions(), Vector3D(0, 0, 0))
+
+        new_base = intersect_container(eroded_container, obj.position._conditioned.region)
         new_pos = PointInRegionDistribution(new_base)
         condition_to(obj.position, new_pos)
         # TODO: Calculate volume of convex poly? Probs not possible with infinite vol halfspaces...
 
 
-# @distributionFunction
-def erode_container_and_prune(container: Convex, o: Object) -> Region:
-    o_hsi = cube_to_hsi(np.zeros(3), o.dimensions(), np.array(o.to_orientation()))
-    container_hsi = container.to_hsi()
-    eroded_container = ConvexPolyhedronRegion(erode_hsis(container_hsi, o_hsi))
-
-    new_base = o.position.region.intersect(eroded_container)
-
-    if isinstance(new_base, EmptyRegion):
-        raise InvalidScenarioError(f'Object {o} does not intersect with {container}')
-
+@distributionFunction
+def intersect_container(container: Convex, obj_pos_region: Intersect):
+    new_base = obj_pos_region.intersect(container)
     return new_base
+
+
+@distributionFunction
+def erode_container(container: Convex, obj_dims: np.array, obj_rot: Vector3D):
+    o_hsi = cube_to_hsi(np.zeros(3), obj_dims, np.array(obj_rot))
+    container_hsi = container.to_hsi()
+    return ConvexPolyhedronRegion(erode_hsis(container_hsi, o_hsi))
+
 
 # def prune_relative_heading(scenario, verbosity):
 #     """Prune based on requirements bounding the relative heading of an Object.

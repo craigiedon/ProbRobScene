@@ -6,6 +6,7 @@ from scenic3d.core.distributions import Samplable, RejectionException, needs_sam
 from scenic3d.core.external_params import ExternalSampler
 from scenic3d.core.geometry import cuboids_intersect
 from scenic3d.core.lazy_eval import needs_lazy_evaluation
+from scenic3d.core.plotUtil3d import draw_cube
 from scenic3d.core.regions import Region
 from scenic3d.core.utils import areEquivalent, InvalidScenarioError, RuntimeParseError
 import numpy as np
@@ -21,25 +22,26 @@ class Scene:
         import matplotlib.pyplot as plt
         fig = plt.figure()
         ax = fig.add_subplot(111, projection='3d')
-        show_3d_workspace(ax, self.workspace)
 
         print("Num objects:", len(self.objects))
         for obj in self.objects:
             obj.show_3d(ax)
 
-        plt.show(block=block)
+        w_min_corner, w_max_corner = self.workspace.getAABB()
+        w_dims = w_max_corner - w_min_corner
 
-    def show(self, zoom=None, block=True):
-        """Render a schematic of the scene for debugging."""
-        import matplotlib.pyplot as plt
-        # display map
-        self.workspace.show(plt)
-        # draw objects
-        for obj in self.objects:
-            obj.show(self.workspace, plt)
-        # zoom in if requested
-        if zoom is not None:
-            self.workspace.zoom_around(plt, self.objects, expansion=zoom)
+        draw_cube(ax, w_dims / 2.0, w_dims, np.zeros(3), color='purple', alpha=0.03)
+
+        total_min, total_max = np.min(w_min_corner), np.max(w_max_corner)
+
+        ax.set_xlim(total_min, total_max)
+        ax.set_ylim(total_min, total_max)
+        ax.set_zlim(total_min, total_max)
+
+        ax.set_xlabel("X")
+        ax.set_ylabel("Y")
+        ax.set_zlabel("Z")
+
         plt.show(block=block)
 
 
@@ -157,17 +159,6 @@ def try_sample(external_sampler, dependencies, objects, workspace, active_reqs):
         return None, 'user-specified requirement'
 
     return sample, None
-
-
-def show_3d_workspace(ax, workspace: Region):
-    aabb = workspace.getAABB()
-
-    min_coords, max_coords = aabb
-    total_min, total_max = np.min(min_coords), np.max(max_coords)
-
-    ax.set_xlim(total_min, total_max)
-    ax.set_ylim(total_min, total_max)
-    ax.set_zlim(total_min, total_max)
 
 # def zoom_around(workspace: Region, plt, objects, expansion=2):
 #     """Zoom the schematic around the specified objects"""
