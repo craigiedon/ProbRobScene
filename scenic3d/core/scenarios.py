@@ -30,18 +30,19 @@ class Scene:
         w_min_corner, w_max_corner = self.workspace.getAABB()
         w_dims = w_max_corner - w_min_corner
 
-        draw_cube(ax, w_dims / 2.0, w_dims, np.zeros(3), color='purple', alpha=0.03)
+        draw_cube(ax, (w_max_corner + w_min_corner) * 0.5, w_dims, np.zeros(3), color='purple', alpha=0.03)
 
         total_min, total_max = np.min(w_min_corner), np.max(w_max_corner)
 
-        ax.set_xlim(total_min, total_max)
-        ax.set_ylim(total_min, total_max)
-        ax.set_zlim(total_min, total_max)
+        # ax.set_xlim(total_min, total_max)
+        # ax.set_ylim(total_min, total_max)
+        # ax.set_zlim(total_min, total_max)
 
         ax.set_xlabel("X")
         ax.set_ylabel("Y")
         ax.set_zlabel("Z")
 
+        plt.tight_layout()
         plt.show(block=block)
 
 
@@ -92,7 +93,7 @@ class Scenario:
             if not static_bounds[i]:
                 continue
             # Require object to be contained in the workspace/valid region
-            container = self.workspace.region
+            container = self.workspace
             if not needs_sampling(container) and not container.contains_object(oi):
                 raise InvalidScenarioError(f'Object at {oi.position} does not fit in container')
             for j in range(i):

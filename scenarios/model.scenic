@@ -2,11 +2,11 @@
 
 import math
 
-width = 3
-length = 3
+width = 5
+length = 5
 height = 5
-workspace = CuboidRegion(Vector3D(width / 2.0, length / 2.0, height / 2.0), Vector3D(0,0,0), width, length, height)
-floor = Rectangle3DRegion(width, length, Vector3D(width / 2.0, length / 2.0, 0.0), Vector3D(0, 0, 0))
+workspace = CuboidRegion(Vector3D(0, 0, height / 2.0), Vector3D(0,0,0), width, length, height)
+floor = Rectangle3DRegion(width, length, Vector3D(0, 0, 0), Vector3D(0, 0, 0))
 
 class Cube:
     width: 0.02
@@ -15,10 +15,10 @@ class Cube:
     color: 'blue'
     shape_type: 'CUBOID'
 
-class BCube:
-    width: 0.5
-    height: 0.5
-    length: 0.5
+class ToyCube:
+    width: 0.25
+    height: 0.25
+    length: 0.25
     color: 'blue'
 
 
@@ -52,7 +52,7 @@ class Cup:
     color: "blue"
 
 class Robot:
-    width: 0.298174
-    length: 0.733159
+    width: 0.2256
+    length: 0.2256
     height: 1.025562
     color: 'white'

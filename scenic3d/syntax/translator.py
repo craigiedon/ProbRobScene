@@ -276,8 +276,7 @@ point3dSpecifiers = {
     ('facing', 'toward'): 'FacingToward3D',
     ('left', 'of'): 'LeftSpec3D',
     ('right', 'of'): 'RightSpec3D',
-    ('ahead', 'of'): 'Ahead3D',
-    ('aheadRough', 'of'): 'AheadRough',
+    ('ahead', 'of'): 'AheadRough',
     ('behind',): 'Behind3D',
     ('above',): 'Above3D',
     ('below',): 'Below3D',
@@ -325,7 +324,8 @@ prefixOperators = {
     ('back',): 'Back',
     ('left',): 'Left',
     ('right',): 'Right',
-    ('top',): 'Top',
+    ('top', 'front'): 'TopFront',
+    ('top', 'back'): 'TopBack',
     ('bottom',): 'Bottom'
 }
 assert all(1 <= len(op) <= 2 for op in prefixOperators)

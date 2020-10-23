@@ -36,7 +36,7 @@ __all__ = (
     'LeftSpec3D', 'RightSpec3D', 'Ahead3D', 'Behind3D', 'Above3D', 'Below3D',
     'Following3D', 'OnTopOf', 'OnTopOfStrict', 'AheadRough',
     # 3D Prefix Ops
-    'Top', 'Bottom',
+    'Top', 'Bottom', 'TopFront', 'TopBack',
     # 3D Infix Operators
     'RelativeTo3D',
     # Constants
@@ -211,7 +211,7 @@ def mutate(*objects):  # TODO update syntax
 ops = (
     'front', 'back', 'left', 'right',
     'front left', 'front right',
-    'back left', 'back right', 'top', 'bottom'
+    'back left', 'back right', 'top', 'bottom', 'top front', 'top back'
 )
 template = '''\
 def {function}(X):
@@ -222,7 +222,7 @@ def {function}(X):
 '''
 for op in ops:
     func = ''.join(word.capitalize() for word in op.split(' '))
-    prop = func[0].lower() + func[1:]
+    prop = '_'.join(word for word in op.split(' '))
     definition = template.format(function=func, syntax=op, property=prop)
     exec(definition)
 
@@ -626,7 +626,7 @@ def front_plane(ref_obj: Object, min_amount: float, max_amount: float) -> HalfSp
 def on_top_of_rect(obj_to_place: Object, r: Rectangle3DRegion, dist: float, strict: bool = False) -> Rectangle3DRegion:
     offset = rotate_euler_v3d(Vector3D(0, 0, dist + obj_to_place.height / 2.0), r.rot)
     if strict:
-        assert r.width > obj_to_place.width and r.length > obj_to_place.length
+        # assert r.width > obj_to_place.width and r.length > obj_to_place.length
         return Rectangle3DRegion(r.width - obj_to_place.width, r.length - obj_to_place.length, r.origin + offset, r.rot)
 
     return Rectangle3DRegion(r.width, r.length, r.origin + offset, r.rot)
@@ -638,7 +638,7 @@ def top_surface_region(obj_to_place: Object, ref_obj: Object, dist: float, stric
     region_pos = rotated_offset + ref_top_surface
 
     if strict:
-        assert ref_obj.width > obj_to_place.width and ref_obj.length > obj_to_place.length
+        # assert ref_obj.width > obj_to_place.width and ref_obj.length > obj_to_place.length
         return Rectangle3DRegion(ref_obj.width - obj_to_place.width, ref_obj.length - obj_to_place.length, region_pos, ref_obj.orientation)
     return Rectangle3DRegion(ref_obj.width, ref_obj.length, region_pos, ref_obj.orientation)
 

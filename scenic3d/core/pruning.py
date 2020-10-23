@@ -61,8 +61,8 @@ def intersect_container(container: Convex, obj_pos_region: Intersect):
 
 
 @distributionFunction
-def erode_container(container: Convex, obj_dims: np.array, obj_rot: Vector3D):
-    o_hsi = cube_to_hsi(np.zeros(3), obj_dims, np.array(obj_rot))
+def erode_container(container: Convex, obj_dims: Vector3D, obj_rot: Vector3D):
+    o_hsi = cube_to_hsi(np.zeros(3), np.array(obj_dims), np.array(obj_rot))
     container_hsi = container.to_hsi()
     return ConvexPolyhedronRegion(erode_hsis(container_hsi, o_hsi))
 

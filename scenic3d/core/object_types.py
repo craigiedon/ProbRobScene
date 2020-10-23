@@ -10,7 +10,8 @@ import numpy as np
 from scenic3d.core.distributions import Samplable, needs_sampling, to_distribution
 from scenic3d.core.geometry import averageVectors, hypot, min
 from scenic3d.core.lazy_eval import needs_lazy_evaluation, makeDelayedFunctionCall
-from scenic3d.core.regions import SphericalRegion, Oriented, intersect_two, PointInRegionDistribution, IntersectionRegion
+from scenic3d.core.regions import SphericalRegion, Oriented, intersect_two, PointInRegionDistribution, \
+    IntersectionRegion
 from scenic3d.core.specifiers import Specifier, PropertyDefault
 from scenic3d.core.type_support import toVector, toScalar, toType
 from scenic3d.core.utils import areEquivalent, RuntimeParseError, group_by
@@ -73,7 +74,8 @@ class Constructible(Samplable):
                 # TODO: So, this doesn't actually work. try creating a new "Intersection" object or similar?
                 r1 = spec_vals[0].region
                 r2 = spec_vals[1].region
-                delayed_intersection = makeDelayedFunctionCall(lambda a, b: PointInRegionDistribution(IntersectionRegion(a, b)), [r1, r2], {})
+                delayed_intersection = makeDelayedFunctionCall(
+                    lambda a, b: PointInRegionDistribution(IntersectionRegion(a, b)), [r1, r2], {})
                 intersect_spec = Specifier(p, delayed_intersection)
                 properties[p] = intersect_spec
                 specifiers.append(intersect_spec)
@@ -219,7 +221,7 @@ class OrientedPoint3D(Point3D, Oriented):
         return self.orientation
 
 
-def relative_position_3d(rel_pos, reference_pos, reference_orientation):
+def rel_pos_3d(rel_pos, reference_pos, reference_orientation):
     pos = reference_pos + rotate_euler_v3d(rel_pos, reference_orientation)
     return OrientedPoint3D(position=pos, orientation=reference_orientation)
 
@@ -248,18 +250,21 @@ class Object(Point3D, Oriented):
         self.radius = hypot(hw, hl, hh)  # circumcircle; for collision detection
         self.inradius = min(hw, hl, hh)  # incircle; for collision detection
 
-        self.left = relative_position_3d(Vector3D(-hw, 0, 0), self.position, self.orientation)
-        self.right = relative_position_3d(Vector3D(hw, 0, 0), self.position, self.orientation)
-        self.front = relative_position_3d(Vector3D(0, hl, 0), self.position, self.orientation)
-        self.back = relative_position_3d(Vector3D(0, -hl, 0), self.position, self.orientation)
+        self.left = rel_pos_3d(Vector3D(-hw, 0, 0), self.position, self.orientation)
+        self.right = rel_pos_3d(Vector3D(hw, 0, 0), self.position, self.orientation)
+        self.front = rel_pos_3d(Vector3D(0, hl, 0), self.position, self.orientation)
+        self.back = rel_pos_3d(Vector3D(0, -hl, 0), self.position, self.orientation)
 
-        self.top = relative_position_3d(Vector3D(0, 0, hh), self.position, self.orientation)
-        self.bottom = relative_position_3d(Vector3D(0, 0, -hh), self.position, self.orientation)
+        self.top = rel_pos_3d(Vector3D(0, 0, hh), self.position, self.orientation)
+        self.top_front = rel_pos_3d(Vector3D(0, hl, hh), self.position, self.orientation)
+        self.top_back = rel_pos_3d(Vector3D(0, -hl, hh), self.position, self.orientation)
 
-        self.frontLeft = relative_position_3d(Vector3D(-hw, hl, 0), self.position, self.orientation)
-        self.frontRight = relative_position_3d(Vector3D(hw, hl, 0), self.position, self.orientation)
-        self.backLeft = relative_position_3d(Vector3D(-hw, -hl, 0), self.position, self.orientation)
-        self.backRight = relative_position_3d(Vector3D(-hw, hl, 0), self.position, self.orientation)
+        self.bottom = rel_pos_3d(Vector3D(0, 0, -hh), self.position, self.orientation)
+
+        self.front_left = rel_pos_3d(Vector3D(-hw, hl, 0), self.position, self.orientation)
+        self.front_right = rel_pos_3d(Vector3D(hw, hl, 0), self.position, self.orientation)
+        self.back_left = rel_pos_3d(Vector3D(-hw, -hl, 0), self.position, self.orientation)
+        self.back_right = rel_pos_3d(Vector3D(-hw, hl, 0), self.position, self.orientation)
 
         self.corners = tuple(self.position + rotate_euler_v3d(Vector3D(*offset), self.orientation)
                              for offset in it.product((hw, -hw), (hl, -hl), (hh, -hh)))
@@ -268,8 +273,8 @@ class Object(Point3D, Oriented):
         # self.visibleRegion = SectorRegion(camera, self.visibleDistance, self.heading, self.viewAngle)
         self._relations = []
 
-    def dimensions(self) -> np.array:
-        return np.array([self.width, self.length, self.height])
+    def dimensions(self) -> Vector3D:
+        return Vector3D(self.width, self.length, self.height)
 
     def show_3d(self, ax, highlight=False):
         if needs_sampling(self):
@@ -278,4 +283,5 @@ class Object(Point3D, Oriented):
         color = self.color if hasattr(self, 'color') else (1, 0, 0)
         draw_cube(ax, np.array([*self.position]), np.array([self.width, self.length, self.height]),
                   np.array([*self.orientation]), color=color)
-        ax.quiver(self.position[0], self.position[1], self.position[2], self.forward[0], self.forward[1], self.forward[2], length=0.2, normalize=True)
+        ax.quiver(self.position[0], self.position[1], self.position[2], self.forward[0], self.forward[1],
+                  self.forward[2], length=0.2, normalize=True)
