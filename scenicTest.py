@@ -1,6 +1,6 @@
 import scenic3d
 
-scenario = scenic3d.scenarioFromFile("scenarios/paperPic.scenic")
+scenario = scenic3d.scenarioFromFile("scenarios/tableCube.scenic")
 
 for i in range(1):
     print(f"Generation {i}")

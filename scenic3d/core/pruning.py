@@ -8,7 +8,7 @@ from scenic3d.core.distributions import (Samplable, MethodDistribution, Operator
                                          support_interval, underlying_function, distributionFunction, condition_to, needs_sampling)
 from scenic3d.core.geometry import normalize_angle
 from scenic3d.core.object_types import Object
-from scenic3d.core.regions import PointInRegionDistribution, Intersect, cube_to_hsi, Region, EmptyRegion, erode_hsis, Convex, ConvexPolyhedronRegion, IntersectionRegion, intersect_two
+from scenic3d.core.regions import PointInRegionDistribution, Intersect, cube_to_hsi, Region, EmptyRegion, erode_hsis, Convex, ConvexPolyhedronRegion, IntersectionRegion, intersect_many
 from scenic3d.core.utils import InvalidScenarioError
 from scenic3d.core.vectors import VectorField, PolygonalVectorField, VectorMethodDistribution, Vector3D
 from scenic3d.syntax.relations import RelativeHeadingRelation, DistanceRelation
@@ -40,7 +40,7 @@ def prune_containment(scenario, verbosity):
     #                           and isinstance(x.position.region, Intersect)]
     for obj in prunable:
         if isinstance(obj.position.region, IntersectionRegion):
-            r_intersected = intersect_two(obj.position.region.r1, obj.position.region.r2)
+            r_intersected = intersect_many(*obj.position.region.regions)
             condition_to(obj.position, PointInRegionDistribution(r_intersected))
 
         if not needs_sampling(obj.to_orientation()):

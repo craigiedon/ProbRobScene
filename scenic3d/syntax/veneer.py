@@ -33,7 +33,7 @@ __all__ = (
     # 3D Specifiers
     'At3D', 'In3D', 'Beyond3D', 'OffsetBy3D',
     'Facing3D', 'FacingToward3D',
-    'LeftSpec3D', 'RightSpec3D', 'Ahead3D', 'Behind3D', 'Above3D', 'Below3D',
+    'LeftRough', 'RightRough', 'Ahead3D', 'Behind3D', 'Above3D', 'Below3D',
     'Following3D', 'OnTopOf', 'OnTopOfStrict', 'AheadRough',
     # 3D Prefix Ops
     'Top', 'Bottom', 'TopFront', 'TopBack',
@@ -528,18 +528,18 @@ def Behind(pos, dist=0):
 eps = 1e-9
 
 
-def LeftSpec3D(pos, dist=eps) -> Specifier:
-    return directional_spec_helper(syntax='left of',
-                                   pos=pos,
-                                   dist=dist,
-                                   axis='width',
-                                   to_components=lambda d: (d, 0, 0),
-                                   make_offset=lambda self, dx, dy, dz: Vector3D(-self.width / 2.0 - dx, dy, dz))
+# def LeftSpec3D(pos, dist=eps) -> Specifier:
+#     return directional_spec_helper(syntax='left of',
+#                                    pos=pos,
+#                                    dist=dist,
+#                                    axis='width',
+#                                    to_components=lambda d: (d, 0, 0),
+#                                    make_offset=lambda self, dx, dy, dz: Vector3D(-self.width / 2.0 - dx, dy, dz))
 
 
-def RightSpec3D(pos, dist=eps) -> Specifier:
-    return directional_spec_helper('right of', pos, dist, 'width', lambda dist: (dist, 0, 0),
-                                   lambda self, dx, dy, dz: Vector3D(self.width / 2.0 + dx, dy, dz))
+# def RightSpec3D(pos, dist=eps) -> Specifier:
+#     return directional_spec_helper('right of', pos, dist, 'width', lambda dist: (dist, 0, 0),
+#                                    lambda self, dx, dy, dz: Vector3D(self.width / 2.0 + dx, dy, dz))
 
 
 def Ahead3D(pos, dist=eps) -> Specifier:
@@ -606,6 +606,28 @@ def OnTopOfStrict(thing: Union[Point3D, Vector3D, Object, Rectangle3DRegion], di
     return OnTopOf(thing, dist, True)
 
 
+def LeftRough(obj: Union[Object, Point3D], min_amount: float = 0.0, max_amount: float = 1000.0) -> Specifier:
+    if isinstance(obj, Object):
+        new = PointInRegionDistribution(left_plane(obj, min_amount, max_amount))
+    elif isinstance(obj, Point3D):
+        new = PointInRegionDistribution(HalfSpaceRegion(obj.position + Vector3D(-min_amount, 0, 0), Vector3D(-1, 0, 0), max_amount - min_amount))
+    else:
+        raise TypeError(f'Object {obj} of type {type(obj)} not supported by Ahead. Only supports Point3D and Object types')
+
+    return Specifier('position', new)
+
+
+def RightRough(obj: Union[Object, Point3D], min_amount: float = 0.0, max_amount: float = 1000.0) -> Specifier:
+    if isinstance(obj, Object):
+        new = PointInRegionDistribution(right_plane(obj, min_amount, max_amount))
+    elif isinstance(obj, Point3D):
+        new = PointInRegionDistribution(HalfSpaceRegion(obj.position + Vector3D(min_amount, 0, 0), Vector3D(1, 0, 0), max_amount - min_amount))
+    else:
+        raise TypeError(f'Object {obj} of type {type(obj)} not supported by Ahead. Only supports Point3D and Object types')
+
+    return Specifier('position', new)
+
+
 def AheadRough(obj: Union[Object, Point3D], min_amount: float = 0.0, max_amount: float = 1000.0):
     if isinstance(obj, Object):
         new = PointInRegionDistribution(front_plane(obj, min_amount, max_amount))
@@ -615,6 +637,18 @@ def AheadRough(obj: Union[Object, Point3D], min_amount: float = 0.0, max_amount:
         raise TypeError(f'Object {obj} of type {type(obj)} not supported by Ahead. Only supports Point3D and Object types')
 
     return Specifier('position', new)
+
+
+def left_plane(ref_obj: Object, min_amount: float, max_amount: float) -> HalfSpaceRegion:
+    point = ref_obj.position + rotate_euler_v3d(Vector3D(-ref_obj.width / 2.0 - min_amount, 0.0, 0.0), ref_obj.orientation)
+    normal = rotate_euler_v3d(Vector3D(-1, 0, 0), ref_obj.orientation)
+    return HalfSpaceRegion(point, normal, max_amount - min_amount)
+
+
+def right_plane(ref_obj: Object, min_amount: float, max_amount: float) -> HalfSpaceRegion:
+    point = ref_obj.position + rotate_euler_v3d(Vector3D(ref_obj.width / 2.0 + min_amount, 0.0, 0.0), ref_obj.orientation)
+    normal = rotate_euler_v3d(Vector3D(1, 0, 0), ref_obj.orientation)
+    return HalfSpaceRegion(point, normal, max_amount - min_amount)
 
 
 def front_plane(ref_obj: Object, min_amount: float, max_amount: float) -> HalfSpaceRegion:

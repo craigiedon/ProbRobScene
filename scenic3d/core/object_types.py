@@ -10,7 +10,7 @@ import numpy as np
 from scenic3d.core.distributions import Samplable, needs_sampling, to_distribution
 from scenic3d.core.geometry import averageVectors, hypot, min
 from scenic3d.core.lazy_eval import needs_lazy_evaluation, makeDelayedFunctionCall
-from scenic3d.core.regions import SphericalRegion, Oriented, intersect_two, PointInRegionDistribution, \
+from scenic3d.core.regions import SphericalRegion, Oriented, intersect_many, PointInRegionDistribution, \
     IntersectionRegion
 from scenic3d.core.specifiers import Specifier, PropertyDefault
 from scenic3d.core.type_support import toVector, toScalar, toType
@@ -69,20 +69,19 @@ class Constructible(Samplable):
         for p, specs in properties.items():
             if len(specs) == 1:
                 properties[p] = specs[0]
-            elif len(specs) == 2:
+            else:
                 spec_vals = [s.value for s in specs]
-                # TODO: So, this doesn't actually work. try creating a new "Intersection" object or similar?
-                r1 = spec_vals[0].region
-                r2 = spec_vals[1].region
-                delayed_intersection = makeDelayedFunctionCall(
-                    lambda a, b: PointInRegionDistribution(IntersectionRegion(a, b)), [r1, r2], {})
+                regs = [sv.region for sv in spec_vals]
+                # r1 = spec_vals[0].region
+                # r2 = spec_vals[1].region
+                delayed_intersection = makeDelayedFunctionCall(intersect_distribution, regs, {})
                 intersect_spec = Specifier(p, delayed_intersection)
                 properties[p] = intersect_spec
                 specifiers.append(intersect_spec)
                 for s in specs:
                     specifiers.remove(s)
-            else:
-                raise RuntimeParseError(f'property "{p}" of {name} specified twice (non combinable)')
+            # else:
+            #     raise RuntimeParseError(f'property "{p}" of {name} specified twice (non combinable)')
 
         # TODO: dealing with duplicates part using intersections
 
@@ -170,6 +169,10 @@ class Constructible(Samplable):
         else:
             all_props = '<under construction>'
         return f'{type(self).__name__}({all_props})'
+
+
+def intersect_distribution(*regions) -> PointInRegionDistribution:
+    return PointInRegionDistribution(IntersectionRegion(*regions))
 
 
 class Mutator:

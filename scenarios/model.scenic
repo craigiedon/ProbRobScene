@@ -15,6 +15,13 @@ class Cube:
     color: 'blue'
     shape_type: 'CUBOID'
 
+class Camera:
+    width: 0.2
+    length: 0.4
+    height: 0.1
+    color: 'green'
+    model_name: "Camera"
+
 class ToyCube:
     width: 0.25
     height: 0.25
@@ -56,3 +63,4 @@ class Robot:
     length: 0.2256
     height: 1.025562
     color: 'white'
+    model_name: "Panda"

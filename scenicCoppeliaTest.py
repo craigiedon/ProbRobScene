@@ -17,7 +17,7 @@ import robotControl as rc
 
 from scenicCoppeliaSimWrapper import cop_from_scenic
 
-scenario = scenic3d.scenarioFromFile("scenarios/simpleCube.scenic")
+scenario = scenic3d.scenarioFromFile("scenarios/tableCube.scenic")
 ex_world, used_its = scenario.generate()
 
 pr = PyRep()
@@ -27,7 +27,7 @@ scene_view = Camera('DefaultCamera')
 scene_view.set_position([3.45, 0.18, 2.0])
 scene_view.set_orientation(np.array([180, -70, 90]) * np.pi / 180.0)
 
-depth_cam = VisionSensor.create([256, 256], position=[0, 0, 2.0], orientation=np.array([0.0, 180.0, -90.0]) * np.pi / 180.0 )
+# depth_cam = VisionSensor.create([256, 256], position=[0, 0, 2.0], orientation=np.array([0.0, 180.0, -90.0]) * np.pi / 180.0 )
 
 # Import Robots
 c_objs = cop_from_scenic(pr, ex_world)
@@ -39,7 +39,7 @@ pr.step()
 
 ### Robot Movement Code Goes Here ####
 
-for i in range(2000):
+for i in range(20000):
     pr.step()
     if i % 100 == 0:
         print(i)

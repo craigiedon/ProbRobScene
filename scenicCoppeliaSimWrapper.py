@@ -4,8 +4,9 @@ import numpy as np
 from numpy.core.multiarray import ndarray
 from pyrep import PyRep
 from pyrep.const import PrimitiveShape
-from pyrep.objects import Shape
+from pyrep.objects import Shape, VisionSensor
 from scenic3d.core.scenarios import Scene
+from setupFuncs import create_table
 
 
 class CoppeliaScene:
@@ -28,8 +29,15 @@ def cop_from_scenic(pr: PyRep, scene: Scene) -> CoppeliaScene:
 
     for m in models:
         print(m.model_name)
-        c_obj = pr.import_model(f'models/{m.model_name}.ttm')
-        c_obj.set_position(scenic_to_coppelia_pos(m.position, c_obj))
+        if m.model_name == "Camera":
+            c_obj = VisionSensor.create([256, 256], position=m.position, orientation=reversed(m.orientation))
+        elif m.model_name == "Table":
+            create_table(pr, m.width, m.length, m.height)
+        else:
+            c_obj = pr.import_model(f'models/{m.model_name}.ttm')
+            c_obj.set_position(scenic_to_coppelia_pos(m.position, c_obj))
+            c_obj.set_orientation(reversed(m.orientation))
+        cop_obs.append(c_obj)
 
     return CoppeliaScene(cop_obs)
 

@@ -218,10 +218,11 @@ class SphericalRegion(Region, BoundingBox):
 
 class IntersectionRegion(Region):
 
-    def __init__(self, r1: Region, r2: Region):
-        super().__init__('Intersection', r1, r2)
-        self.r1 = r1
-        self.r2 = r2
+    def __init__(self, *regions):
+        super().__init__('Intersection', *regions)
+        self.regions = regions
+        # self.r1 = r1
+        # self.r2 = r2
 
     def uniform_point_inner(self):
         raise RuntimeError("Should not be sampling from this region. Prune out")
@@ -597,11 +598,10 @@ class PointSetRegion(Region):
 
 
 @distributionFunction
-def intersect_two(r1, r2) -> Region:
-    # intersection = AllRegion("All")
-    # for r in regions:
-    #     intersection = intersection.intersect(r)
-    intersection = r1.intersect(r2)
+def intersect_many(*regions) -> Region:
+    intersection = AllRegion("All")
+    for r in regions:
+        intersection = intersection.intersect(r)
     return intersection
 
 
