@@ -49,7 +49,3 @@ Then, spin up the enironment of your choice using the relevant python script. E.
 ```
 python dualArmTable.py
 ```
-
-## Project Aims / Further Information
-
-[Rough Draft Roadmap Document](https://www.overleaf.com/read/xvrdrpzdckfw)
