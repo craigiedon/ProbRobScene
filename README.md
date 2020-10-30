@@ -1,4 +1,4 @@
-# Manipulation Playground
+# ProbRobScene
 
 A set of python scripts which set up manipulation environments for the [Coppelia-Sim](https://www.coppeliarobotics.com/) simulator. Current scenarios are:
 
