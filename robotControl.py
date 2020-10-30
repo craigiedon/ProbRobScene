@@ -12,7 +12,7 @@ def grasp(pr, gripper, close: bool) -> None:
     i = 0
     while not actuated:
         actuated = gripper.actuate(pos, 0.1)
-        print("Open amount: ", gripper.get_open_amount())
+        # print("Open amount: ", gripper.get_open_amount())
         pr.step()
     pr.step()
 
@@ -62,7 +62,7 @@ def location_from_depth_cam(pr, d_cam, target_obj):
     cam_res = d_cam.get_resolution()
     d_im = np.array(d_cam.capture_depth())
 
-    # Get bounding box of dpeth mask and take x/y location of object as centre
+    # Get bounding box of depth mask and take x/y location of object as centre
     mask_locs = np.flip(np.transpose(np.where(d_im <= 1.0)), axis=1)
     lower_bound = mask_locs[0]
     upper_bound = mask_locs[-1]

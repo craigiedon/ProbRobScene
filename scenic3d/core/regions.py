@@ -476,14 +476,14 @@ class ConvexPolygon3DRegion(Region, Convex, Intersect, Oriented):
     def to_hsi(self) -> HalfspaceIntersection:
         return self.hsi
 
-    def __init__(self, hsi, origin, normal):
-        super().__init__("ConvexPolygon3D", hsi, origin, normal)
+    def __init__(self, hsi, origin, rot):
+        super().__init__("ConvexPolygon3D", hsi, origin, rot)
         self.hsi = hsi
         self.origin = origin
-        self.normal = normal
-
-        self.rot: Vector3D = rotation_to_euler(Vector3D(0, 0, 1), self.normal)
+        self.rot = rot
         self.rev_rot: Vector3D = reverse_euler(self.rot)
+
+        self.normal = rotate_euler_v3d(Vector3D(0, 0, 1), rot)
 
     def uniform_point_inner(self):
         random_point_flat = Vector3D(*hit_and_run(self.hsi), 0)
@@ -500,13 +500,13 @@ class ConvexPolygon3DRegion(Region, Convex, Intersect, Oriented):
         return True
 
     def sample_given_dependencies(self, dep_values):
-        return ConvexPolygon3DRegion(dep_values[self.hsi], dep_values[self.origin], dep_values[self.normal])
+        return ConvexPolygon3DRegion(dep_values[self.hsi], dep_values[self.origin], dep_values[self.rot])
 
     def evaluateInner(self, context):
         hsi = value_in_context(self.hsi, context)
         origin = value_in_context(self.origin, context)
-        normal = value_in_context(self.normal, context)
-        return ConvexPolygon3DRegion(hsi, origin, normal)
+        rot = value_in_context(self.rot, context)
+        return ConvexPolygon3DRegion(hsi, origin, rot)
 
     def intersect(self, other):
         if isinstance(other, (CuboidRegion, HalfSpaceRegion, ConvexPolyhedronRegion)):
@@ -616,7 +616,7 @@ def intersect_poly_convex(c1: Union[ConvexPolygon3DRegion, Rectangle3DRegion], c
 
     if hsi is None:
         return EmptyRegion("Empty")
-    return ConvexPolygon3DRegion(hsi, c1.origin, c1.normal)
+    return ConvexPolygon3DRegion(hsi, c1.origin, c1.rot)
 
 
 @distributionFunction

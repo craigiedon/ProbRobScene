@@ -9,9 +9,9 @@ workspace = CuboidRegion(Vector3D(0, 0, height / 2.0), Vector3D(0,0,0), width, l
 floor = Rectangle3DRegion(width, length, Vector3D(0, 0, 0), Vector3D(0, 0, 0))
 
 class Cube:
-    width: 0.02
-    height: 0.02
-    length: 0.02
+    width: 0.04
+    height: 0.04
+    length: 0.04
     color: 'blue'
     shape_type: 'CUBOID'
 
@@ -30,8 +30,8 @@ class ToyCube:
 
 
 class Tray:
-    width: 0.4522
-    length: 0.2364
+    width: 0.2364
+    length: 0.4522
     height: 0.028964
     color: '0.75'
     model_name: "Tray"
@@ -59,8 +59,8 @@ class Cup:
     color: "blue"
 
 class Robot:
-    width: 0.2256
-    length: 0.2256
+    width: 0.14
+    length: 0.22
     height: 1.025562
     color: 'white'
     model_name: "Panda"

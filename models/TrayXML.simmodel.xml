@@ -1,0 +1,1318 @@
+<CoppeliaSim>
+    <filetype>exhaustiveModel</filetype>
+    <xmlSerializationNb>1</xmlSerializationNb>
+    <prgFlavor>1</prgFlavor>
+    <prgVer>40100</prgVer>
+    <prgRev>1</prgRev>
+    <modelThumbnailInfo>
+        <pose>
+            <position>-0.000000 -0.000000 0.007982</position>
+            <quaternion>1.000000 0.000000 0.000000 0.000000</quaternion>
+        </pose>
+        <modelBoundingBoxSize>0.236439 0.452192 0.028964</modelBoundingBoxSize>
+        <modelNonDefaultTranslationStepSize>0.000000</modelNonDefaultTranslationStepSize>
+    </modelThumbnailInfo>
+    <modelThumbnail>
+        <data_base64Coded>////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wDw8PEf////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A1NTXT5OUnt/S09df9/f4D////wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////ANTU1099fojvg4SQ/4iJlf+trbav6OnrL////wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////APv7/A/Q0NVffX6I73V2gf+DhJD/iImV/4iJlf+PkJvv0tPXX/f3+A////8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD29vcPpKWtr3l6hv91doH/dXaB/4OEkP+IiZX/iImV/4iJlf+IiZX/ra22r+jp6y////8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A9vb3D6CgqK91doH/eXqG/42PnP94eYT/hoeT/4iJlf+IiZX/iImV/4iJlf+IiZX/j5Cb79LT11/39/gP////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////APb29w+goKivdXaB/3V2gf95eob/eXqG/3l6hv+IiZX/iImV/4iJlf+IiZX/iImV/4iJlf+IiZX/iImV/62ttq/o6esv////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wDn6O1PmJmjz3V2gf91doH/d3iD/3d4g/91doH/eXqG/4iJlf+IiZX/iImV/4iJlf+IiZX/iImV/4iJlf+IiZX/iImV/4+Qm++0tbyf9/f4D////wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A1NTXT4eIk+91doH/foCL/3V2gf91doH/dXaB/3l6hv+nqbj/mpyp/4iJlf+IiZX/iImV/4iJlf+IiZX/iImV/4iJlf+IiZX/iImV/4iJlf+en6jP2treT////wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////ANTU1099fojvdXaB/3V2gf9+gIv/dXaB/3V2gf+DhJH/q628/8TG1//AwtP/ra++/5OUof+IiZX/iImV/4iJlf+IiZX/iImV/4iJlf+IiZX/iImV/4iJlf+PkJvvtLW8n/f3+A////8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wDU1NdPfX6I73V2gf91doH/dXaB/3V2gf91doH/iYuX/7u9zf/Extf/xMbX/8TG1//Extf/wMLT/56frf+LjJn/iImV/4iJlf+IiZX/iImV/4iJlf+IiZX/iImV/4iJlf+IiZX/np+oz9ra3k////8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD29vcPvL3Fn31+iO95eob/eXqG/3V2gf91doH/dXaB/42Om/+7vc3/wMLT/8TG1//Extf/xMbX/8TG1//Extf/xMbX/7i6yv+anKn/iImV/4iJlf+IiZX/iImV/4iJlf+IiZX/iImV/4iJlf+IiZX/j5Cb77S1vJ/39/gP////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A9vb3D6CgqK91doH/dXaB/3l6hv95eob/dXaB/3l6hv+mqLb/v8HR/8TG1//Extf/xMbX/7S2xv/Extf/xMbX/8TG1//Extf/xMbX/8DC0/+tr77/i4yZ/4iJlf+IiZX/iImV/4iJlf+IiZX/iImV/4iJlf+IiZX/iImV/56fqM/a2t5P////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////APb29w+goKivdXaB/3V2gf91doH/dXaB/3V2gf95eob/q628/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//AwtP/wMLT/8TG1//Extf/xMbX/8TG1/+4usr/np+t/4uMmf+IiZX/iImV/4iJlf+IiZX/iImV/4iJlf+IiZX/iImV/4+Qm++0tbyf9/f4D////wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wDv7/IvoKCor3V2gf9+gIv/dXaB/3V2gf91doH/g4SR/6utvP/Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8DC0//AwtP/xMbX/8TG1//Extf/xMbX/8TG1//Extf/sbPC/5OUof+IiZX/iImV/4iJlf+IiZX/iImV/4iJlf+IiZX/iImV/4iJlf+en6jP2treT////wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A3d7iT5GSnu91doH/dXaB/36Ai/91doH/dXaB/42Om/+/wdH/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/tLbG/8TG1//Extf/xMbX/8TG1//Extf/wMLT/56frf+LjJn/iImV/4iJlf+IiZX/iImV/4iJlf+IiZX/iImV/4iJlf+PkJvvtLW8n/f3+A////8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////ANTU1099fojvdXaB/3V2gf91doH/dXaB/3V2gf+Njpv/v8HR/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8DC0//AwtP/xMbX/8TG1//Extf/xMbX/7i6yv+anKn/iImV/4iJlf+IiZX/iImV/4iJlf+IiZX/iImV/4iJlf+IiZX/np+oz9ra3k////8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wDU1NdPfX6I73V2gf91doH/dXaB/3V2gf95eob/kpOh/7/B0f/Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/wMLT/8DC0//Extf/xMbX/8TG1//Extf/xMbX/8DC0/+tr77/i4yZ/4iJlf+IiZX/iImV/4iJlf+IiZX/iImV/4iJlf+IiZX/j5Cb77S1vJ/39/gP////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD7+/wP0NDVX31+iO91doH/iYqW/3V2gf91doH/eXqG/6utvP/Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1/+0tsb/xMbX/8TG1//Extf/xMbX/8TG1/+4usr/np+t/4uMmf+IiZX/iImV/4iJlf+IiZX/iImV/4iJlf+IiZX/iImV/56fqM/a2t5P////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A9vb3D6Slra95eob/dXaB/3V2gf91doH/dXaB/3l6hv+rrbz/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/wMLT/8DC0//Extf/xMbX/8TG1//Extf/sbPC/5OUof+IiZX/iImV/4iJlf+IiZX/iImV/4iJlf+IiZX/iImV/4+Qm++0tbyf9/f4D////wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////APb29w+goKivdXaB/3V2gf91doH/dXaB/3V2gf+Njpv/tbfH/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//AwtP/wMLT/8TG1//Extf/xMbX/8TG1//Extf/wMLT/62vvv+LjJn/iImV/4iJlf+IiZX/iImV/4iJlf+IiZX/iImV/4iJlf+en6jP2treT////wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD29vcPoKCor3V2gf9+gIv/foCL/3V2gf91doH/jY6b/7/B0f/Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/7S2xv/Extf/xMbX/8TG1//Extf/xMbX/7i6yv+anKn/iImV/4iJlf+IiZX/iImV/4iJlf+IiZX/iImV/4iJlf+PkJvvtLW8n+jp6y////8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A5+jtT5iZo891doH/dXaB/3V2gf91doH/eXqG/5KTof+/wdH/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8DC0/+tr77/k5Sh/4iJlf+IiZX/iImV/4iJlf+IiZX/iImV/4iJlf+IiZX/j5Cb79LT11/39/gP////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////ANTU10+HiJPvdXaB/3V2gf91doH/dXaB/3l6hv+rrbz/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//AwtP/np+t/4uMmf+IiZX/iImV/4iJlf+IiZX/iImV/4iJlf+IiZX/iImV/62ttq/o6esv////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wDU1NdPfX6I73V2gf+Jipb/dXaB/3V2gf95eob/q628/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/sbPC/5OUof+IiZX/iImV/4iJlf+IiZX/iImV/4iJlf+IiZX/iImV/4+Qm+/S09df9/f4D////wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A1NTXT31+iO91doH/dXaB/3V2gf91doH/jY6b/7W3x//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/wMLT/62vvv+LjJn/iImV/4iJlf+IiZX/iImV/4iJlf+IiZX/iImV/4iJlf+trbav6OnrL////wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A9vb3D7y9xZ99fojvdXaB/3V2gf91doH/dXaB/42Om/+/wdH/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/7i6yv+anKn/iImV/4iJlf+IiZX/iImV/4iJlf+IiZX/iImV/4iJlf+PkJvv0tPXX/f3+A////8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////APb29w+goKivdXaB/36Ai/9+gIv/dXaB/3l6hv+Sk6H/v8HR/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8DC0/+tr77/k5Sh/4iJlf+IiZX/iImV/4iJlf+IiZX/iImV/4iJlf+IiZX/ra22r+jp6y////8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD29vcPoKCor3V2gf91doH/dXaB/3V2gf95eob/q628/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//AwtP/np+t/4uMmf+IiZX/iImV/4iJlf+IiZX/iImV/4iJlf+IiZX/j5Cb79LT11/39/gP////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A7+/yL6CgqK91doH/dXaB/3V2gf91doH/eXqG/6utvP/Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/uLrK/5qcqf+IiZX/iImV/4iJlf+IiZX/iImV/4iJlf+IiZX/iImV/62ttq/o6esv////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////ANTU10+HiJPveXqG/3l6hv91doH/dXaB/4OEkf+rrbz/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/wMLT/62vvv+LjJn/iImV/4iJlf+IiZX/iImV/4iJlf+IiZX/iImV/4+Qm+/S09df9/f4D////wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wDU1NdPfX6I73V2gf95eob/eXqG/3V2gf+Njpv/v8HR/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/7i6yv+en63/i4yZ/4iJlf+IiZX/iImV/4iJlf+IiZX/iImV/4iJlf+trbav6OnrL////wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A1NTXT31+iO91doH/dXaB/3V2gf91doH/jY6b/7/B0f/Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1/+xs8L/k5Sh/4iJlf+IiZX/iImV/4iJlf+IiZX/iImV/4iJlf+PkJvv0tPXX/f3+A////8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AOXl5y99fojvfoCL/3V2gf91doH/eXqG/6aotv+/wdH/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//AwtP/np+t/4uMmf+IiZX/iImV/4iJlf+IiZX/iImV/4iJlf+IiZX/ra22r+jp6y////8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8Ara61n3V2gf9+gIv/dXaB/3l6hv+rrbz/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/uLrK/5qcqf+IiZX/iImV/4iJlf+IiZX/iImV/4iJlf+IiZX/j5Cb79LT11/39/gP////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wCXmKC/dXaB/3V2gf+DhJH/q628/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/wMLT/62vvv+LjJn/iImV/4iJlf+IiZX/iImV/4iJlf+IiZX/iImV/62ttq/o6esv////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A3+DjP3+Ai+95eob/jY6b/7/B0f/Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/7i6yv+en63/i4yZ/4iJlf+IiZX/iImV/4iJlf+IiZX/iImV/4+Qm++0tbyf9/f4D////wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wDR0dVUdXaB/42Om/+/wdH/xMbX/8TG1//Extf/wMLT/56frf+WmKX/ra++/8DC0//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1/+xs8L/k5Sh/4iJlf+IiZX/iImV/4iJlf+IiZX/iImV/4iJlf+en6jP2treT////wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AMTEyn6mqLb/v8HR/7S2xv/Extf/xMbX/7i6yv+anKn/iImV/4iJlf+IiZX/k5Sh/62vvv+4usr/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//AwtP/ra++/4uMmf+IiZX/iImV/4iJlf+IiZX/iImV/4iJlf+PkJvvtLW8n/f3+A////8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8AyMrWv8DB0e/Extf/xMbX/8TG1/+8vs7/mpup/4uMmf+IiZX/iImV/4iJlf+IiZX/iImV/4uMmf+en63/tbbG/8DC0//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/uLrK/5qcqf+IiZX/iImV/4iJlf+IiZX/iImV/4iJlf+IiZX/np+oz9ra3k////8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A7OzvL+np8F/LzNrPwMLT/8TG1//Extf/uLrK/56frf+LjJn/iImV/4iJlf+IiZX/iImV/4iJlf+IiZX/k5Sh/62vvv/AwtP/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/wMLT/62vvv+TlKH/iImV/4iJlf+IiZX/iImV/4iJlf+IiZX/j5Cb77S1vJ/39/gP////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////APf3+A/s7fE/ysvVn8/Q3s/Extf/xMbX/7i6yv+tr77/k5Sh/4iJlf+IiZX/iImV/4iJlf+IiZX/iImV/5OUof+en63/uLrK/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8DC0/+en63/i4yZ/4iJlf+IiZX/iImV/4iJlf+IiZX/iImV/56fqM/a2t5P////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A+/v8D+Hi51/LzNi/x8nZ78TG1//AwtP/tbbG/56frf+LjJn/iImV/4iJlf+IiZX/iImV/4iJlf+LjJn/np+t/7W2xv/AwtP/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1/+xs8L/k5Sh/4iJlf+IiZX/iImV/4iJlf+IiZX/iImV/4+Qm++0tbyf9/f4D////wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD09PcvysvVn8/Q3s/Extf/xMbX/7i6yv+tr77/k5Sh/4iJlf+IiZX/iImV/4iJlf+IiZX/iImV/5OUof+tr77/uLrK/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//AwtP/ra++/4uMmf+IiZX/iImV/4iJlf+IiZX/iImV/4iJlf+en6jP2treT////wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A+/v8D+Hi51/LzNi/x8nZ78TG1//AwtP/tbbG/56frf+LjJn/iImV/4iJlf+IiZX/iImV/4iJlf+LjJn/np+t/7i6yv/Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/uLrK/5qcqf+IiZX/iImV/4iJlf+IiZX/iImV/4iJlf+PkJvvtLW8n/f3+A////8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD09PcvysvVn8/Q3s/Extf/xMbX/7i6yv+tr77/k5Sh/4iJlf+IiZX/iImV/4iJlf+IiZX/i4yZ/5aYpf+tr77/wMLT/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/wMLT/62vvv+TlKH/iImV/4iJlf+IiZX/iImV/4iJlf+IiZX/np+oz9ra3k////8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A+/v8D+Hi51/LzNi/x8nZ78TG1//AwtP/tbbG/56frf+LjJn/iImV/4iJlf+IiZX/iImV/4iJlf+TlKH/ra++/7i6yv/Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8DC0/+en63/i4yZ/4iJlf+IiZX/iImV/4iJlf+IiZX/j5Cb77S1vJ/39/gP////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD09PcvysvVn8/Q3s/Extf/xMbX/7i6yv+tr77/k5Sh/4iJlf+IiZX/iImV/4iJlf+IiZX/i4yZ/56frf+1tsb/wMLT/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1/+xs8L/k5Sh/4iJlf+IiZX/iImV/4iJlf+IiZX/iImV/56fqM/a2t5P////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A+/v8D+Hi51/LzNi/x8nZ78TG1//AwtP/tbbG/56frf+LjJn/iImV/4iJlf+IiZX/iImV/4iJlf+TlKH/ra++/8DC0//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//AwtP/ra++/4uMmf+IiZX/iImV/4iJlf+IiZX/iImV/4+Qm++0tbyf9/f4D////wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD09PcvysvVn8/Q3s/Extf/xMbX/7i6yv+en63/k5Sh/4iJlf+IiZX/iImV/4iJlf+IiZX/k5Sh/56frf+4usr/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/uLrK/56frf+LjJn/iImV/4iJlf+IiZX/iImV/4iJlf+en6jP2treT////wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A+/v8D+Hi51/LzNi/wMHR78TG1//AwtP/ra++/5aYpf+LjJn/iImV/4iJlf+IiZX/iImV/4uMmf+en63/tbbG/8DC0//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/7Gzwv+TlKH/iImV/4iJlf+IiZX/iImV/4iJlf+PkJvvtLW8n+jp6y////8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wDs7O8v6enwX8vM2s/AwtP/xMbX/7i6yv+en63/k5Sh/4iJlf+IiZX/iImV/4iJlf+IiZX/k5Sh/62vvv+4usr/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8DC0/+en63/i4yZ/4iJlf+IiZX/iImV/4iJlf+IiZX/j5Cb79fX20////8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A9/f4D+zt8T/a2+afwMHR78TG1//AwtP/ra++/5aYpf+LjJn/iImV/4iJlf+IiZX/iImV/4uMmf+en63/uLrK/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1/+4usr/mpyp/4iJlf+IiZX/iImV/4iJlf+IiZX/o6Osv////wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wDs7O8v6enwX8vM2s/AwtP/xMbX/7i6yv+en63/k5Sh/4iJlf+IiZX/iImV/4iJlf+LjJn/lpil/62vvv/AwtP/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//AwtP/ra++/4uMmf+IiZX/iImV/4iJlf+lpq+/////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A9/f4D+zt8T/a2+afwMHR78TG1//AwtP/ra++/5aYpf+LjJn/iImV/4iJlf+IiZX/iImV/5OUof+tr77/uLrK/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/uLrK/56frf+LjJn/iImV/42Nme/m5ugv////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wDs7O8v6enwX8vM2s/AwtP/xMbX/7i6yv+en63/k5Sh/4iJlf+IiZX/iImV/4iJlf+LjJn/np+t/7W2xv/AwtP/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/tbfH/5KTof+IiZb/pqi2/7/B0f/Extf/xMbX/7Gzwv+TlKH/iImV/+Hh5D////8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A9/f4D+zt8T/a2+afwMHR78TG1//AwtP/ra++/5OUof+IiZX/iImV/4iJlf+IiZX/iImV/5OUof+tr77/wMLT/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1/+1t8f/pqi2/4iJlv95eob/dXaB/3V2gf91doH/jY6b/7W3x//Extf/xMbX/8DC0/+en63/5eXoP////wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wDs7O8v6enwX8vM2s/AwtP/wMLT/7W2xv+en63/i4yZ/4iJlf+IiZX/iImV/4iJlf+TlKH/np+t/7i6yv/Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/7/B0f+mqLb/iImW/3l6hv91doH/dXaB/3V2gf91doH/dXaB/4OEkf+Sk6H/tbfH/8TG1//Hydnv0tThv+np8F/7+/wP////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A9/f4D+zt8T/a2+afwMHR78TG1/+4usr/ra++/5OUof+IiZX/iImV/4iJlf+IiZX/i4yZ/56frf+1tsb/wMLT/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/v8HR/7Cywf+Sk6H/g4SR/3V2gf91doH/dXaB/3V2gf91doH/eXqG/5KTof+wssH/v8HR/8fJ2e/S1OG/6enwX/T09y////8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wDs7O8v6enwX9LU4b/HydnvwMLT/7W2xv+en63/i4yZ/4iJlf+IiZX/iImV/4iJlf+TlKH/ra++/7i6yv/Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1/+/wdH/sLLB/5KTof+DhJH/dXaB/3V2gf91doH/dXaB/3V2gf95eob/iImW/6aotv+1t8f/v8HR/8rL2c/Gx9Cf9PT3L////wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////APT09y/Ky9Wfz9Dez8TG1/+4usr/ra++/5OUof+IiZX/iImV/4iJlf+IiZX/i4yZ/56frf+4usr/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1/+1t8f/pqi2/4OEkf91doH/dXaB/3V2gf91doH/dXaB/3l6hv+IiZb/pqi2/7W3x/+/wdH/ysvZz8bH0J/r7O8/9vb3D////wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD7+/wP4eLnX8vM2L/HydnvwMLT/7W2xv+en63/i4yZ/4iJlf+IiZX/iImV/4uMmf+WmKX/ra++/8DC0//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/7W3x/+mqLb/iImW/3l6hv91doH/dXaB/3V2gf91doH/eXqG/4iJlv+mqLb/tbfH/7/B0f/Ky9nPxsfQn+vs7z/29vcP////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////APT09y/Ky9Wfz9Dez8TG1/+4usr/ra++/5OUof+IiZX/iImV/4iJlf+IiZX/k5Sh/62vvv+4usr/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/v8HR/7Cywf+Sk6H/eXqG/3V2gf91doH/dXaB/3V2gf95eob/iImW/6aotv+1t8f/v8HR/8rL2c/Gx9Cf6+zvP/b29w////8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD7+/wP4eLnX8vM2L/HydnvwMLT/7W2xv+en63/i4yZ/4iJlf+IiZX/iImV/4uMmf+en63/tbbG/8DC0//Extf/xMbX/8TG1//Extf/xMbX/8TG1//Extf/xMbX/8TG1/+/wdH/sLLB/5KTof+DhJH/dXaB/3V2gf91doH/dXaB/3V2gf+DhJH/kpOh/7W3x/+/wdH/ysvZz8bH0J/r7O8/9vb3D////wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////APT09y/Ky9Wfz9Dez8TG1/+4usr/np+t/5OUof+IiZX/iImV/4iJlf+IiZX/k5Sh/62vvv/AwtP/xMbX/8TG1//Extf/xMbX/8TG1/+1t8f/pqi2/4OEkf91doH/dXaB/3V2gf91doH/dXaB/4OEkf+Sk6H/sLLB/7q8zP/Ky9nPxsfQn+vs7z/29vcP////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD7+/wP4eLnX8vM2L/HydnvwMLT/62vvv+WmKX/i4yZ/4iJlf+IiZX/iImV/5OUof+en63/uLrK/7W3x/+mqLb/iImW/3l6hv91doH/dXaB/3V2gf91doH/g4SR/5KTof+wssH/v8HR/8/Q3s/Gx9Cf6+zvP/b29w////8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////APT09y/Ky9Wfz9Dez8TG1/+4usr/np+t/5OUof+IiZX/iImV/4iJlf+LjJn/fX6K/3V2gf91doH/dXaB/3V2gf+DhJH/kpOh/7Cywf+/wdH/z9Dez9rb5p/w8PU/+/v8D////wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD7+/wP4eLnX8vM2L/HydnvwMLT/62vvv+WmKX/i4yZ/4iJlf95eob/dXaB/3l6hv+IiZb/pqi2/7/B0f/P0N7P2tvmn/Dw9T/7+/wP////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////APT09y/Ky9Wfz9Dez8TG1/+4usr/np+t/4yNmv+mqLb/tbfH/72/zu/Iyta/39/lX/v7/A////8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD7+/wP8PD1P9rb5p/AwdHvvb/O78jK1r/f3+Vf6ursL////wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AOzs7y/q6uwv////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AA==</data_base64Coded>
+    </modelThumbnail>
+    <sceneObject>
+        <shape>
+            <common>
+                <name>tray</name>
+                <altName>Shape</altName>
+                <handle>26</handle>
+                <parentHandle>-1</parentHandle>
+                <localFrame>
+                    <position>-0.000000 0.000000 0.000000</position>
+                    <quaternion>1.000000 0.000000 0.000000 0.000000</quaternion>
+                </localFrame>
+                <assembling>
+                    <localFrame>
+                        <position>0.000000 0.000000 0.000000</position>
+                        <quaternion>1.000000 0.000000 0.000000 0.000000</quaternion>
+                    </localFrame>
+                    <matchValues>
+                        <child>default</child>
+                        <parent>default</parent>
+                    </matchValues>
+                    <localFrameIsUsed>false</localFrameIsUsed>
+                </assembling>
+                <hierarchyColorIndex>-1</hierarchyColorIndex>
+                <collectionSelfCollisionIndicator>0</collectionSelfCollisionIndicator>
+                <localObjectProperty>
+                    <hierarchyCollapsed>false</hierarchyCollapsed>
+                    <selectable>true</selectable>
+                    <selectModelBaseInstead>true</selectModelBaseInstead>
+                    <dontShowAsInsideModel>false</dontShowAsInsideModel>
+                    <canUpdateDna>false</canUpdateDna>
+                    <selectInvisible>false</selectInvisible>
+                    <depthInvisible>false</depthInvisible>
+                    <cannotDelete>false</cannotDelete>
+                    <cannotDeleteDuringSimulation>false</cannotDeleteDuringSimulation>
+                </localObjectProperty>
+                <localObjectSpecialProperty>
+                    <collidable>true</collidable>
+                    <measurable>true</measurable>
+                    <renderable>true</renderable>
+                    <ultrasonicDetectable>true</ultrasonicDetectable>
+                    <infraredDetectable>true</infraredDetectable>
+                    <laserDetectable>true</laserDetectable>
+                    <inductiveDetectable>true</inductiveDetectable>
+                    <capacitiveDetectable>true</capacitiveDetectable>
+                </localObjectSpecialProperty>
+                <localModelProperty>
+                    <notCollidable>false</notCollidable>
+                    <notMeasurable>false</notMeasurable>
+                    <notRenderable>false</notRenderable>
+                    <notDetectable>false</notDetectable>
+                    <notDynamic>false</notDynamic>
+                    <notRespondable>false</notRespondable>
+                    <notReset>false</notReset>
+                    <notVisible>false</notVisible>
+                    <scriptsInactive>false</scriptsInactive>
+                    <notShowAsInsideModel>false</notShowAsInsideModel>
+                </localModelProperty>
+                <layer>1</layer>
+                <switches>
+                    <modelBase>true</modelBase>
+                    <ignoredByViewFitting>false</ignoredByViewFitting>
+                </switches>
+                <manipulation>
+                    <permissions>35</permissions>
+                    <translation>
+                        <disabledDuringSimulation>false</disabledDuringSimulation>
+                        <disabledDuringNonSimulation>false</disabledDuringNonSimulation>
+                        <settingsLocked>false</settingsLocked>
+                        <relativeTo>0</relativeTo>
+                        <nonDefaultStepSize>0.000000</nonDefaultStepSize>
+                    </translation>
+                    <rotation>
+                        <disabledDuringSimulation>false</disabledDuringSimulation>
+                        <disabledDuringNonSimulation>false</disabledDuringNonSimulation>
+                        <settingsLocked>false</settingsLocked>
+                        <relativeTo>2</relativeTo>
+                        <nonDefaultStepSize>0.000000</nonDefaultStepSize>
+                    </rotation>
+                </manipulation>
+                <sizeFactor>1.000000</sizeFactor>
+                <sizeValues>1.000000 1.000000 1.000000</sizeValues>
+                <dnaString_base64Coded>GEb1jVIl2FxQzO7Dw7lO0Q==</dnaString_base64Coded>
+                <uniquePersistentString_base64Coded>RjBENDNGNzc0OUQyQkI3MA==</uniquePersistentString_base64Coded>
+                <transparentObjectDistanceOffset>0.000000</transparentObjectDistanceOffset>
+                <authorizedViewableObjects>-1</authorizedViewableObjects>
+                <extensionString></extensionString>
+                <modelAcknowledgement></modelAcknowledgement>
+            </common>
+            <meshProxy>
+                <mesh>
+                    <common>
+                        <name>sub__0</name>
+                        <dynamics>
+                            <mass>1.000000</mass>
+                            <localInertiaFrame>
+                                <position>0.000000 -0.000000 0.000000</position>
+                                <quaternion>0.707107 0.000000 0.000000 0.707107</quaternion>
+                                <principalMomentsOfInertia>0.001000 0.001000 0.001000</principalMomentsOfInertia>
+                            </localInertiaFrame>
+                        </dynamics>
+                        <transformationSinceGrouping>
+                            <position>-0.025000 -0.125000 -0.006494</position>
+                            <quaternion>0.707107 0.000000 0.000000 0.707107</quaternion>
+                        </transformationSinceGrouping>
+                        <switches>
+                            <convex>true</convex>
+                        </switches>
+                    </common>
+                    <shadingAngle>0.000000</shadingAngle>
+                    <edgeThresholdAngle>0.000000</edgeThresholdAngle>
+                    <color>
+                        <name></name>
+                        <extensionString>povray { pattern {default}}</extensionString>
+                        <ambient>0.810000 0.820000 0.890000</ambient>
+                        <diffuse>0.000000 0.000000 0.000000</diffuse>
+                        <specular>0.250000 0.250000 0.250000</specular>
+                        <emission>0.000000 0.000000 0.000000</emission>
+                        <temperature>0.500000 0.000000 0.000000</temperature>
+                        <shininess>48</shininess>
+                        <transparency>0.500000</transparency>
+                        <switches>
+                            <transparent>false</transparent>
+                        </switches>
+                        <flashing>
+                            <enabled>false</enabled>
+                            <inSimulationTime>false</inSimulationTime>
+                            <frequency>2.000000</frequency>
+                            <ratio>0.500000</ratio>
+                            <phase>0.000000</phase>
+                        </flashing>
+                    </color>
+                    <primitive>
+                        <type>none</type>
+                        <insideScaling>0.000000</insideScaling>
+                        <sizes>0.000000 0.000000 0.000000</sizes>
+                    </primitive>
+                    <verticesLocalFrame>
+                        <position>-0.025000 -0.125000 -0.006494</position>
+                        <quaternion>0.707107 0.000000 0.000000 0.707107</quaternion>
+                    </verticesLocalFrame>
+                    <switches>
+                        <edgesVisible>false</edgesVisible>
+                        <culling>false</culling>
+                        <wireframe>false</wireframe>
+                        <hideEdgeBorders>false</hideEdgeBorders>
+                    </switches>
+                    <heightfield>
+                        <sizes>0 0</sizes>
+                        <data></data>
+                    </heightfield>
+                    <meshData>
+                        <vertices>0.351094 0.093219 0.012994 0.351095 0.093219 0.000005 -0.101095 0.093219 -0.000007 0.351095 -0.143219 0.012994 -0.101095 0.093219 0.012982 -0.101095 -0.143218 -0.000006 -0.101095 -0.143219 0.012982 0.351095 -0.143219 0.000006</vertices>
+                        <indices>0 1 2 1 0 3 4 0 2 5 4 2 4 5 6 0 4 3 4 6 3 7 1 3 6 7 3 5 7 6 1 7 2 7 5 2</indices>
+                        <normals>0.000000 1.000000 0.000000 0.000000 1.000000 0.000000 0.000000 1.000000 0.000000 1.000000 0.000000 0.000000 1.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 1.000000 0.000000 0.000000 1.000000 0.000000 -1.000000 0.000000 0.000000 -1.000000 0.000000 0.000000 -1.000000 0.000000 0.000000 -1.000000 0.000000 0.000000 -1.000000 0.000000 0.000000 -1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 1.000000 0.000000 0.000000 1.000000 0.000000 0.000000 1.000000 0.000000 0.000000 1.000000 0.000000 0.000000 1.000000 1.000000 0.000000 0.000000 1.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 -1.000000 0.000000 0.000000 -1.000000 0.000000 0.000000 -1.000000 0.000000 0.000000 -1.000000 0.000000 0.000000 -1.000000 0.000000 0.000000 -1.000000 0.000000 0.000000 0.000000 -1.000000 0.000000 0.000000 -1.000000 0.000000 0.000000 -1.000000 0.000000 0.000000 -1.000000 0.000000 0.000000 -1.000000 0.000000 0.000000 -1.000000</normals>
+                        <edges>255 255 255 255 15</edges>
+                    </meshData>
+                </mesh>
+            </meshProxy>
+            <dynamics>
+                <respondableMask>65535</respondableMask>
+                <initialLinearVelocity>0.000000 0.000000 0.000000</initialLinearVelocity>
+                <initialAngularVelocity>0.000000 0.000000 0.000000</initialAngularVelocity>
+                <switches>
+                    <static>true</static>
+                    <respondable>true</respondable>
+                    <startSleeping>false</startSleeping>
+                    <setToDynamicIfGetsParent>false</setToDynamicIfGetsParent>
+                </switches>
+                <material>
+                    <id>2290013</id>
+                    <name>usr_</name>
+                    <engines>
+                        <bullet>
+                            <restitution>0.000000</restitution>
+                            <friction>0.710000</friction>
+                            <oldfriction>0.710000</oldfriction>
+                            <lineardamping>0.000000</lineardamping>
+                            <angulardamping>0.000000</angulardamping>
+                            <nondefaultcollisionmargingfactor>0.100000</nondefaultcollisionmargingfactor>
+                            <nondefaultcollisionmargingfactorconvex>0.002000</nondefaultcollisionmargingfactorconvex>
+                            <sticky>false</sticky>
+                            <usenondefaultcollisionmargin>false</usenondefaultcollisionmargin>
+                            <usenondefaultcollisionmarginconvex>true</usenondefaultcollisionmarginconvex>
+                            <autoshrinkconvex>false</autoshrinkconvex>
+                        </bullet>
+                        <ode>
+                            <friction>0.710000</friction>
+                            <softerp>0.200000</softerp>
+                            <softcfm>0.000000</softcfm>
+                            <lineardamping>0.000000</lineardamping>
+                            <angulardamping>0.000000</angulardamping>
+                            <maxcontacts>64</maxcontacts>
+                        </ode>
+                        <vortex>
+                            <primlinearaxisfriction>0.500000</primlinearaxisfriction>
+                            <seclinearaxisfriction>0.500000</seclinearaxisfriction>
+                            <primangularaxisfriction>0.000000</primangularaxisfriction>
+                            <secangularaxisfriction>0.000000</secangularaxisfriction>
+                            <normalangularaxisfriction>0.000000</normalangularaxisfriction>
+                            <primlinearaxisstaticfrictionscale>1.100000</primlinearaxisstaticfrictionscale>
+                            <seclinearaxisstaticfrictionscale>1.100000</seclinearaxisstaticfrictionscale>
+                            <primangularaxisstaticfrictionscale>1.000000</primangularaxisstaticfrictionscale>
+                            <secangularaxisstaticfrictionscale>1.000000</secangularaxisstaticfrictionscale>
+                            <normalangularaxisstaticfrictionscale>1.000000</normalangularaxisstaticfrictionscale>
+                            <compliance>0.000000</compliance>
+                            <damping>10000000.000000</damping>
+                            <restitution>0.000000</restitution>
+                            <restitutionthreshold>0.500000</restitutionthreshold>
+                            <adhesiveforce>0.000000</adhesiveforce>
+                            <linearvelocitydamping>0.000000</linearvelocitydamping>
+                            <angularvelocitydamping>0.000000</angularvelocitydamping>
+                            <primlinearaxisslide>0.000000</primlinearaxisslide>
+                            <seclinearaxisslide>0.000000</seclinearaxisslide>
+                            <primangularaxisslide>0.000000</primangularaxisslide>
+                            <secangularaxisslide>0.000000</secangularaxisslide>
+                            <normalangularaxisslide>0.000000</normalangularaxisslide>
+                            <primlinearaxisslip>0.000000</primlinearaxisslip>
+                            <seclinearaxisslip>0.000000</seclinearaxisslip>
+                            <primangularaxisslip>0.000000</primangularaxisslip>
+                            <secangularaxisslip>0.000000</secangularaxisslip>
+                            <normalangularaxisslip>0.000000</normalangularaxisslip>
+                            <autosleeplinearspeedthreshold>0.140000</autosleeplinearspeedthreshold>
+                            <autosleeplinearaccelthreshold>0.045000</autosleeplinearaccelthreshold>
+                            <autosleepangularspeedthreshold>0.030000</autosleepangularspeedthreshold>
+                            <autosleepangularaccelthreshold>0.045000</autosleepangularaccelthreshold>
+                            <skinthickness>0.000000</skinthickness>
+                            <autoangulardampingtensionratio>0.010000</autoangulardampingtensionratio>
+                            <primaxisvectorx>0.000000</primaxisvectorx>
+                            <primaxisvectory>0.000000</primaxisvectory>
+                            <primaxisvectorz>1.000000</primaxisvectorz>
+                            <primlinearaxisfrictionmodel>4</primlinearaxisfrictionmodel>
+                            <seclinearaxisfrictionmodel>4</seclinearaxisfrictionmodel>
+                            <primangulararaxisfrictionmodel>6</primangulararaxisfrictionmodel>
+                            <secmangulararaxisfrictionmodel>6</secmangulararaxisfrictionmodel>
+                            <normalmangulararaxisfrictionmodel>6</normalmangulararaxisfrictionmodel>
+                            <autosleepsteplivethreshold>10</autosleepsteplivethreshold>
+                            <materialuniqueid>55</materialuniqueid>
+                            <pureshapesasconvex>false</pureshapesasconvex>
+                            <convexshapesasrandom>false</convexshapesasrandom>
+                            <randomshapesasterrain>false</randomshapesasterrain>
+                            <fastmoving>true</fastmoving>
+                            <autoslip>false</autoslip>
+                            <seclinaxissameasprimlinaxis>true</seclinaxissameasprimlinaxis>
+                            <secangaxissameasprimangaxis>true</secangaxissameasprimangaxis>
+                            <normangaxissameasprimangaxis>true</normangaxissameasprimangaxis>
+                            <autoangulardamping>false</autoangulardamping>
+                        </vortex>
+                        <newton>
+                            <staticfriction>0.500000</staticfriction>
+                            <kineticfriction>0.500000</kineticfriction>
+                            <restitution>0.000000</restitution>
+                            <lineardrag>0.000000</lineardrag>
+                            <angulardrag>0.000000</angulardrag>
+                            <fastmoving>false</fastmoving>
+                        </newton>
+                    </engines>
+                </material>
+            </dynamics>
+        </shape>
+    </sceneObject>
+    <sceneObject>
+        <shape>
+            <common>
+                <name>border3</name>
+                <altName>Shape2</altName>
+                <handle>27</handle>
+                <parentHandle>26</parentHandle>
+                <localFrame>
+                    <position>-0.110716 -0.000001 0.014476</position>
+                    <quaternion>0.707107 0.000000 0.000000 0.707107</quaternion>
+                </localFrame>
+                <assembling>
+                    <localFrame>
+                        <position>0.000000 0.000000 0.000000</position>
+                        <quaternion>1.000000 0.000000 0.000000 0.000000</quaternion>
+                    </localFrame>
+                    <matchValues>
+                        <child>default</child>
+                        <parent>default</parent>
+                    </matchValues>
+                    <localFrameIsUsed>false</localFrameIsUsed>
+                </assembling>
+                <hierarchyColorIndex>-1</hierarchyColorIndex>
+                <collectionSelfCollisionIndicator>0</collectionSelfCollisionIndicator>
+                <localObjectProperty>
+                    <hierarchyCollapsed>false</hierarchyCollapsed>
+                    <selectable>true</selectable>
+                    <selectModelBaseInstead>true</selectModelBaseInstead>
+                    <dontShowAsInsideModel>false</dontShowAsInsideModel>
+                    <canUpdateDna>false</canUpdateDna>
+                    <selectInvisible>false</selectInvisible>
+                    <depthInvisible>false</depthInvisible>
+                    <cannotDelete>false</cannotDelete>
+                    <cannotDeleteDuringSimulation>false</cannotDeleteDuringSimulation>
+                </localObjectProperty>
+                <localObjectSpecialProperty>
+                    <collidable>true</collidable>
+                    <measurable>true</measurable>
+                    <renderable>true</renderable>
+                    <ultrasonicDetectable>true</ultrasonicDetectable>
+                    <infraredDetectable>true</infraredDetectable>
+                    <laserDetectable>true</laserDetectable>
+                    <inductiveDetectable>true</inductiveDetectable>
+                    <capacitiveDetectable>true</capacitiveDetectable>
+                </localObjectSpecialProperty>
+                <localModelProperty>
+                    <notCollidable>false</notCollidable>
+                    <notMeasurable>false</notMeasurable>
+                    <notRenderable>false</notRenderable>
+                    <notDetectable>false</notDetectable>
+                    <notDynamic>false</notDynamic>
+                    <notRespondable>false</notRespondable>
+                    <notReset>false</notReset>
+                    <notVisible>false</notVisible>
+                    <scriptsInactive>false</scriptsInactive>
+                    <notShowAsInsideModel>false</notShowAsInsideModel>
+                </localModelProperty>
+                <layer>1</layer>
+                <switches>
+                    <modelBase>false</modelBase>
+                    <ignoredByViewFitting>false</ignoredByViewFitting>
+                </switches>
+                <manipulation>
+                    <permissions>35</permissions>
+                    <translation>
+                        <disabledDuringSimulation>false</disabledDuringSimulation>
+                        <disabledDuringNonSimulation>false</disabledDuringNonSimulation>
+                        <settingsLocked>false</settingsLocked>
+                        <relativeTo>0</relativeTo>
+                        <nonDefaultStepSize>0.000000</nonDefaultStepSize>
+                    </translation>
+                    <rotation>
+                        <disabledDuringSimulation>false</disabledDuringSimulation>
+                        <disabledDuringNonSimulation>false</disabledDuringNonSimulation>
+                        <settingsLocked>false</settingsLocked>
+                        <relativeTo>2</relativeTo>
+                        <nonDefaultStepSize>0.000000</nonDefaultStepSize>
+                    </rotation>
+                </manipulation>
+                <sizeFactor>1.000000</sizeFactor>
+                <sizeValues>1.000000 1.000000 1.000000</sizeValues>
+                <dnaString_base64Coded>YTieW8JSuXql2cx4jx36Rg==</dnaString_base64Coded>
+                <uniquePersistentString_base64Coded>REY0RDJBN0MzRUZFQkJCNg==</uniquePersistentString_base64Coded>
+                <transparentObjectDistanceOffset>0.000000</transparentObjectDistanceOffset>
+                <authorizedViewableObjects>-1</authorizedViewableObjects>
+                <extensionString></extensionString>
+                <modelAcknowledgement></modelAcknowledgement>
+            </common>
+            <meshProxy>
+                <mesh>
+                    <common>
+                        <name>sub__0</name>
+                        <dynamics>
+                            <mass>1.000000</mass>
+                            <localInertiaFrame>
+                                <position>0.000000 -0.000000 0.000000</position>
+                                <quaternion>1.000000 0.000000 0.000000 0.000000</quaternion>
+                                <principalMomentsOfInertia>0.001000 0.001000 0.001000</principalMomentsOfInertia>
+                            </localInertiaFrame>
+                        </dynamics>
+                        <transformationSinceGrouping>
+                            <position>-0.124999 -0.085716 -0.020970</position>
+                            <quaternion>1.000000 0.000000 0.000000 0.000000</quaternion>
+                        </transformationSinceGrouping>
+                        <switches>
+                            <convex>true</convex>
+                        </switches>
+                    </common>
+                    <shadingAngle>0.000000</shadingAngle>
+                    <edgeThresholdAngle>0.000000</edgeThresholdAngle>
+                    <color>
+                        <name></name>
+                        <extensionString>povray { pattern {default}}</extensionString>
+                        <ambient>0.810000 0.820000 0.890000</ambient>
+                        <diffuse>0.000000 0.000000 0.000000</diffuse>
+                        <specular>0.250000 0.250000 0.250000</specular>
+                        <emission>0.000000 0.000000 0.000000</emission>
+                        <temperature>0.500000 0.000000 0.000000</temperature>
+                        <shininess>48</shininess>
+                        <transparency>0.500000</transparency>
+                        <switches>
+                            <transparent>false</transparent>
+                        </switches>
+                        <flashing>
+                            <enabled>false</enabled>
+                            <inSimulationTime>false</inSimulationTime>
+                            <frequency>2.000000</frequency>
+                            <ratio>0.500000</ratio>
+                            <phase>0.000000</phase>
+                        </flashing>
+                    </color>
+                    <primitive>
+                        <type>none</type>
+                        <insideScaling>0.000000</insideScaling>
+                        <sizes>0.000000 0.000000 0.000000</sizes>
+                    </primitive>
+                    <verticesLocalFrame>
+                        <position>-0.124999 -0.085716 -0.020970</position>
+                        <quaternion>1.000000 0.000000 0.000000 0.000000</quaternion>
+                    </verticesLocalFrame>
+                    <switches>
+                        <edgesVisible>false</edgesVisible>
+                        <culling>false</culling>
+                        <wireframe>false</wireframe>
+                        <hideEdgeBorders>false</hideEdgeBorders>
+                    </switches>
+                    <heightfield>
+                        <sizes>0 0</sizes>
+                        <data></data>
+                    </heightfield>
+                    <meshData>
+                        <vertices>-0.101095 0.093220 0.028946 0.351094 0.093219 0.012994 -0.101096 0.093219 0.012982 -0.101096 0.078212 0.028946 -0.101096 0.078212 0.012982 0.351094 0.078212 0.028957 0.351094 0.093219 0.028957 0.351094 0.078213 0.012994</vertices>
+                        <indices>0 1 2 3 4 5 3 0 2 4 3 2 6 1 0 6 3 5 3 6 0 7 4 2 1 7 2 4 7 5 7 6 5 6 7 1</indices>
+                        <normals>0.000000 1.000000 0.000000 0.000000 1.000000 0.000000 0.000000 1.000000 0.000000 0.000000 -1.000000 0.000000 0.000000 -1.000000 0.000000 0.000000 -1.000000 0.000000 -1.000000 0.000000 0.000000 -1.000000 0.000000 0.000000 -1.000000 0.000000 0.000000 -1.000000 0.000000 0.000000 -1.000000 0.000000 0.000000 -1.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 1.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 1.000000 0.000000 0.000000 1.000000 0.000000 0.000000 1.000000 0.000000 0.000000 1.000000 0.000000 0.000000 1.000000 0.000000 0.000000 -1.000000 0.000000 0.000000 -1.000000 0.000000 0.000000 -1.000000 0.000000 0.000000 -1.000000 0.000000 0.000000 -1.000000 0.000000 0.000000 -1.000000 0.000000 -1.000000 0.000000 0.000000 -1.000000 0.000000 0.000000 -1.000000 0.000000 1.000000 0.000000 0.000000 1.000000 0.000000 0.000000 1.000000 0.000000 0.000000 1.000000 0.000000 0.000000 1.000000 0.000000 0.000000 1.000000 0.000000 0.000000</normals>
+                        <edges>255 255 255 255 15</edges>
+                    </meshData>
+                </mesh>
+            </meshProxy>
+            <dynamics>
+                <respondableMask>65535</respondableMask>
+                <initialLinearVelocity>0.000000 0.000000 0.000000</initialLinearVelocity>
+                <initialAngularVelocity>0.000000 0.000000 0.000000</initialAngularVelocity>
+                <switches>
+                    <static>true</static>
+                    <respondable>true</respondable>
+                    <startSleeping>false</startSleeping>
+                    <setToDynamicIfGetsParent>false</setToDynamicIfGetsParent>
+                </switches>
+                <material>
+                    <id>2290014</id>
+                    <name>usr_</name>
+                    <engines>
+                        <bullet>
+                            <restitution>0.000000</restitution>
+                            <friction>0.710000</friction>
+                            <oldfriction>0.710000</oldfriction>
+                            <lineardamping>0.000000</lineardamping>
+                            <angulardamping>0.000000</angulardamping>
+                            <nondefaultcollisionmargingfactor>0.100000</nondefaultcollisionmargingfactor>
+                            <nondefaultcollisionmargingfactorconvex>0.002000</nondefaultcollisionmargingfactorconvex>
+                            <sticky>false</sticky>
+                            <usenondefaultcollisionmargin>false</usenondefaultcollisionmargin>
+                            <usenondefaultcollisionmarginconvex>true</usenondefaultcollisionmarginconvex>
+                            <autoshrinkconvex>false</autoshrinkconvex>
+                        </bullet>
+                        <ode>
+                            <friction>0.710000</friction>
+                            <softerp>0.200000</softerp>
+                            <softcfm>0.000000</softcfm>
+                            <lineardamping>0.000000</lineardamping>
+                            <angulardamping>0.000000</angulardamping>
+                            <maxcontacts>64</maxcontacts>
+                        </ode>
+                        <vortex>
+                            <primlinearaxisfriction>0.500000</primlinearaxisfriction>
+                            <seclinearaxisfriction>0.500000</seclinearaxisfriction>
+                            <primangularaxisfriction>0.000000</primangularaxisfriction>
+                            <secangularaxisfriction>0.000000</secangularaxisfriction>
+                            <normalangularaxisfriction>0.000000</normalangularaxisfriction>
+                            <primlinearaxisstaticfrictionscale>1.100000</primlinearaxisstaticfrictionscale>
+                            <seclinearaxisstaticfrictionscale>1.100000</seclinearaxisstaticfrictionscale>
+                            <primangularaxisstaticfrictionscale>1.000000</primangularaxisstaticfrictionscale>
+                            <secangularaxisstaticfrictionscale>1.000000</secangularaxisstaticfrictionscale>
+                            <normalangularaxisstaticfrictionscale>1.000000</normalangularaxisstaticfrictionscale>
+                            <compliance>0.000000</compliance>
+                            <damping>10000000.000000</damping>
+                            <restitution>0.000000</restitution>
+                            <restitutionthreshold>0.500000</restitutionthreshold>
+                            <adhesiveforce>0.000000</adhesiveforce>
+                            <linearvelocitydamping>0.000000</linearvelocitydamping>
+                            <angularvelocitydamping>0.000000</angularvelocitydamping>
+                            <primlinearaxisslide>0.000000</primlinearaxisslide>
+                            <seclinearaxisslide>0.000000</seclinearaxisslide>
+                            <primangularaxisslide>0.000000</primangularaxisslide>
+                            <secangularaxisslide>0.000000</secangularaxisslide>
+                            <normalangularaxisslide>0.000000</normalangularaxisslide>
+                            <primlinearaxisslip>0.000000</primlinearaxisslip>
+                            <seclinearaxisslip>0.000000</seclinearaxisslip>
+                            <primangularaxisslip>0.000000</primangularaxisslip>
+                            <secangularaxisslip>0.000000</secangularaxisslip>
+                            <normalangularaxisslip>0.000000</normalangularaxisslip>
+                            <autosleeplinearspeedthreshold>0.140000</autosleeplinearspeedthreshold>
+                            <autosleeplinearaccelthreshold>0.045000</autosleeplinearaccelthreshold>
+                            <autosleepangularspeedthreshold>0.030000</autosleepangularspeedthreshold>
+                            <autosleepangularaccelthreshold>0.045000</autosleepangularaccelthreshold>
+                            <skinthickness>0.000000</skinthickness>
+                            <autoangulardampingtensionratio>0.010000</autoangulardampingtensionratio>
+                            <primaxisvectorx>0.000000</primaxisvectorx>
+                            <primaxisvectory>0.000000</primaxisvectory>
+                            <primaxisvectorz>1.000000</primaxisvectorz>
+                            <primlinearaxisfrictionmodel>4</primlinearaxisfrictionmodel>
+                            <seclinearaxisfrictionmodel>4</seclinearaxisfrictionmodel>
+                            <primangulararaxisfrictionmodel>6</primangulararaxisfrictionmodel>
+                            <secmangulararaxisfrictionmodel>6</secmangulararaxisfrictionmodel>
+                            <normalmangulararaxisfrictionmodel>6</normalmangulararaxisfrictionmodel>
+                            <autosleepsteplivethreshold>10</autosleepsteplivethreshold>
+                            <materialuniqueid>57</materialuniqueid>
+                            <pureshapesasconvex>false</pureshapesasconvex>
+                            <convexshapesasrandom>false</convexshapesasrandom>
+                            <randomshapesasterrain>false</randomshapesasterrain>
+                            <fastmoving>true</fastmoving>
+                            <autoslip>false</autoslip>
+                            <seclinaxissameasprimlinaxis>true</seclinaxissameasprimlinaxis>
+                            <secangaxissameasprimangaxis>true</secangaxissameasprimangaxis>
+                            <normangaxissameasprimangaxis>true</normangaxissameasprimangaxis>
+                            <autoangulardamping>false</autoangulardamping>
+                        </vortex>
+                        <newton>
+                            <staticfriction>0.500000</staticfriction>
+                            <kineticfriction>0.500000</kineticfriction>
+                            <restitution>0.000000</restitution>
+                            <lineardrag>0.000000</lineardrag>
+                            <angulardrag>0.000000</angulardrag>
+                            <fastmoving>false</fastmoving>
+                        </newton>
+                    </engines>
+                </material>
+            </dynamics>
+        </shape>
+    </sceneObject>
+    <sceneObject>
+        <shape>
+            <common>
+                <name>border4</name>
+                <altName>Shape3</altName>
+                <handle>28</handle>
+                <parentHandle>26</parentHandle>
+                <localFrame>
+                    <position>0.110716 -0.000001 0.014476</position>
+                    <quaternion>0.707107 0.000000 0.000000 0.707107</quaternion>
+                </localFrame>
+                <assembling>
+                    <localFrame>
+                        <position>0.000000 0.000000 0.000000</position>
+                        <quaternion>1.000000 0.000000 0.000000 0.000000</quaternion>
+                    </localFrame>
+                    <matchValues>
+                        <child>default</child>
+                        <parent>default</parent>
+                    </matchValues>
+                    <localFrameIsUsed>false</localFrameIsUsed>
+                </assembling>
+                <hierarchyColorIndex>-1</hierarchyColorIndex>
+                <collectionSelfCollisionIndicator>0</collectionSelfCollisionIndicator>
+                <localObjectProperty>
+                    <hierarchyCollapsed>false</hierarchyCollapsed>
+                    <selectable>true</selectable>
+                    <selectModelBaseInstead>true</selectModelBaseInstead>
+                    <dontShowAsInsideModel>false</dontShowAsInsideModel>
+                    <canUpdateDna>false</canUpdateDna>
+                    <selectInvisible>false</selectInvisible>
+                    <depthInvisible>false</depthInvisible>
+                    <cannotDelete>false</cannotDelete>
+                    <cannotDeleteDuringSimulation>false</cannotDeleteDuringSimulation>
+                </localObjectProperty>
+                <localObjectSpecialProperty>
+                    <collidable>true</collidable>
+                    <measurable>true</measurable>
+                    <renderable>true</renderable>
+                    <ultrasonicDetectable>true</ultrasonicDetectable>
+                    <infraredDetectable>true</infraredDetectable>
+                    <laserDetectable>true</laserDetectable>
+                    <inductiveDetectable>true</inductiveDetectable>
+                    <capacitiveDetectable>true</capacitiveDetectable>
+                </localObjectSpecialProperty>
+                <localModelProperty>
+                    <notCollidable>false</notCollidable>
+                    <notMeasurable>false</notMeasurable>
+                    <notRenderable>false</notRenderable>
+                    <notDetectable>false</notDetectable>
+                    <notDynamic>false</notDynamic>
+                    <notRespondable>false</notRespondable>
+                    <notReset>false</notReset>
+                    <notVisible>false</notVisible>
+                    <scriptsInactive>false</scriptsInactive>
+                    <notShowAsInsideModel>false</notShowAsInsideModel>
+                </localModelProperty>
+                <layer>1</layer>
+                <switches>
+                    <modelBase>false</modelBase>
+                    <ignoredByViewFitting>false</ignoredByViewFitting>
+                </switches>
+                <manipulation>
+                    <permissions>35</permissions>
+                    <translation>
+                        <disabledDuringSimulation>false</disabledDuringSimulation>
+                        <disabledDuringNonSimulation>false</disabledDuringNonSimulation>
+                        <settingsLocked>false</settingsLocked>
+                        <relativeTo>0</relativeTo>
+                        <nonDefaultStepSize>0.000000</nonDefaultStepSize>
+                    </translation>
+                    <rotation>
+                        <disabledDuringSimulation>false</disabledDuringSimulation>
+                        <disabledDuringNonSimulation>false</disabledDuringNonSimulation>
+                        <settingsLocked>false</settingsLocked>
+                        <relativeTo>2</relativeTo>
+                        <nonDefaultStepSize>0.000000</nonDefaultStepSize>
+                    </rotation>
+                </manipulation>
+                <sizeFactor>1.000000</sizeFactor>
+                <sizeValues>1.000000 1.000000 1.000000</sizeValues>
+                <dnaString_base64Coded>UQBxeNMYflnr1I3Kx+Mrgw==</dnaString_base64Coded>
+                <uniquePersistentString_base64Coded>NzBFMzEzODBDMzYxQUE0MQ==</uniquePersistentString_base64Coded>
+                <transparentObjectDistanceOffset>0.000000</transparentObjectDistanceOffset>
+                <authorizedViewableObjects>-1</authorizedViewableObjects>
+                <extensionString></extensionString>
+                <modelAcknowledgement></modelAcknowledgement>
+            </common>
+            <meshProxy>
+                <mesh>
+                    <common>
+                        <name>sub__0</name>
+                        <dynamics>
+                            <mass>1.000000</mass>
+                            <localInertiaFrame>
+                                <position>0.000000 -0.000000 0.000000</position>
+                                <quaternion>1.000000 0.000000 0.000000 0.000000</quaternion>
+                                <principalMomentsOfInertia>0.001000 0.001000 0.001000</principalMomentsOfInertia>
+                            </localInertiaFrame>
+                        </dynamics>
+                        <transformationSinceGrouping>
+                            <position>-0.124999 0.135716 -0.020970</position>
+                            <quaternion>1.000000 0.000000 0.000000 0.000000</quaternion>
+                        </transformationSinceGrouping>
+                        <switches>
+                            <convex>true</convex>
+                        </switches>
+                    </common>
+                    <shadingAngle>0.000000</shadingAngle>
+                    <edgeThresholdAngle>0.000000</edgeThresholdAngle>
+                    <color>
+                        <name></name>
+                        <extensionString>povray { pattern {default}}</extensionString>
+                        <ambient>0.810000 0.820000 0.890000</ambient>
+                        <diffuse>0.000000 0.000000 0.000000</diffuse>
+                        <specular>0.250000 0.250000 0.250000</specular>
+                        <emission>0.000000 0.000000 0.000000</emission>
+                        <temperature>0.500000 0.000000 0.000000</temperature>
+                        <shininess>48</shininess>
+                        <transparency>0.500000</transparency>
+                        <switches>
+                            <transparent>false</transparent>
+                        </switches>
+                        <flashing>
+                            <enabled>false</enabled>
+                            <inSimulationTime>false</inSimulationTime>
+                            <frequency>2.000000</frequency>
+                            <ratio>0.500000</ratio>
+                            <phase>0.000000</phase>
+                        </flashing>
+                    </color>
+                    <primitive>
+                        <type>none</type>
+                        <insideScaling>0.000000</insideScaling>
+                        <sizes>0.000000 0.000000 0.000000</sizes>
+                    </primitive>
+                    <verticesLocalFrame>
+                        <position>-0.124999 0.135716 -0.020970</position>
+                        <quaternion>1.000000 0.000000 0.000000 0.000000</quaternion>
+                    </verticesLocalFrame>
+                    <switches>
+                        <edgesVisible>false</edgesVisible>
+                        <culling>false</culling>
+                        <wireframe>false</wireframe>
+                        <hideEdgeBorders>false</hideEdgeBorders>
+                    </switches>
+                    <heightfield>
+                        <sizes>0 0</sizes>
+                        <data></data>
+                    </heightfield>
+                    <meshData>
+                        <vertices>-0.101096 -0.143219 0.028946 -0.101096 -0.128213 0.028946 -0.101095 -0.128212 0.012982 0.351095 -0.143219 0.028958 0.351094 -0.128213 0.028958 -0.101095 -0.143219 0.012982 0.351095 -0.143219 0.012994 0.351095 -0.128213 0.012994</vertices>
+                        <indices>0 1 2 1 0 3 1 4 2 4 1 3 5 0 2 0 5 3 6 4 3 5 6 3 4 7 2 6 7 4 7 5 2 7 6 5</indices>
+                        <normals>-1.000000 0.000000 0.000000 -1.000000 0.000000 0.000000 -1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 1.000000 0.000000 0.000000 1.000000 0.000000 1.000000 0.000000 0.000000 1.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 1.000000 0.000000 0.000000 1.000000 -1.000000 0.000000 0.000000 -1.000000 0.000000 0.000000 -1.000000 0.000000 0.000000 0.000000 -1.000000 0.000000 0.000000 -1.000000 0.000000 0.000000 -1.000000 0.000000 1.000000 0.000000 0.000000 1.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 -1.000000 0.000000 0.000000 -1.000000 0.000000 0.000000 -1.000000 0.000000 0.000000 1.000000 0.000000 0.000000 1.000000 0.000000 0.000000 1.000000 0.000000 1.000000 0.000000 0.000000 1.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 -1.000000 0.000000 0.000000 -1.000000 0.000000 0.000000 -1.000000 0.000000 0.000000 -1.000000 0.000000 0.000000 -1.000000 0.000000 0.000000 -1.000000</normals>
+                        <edges>255 255 255 255 15</edges>
+                    </meshData>
+                </mesh>
+            </meshProxy>
+            <dynamics>
+                <respondableMask>65535</respondableMask>
+                <initialLinearVelocity>0.000000 0.000000 0.000000</initialLinearVelocity>
+                <initialAngularVelocity>0.000000 0.000000 0.000000</initialAngularVelocity>
+                <switches>
+                    <static>true</static>
+                    <respondable>true</respondable>
+                    <startSleeping>false</startSleeping>
+                    <setToDynamicIfGetsParent>false</setToDynamicIfGetsParent>
+                </switches>
+                <material>
+                    <id>2290015</id>
+                    <name>usr_</name>
+                    <engines>
+                        <bullet>
+                            <restitution>0.000000</restitution>
+                            <friction>0.710000</friction>
+                            <oldfriction>0.710000</oldfriction>
+                            <lineardamping>0.000000</lineardamping>
+                            <angulardamping>0.000000</angulardamping>
+                            <nondefaultcollisionmargingfactor>0.100000</nondefaultcollisionmargingfactor>
+                            <nondefaultcollisionmargingfactorconvex>0.002000</nondefaultcollisionmargingfactorconvex>
+                            <sticky>false</sticky>
+                            <usenondefaultcollisionmargin>false</usenondefaultcollisionmargin>
+                            <usenondefaultcollisionmarginconvex>true</usenondefaultcollisionmarginconvex>
+                            <autoshrinkconvex>false</autoshrinkconvex>
+                        </bullet>
+                        <ode>
+                            <friction>0.710000</friction>
+                            <softerp>0.200000</softerp>
+                            <softcfm>0.000000</softcfm>
+                            <lineardamping>0.000000</lineardamping>
+                            <angulardamping>0.000000</angulardamping>
+                            <maxcontacts>64</maxcontacts>
+                        </ode>
+                        <vortex>
+                            <primlinearaxisfriction>0.500000</primlinearaxisfriction>
+                            <seclinearaxisfriction>0.500000</seclinearaxisfriction>
+                            <primangularaxisfriction>0.000000</primangularaxisfriction>
+                            <secangularaxisfriction>0.000000</secangularaxisfriction>
+                            <normalangularaxisfriction>0.000000</normalangularaxisfriction>
+                            <primlinearaxisstaticfrictionscale>1.100000</primlinearaxisstaticfrictionscale>
+                            <seclinearaxisstaticfrictionscale>1.100000</seclinearaxisstaticfrictionscale>
+                            <primangularaxisstaticfrictionscale>1.000000</primangularaxisstaticfrictionscale>
+                            <secangularaxisstaticfrictionscale>1.000000</secangularaxisstaticfrictionscale>
+                            <normalangularaxisstaticfrictionscale>1.000000</normalangularaxisstaticfrictionscale>
+                            <compliance>0.000000</compliance>
+                            <damping>10000000.000000</damping>
+                            <restitution>0.000000</restitution>
+                            <restitutionthreshold>0.500000</restitutionthreshold>
+                            <adhesiveforce>0.000000</adhesiveforce>
+                            <linearvelocitydamping>0.000000</linearvelocitydamping>
+                            <angularvelocitydamping>0.000000</angularvelocitydamping>
+                            <primlinearaxisslide>0.000000</primlinearaxisslide>
+                            <seclinearaxisslide>0.000000</seclinearaxisslide>
+                            <primangularaxisslide>0.000000</primangularaxisslide>
+                            <secangularaxisslide>0.000000</secangularaxisslide>
+                            <normalangularaxisslide>0.000000</normalangularaxisslide>
+                            <primlinearaxisslip>0.000000</primlinearaxisslip>
+                            <seclinearaxisslip>0.000000</seclinearaxisslip>
+                            <primangularaxisslip>0.000000</primangularaxisslip>
+                            <secangularaxisslip>0.000000</secangularaxisslip>
+                            <normalangularaxisslip>0.000000</normalangularaxisslip>
+                            <autosleeplinearspeedthreshold>0.140000</autosleeplinearspeedthreshold>
+                            <autosleeplinearaccelthreshold>0.045000</autosleeplinearaccelthreshold>
+                            <autosleepangularspeedthreshold>0.030000</autosleepangularspeedthreshold>
+                            <autosleepangularaccelthreshold>0.045000</autosleepangularaccelthreshold>
+                            <skinthickness>0.000000</skinthickness>
+                            <autoangulardampingtensionratio>0.010000</autoangulardampingtensionratio>
+                            <primaxisvectorx>0.000000</primaxisvectorx>
+                            <primaxisvectory>0.000000</primaxisvectory>
+                            <primaxisvectorz>1.000000</primaxisvectorz>
+                            <primlinearaxisfrictionmodel>4</primlinearaxisfrictionmodel>
+                            <seclinearaxisfrictionmodel>4</seclinearaxisfrictionmodel>
+                            <primangulararaxisfrictionmodel>6</primangulararaxisfrictionmodel>
+                            <secmangulararaxisfrictionmodel>6</secmangulararaxisfrictionmodel>
+                            <normalmangulararaxisfrictionmodel>6</normalmangulararaxisfrictionmodel>
+                            <autosleepsteplivethreshold>10</autosleepsteplivethreshold>
+                            <materialuniqueid>59</materialuniqueid>
+                            <pureshapesasconvex>false</pureshapesasconvex>
+                            <convexshapesasrandom>false</convexshapesasrandom>
+                            <randomshapesasterrain>false</randomshapesasterrain>
+                            <fastmoving>true</fastmoving>
+                            <autoslip>false</autoslip>
+                            <seclinaxissameasprimlinaxis>true</seclinaxissameasprimlinaxis>
+                            <secangaxissameasprimangaxis>true</secangaxissameasprimangaxis>
+                            <normangaxissameasprimangaxis>true</normangaxissameasprimangaxis>
+                            <autoangulardamping>false</autoangulardamping>
+                        </vortex>
+                        <newton>
+                            <staticfriction>0.500000</staticfriction>
+                            <kineticfriction>0.500000</kineticfriction>
+                            <restitution>0.000000</restitution>
+                            <lineardrag>0.000000</lineardrag>
+                            <angulardrag>0.000000</angulardrag>
+                            <fastmoving>false</fastmoving>
+                        </newton>
+                    </engines>
+                </material>
+            </dynamics>
+        </shape>
+    </sceneObject>
+    <sceneObject>
+        <shape>
+            <common>
+                <name>border2</name>
+                <altName>Shape4</altName>
+                <handle>29</handle>
+                <parentHandle>26</parentHandle>
+                <localFrame>
+                    <position>-0.000000 -0.218592 0.014471</position>
+                    <quaternion>0.707107 0.000000 0.000000 0.707107</quaternion>
+                </localFrame>
+                <assembling>
+                    <localFrame>
+                        <position>0.000000 0.000000 0.000000</position>
+                        <quaternion>1.000000 0.000000 0.000000 0.000000</quaternion>
+                    </localFrame>
+                    <matchValues>
+                        <child>default</child>
+                        <parent>default</parent>
+                    </matchValues>
+                    <localFrameIsUsed>false</localFrameIsUsed>
+                </assembling>
+                <hierarchyColorIndex>-1</hierarchyColorIndex>
+                <collectionSelfCollisionIndicator>0</collectionSelfCollisionIndicator>
+                <localObjectProperty>
+                    <hierarchyCollapsed>false</hierarchyCollapsed>
+                    <selectable>true</selectable>
+                    <selectModelBaseInstead>true</selectModelBaseInstead>
+                    <dontShowAsInsideModel>false</dontShowAsInsideModel>
+                    <canUpdateDna>false</canUpdateDna>
+                    <selectInvisible>false</selectInvisible>
+                    <depthInvisible>false</depthInvisible>
+                    <cannotDelete>false</cannotDelete>
+                    <cannotDeleteDuringSimulation>false</cannotDeleteDuringSimulation>
+                </localObjectProperty>
+                <localObjectSpecialProperty>
+                    <collidable>true</collidable>
+                    <measurable>true</measurable>
+                    <renderable>true</renderable>
+                    <ultrasonicDetectable>true</ultrasonicDetectable>
+                    <infraredDetectable>true</infraredDetectable>
+                    <laserDetectable>true</laserDetectable>
+                    <inductiveDetectable>true</inductiveDetectable>
+                    <capacitiveDetectable>true</capacitiveDetectable>
+                </localObjectSpecialProperty>
+                <localModelProperty>
+                    <notCollidable>false</notCollidable>
+                    <notMeasurable>false</notMeasurable>
+                    <notRenderable>false</notRenderable>
+                    <notDetectable>false</notDetectable>
+                    <notDynamic>false</notDynamic>
+                    <notRespondable>false</notRespondable>
+                    <notReset>false</notReset>
+                    <notVisible>false</notVisible>
+                    <scriptsInactive>false</scriptsInactive>
+                    <notShowAsInsideModel>false</notShowAsInsideModel>
+                </localModelProperty>
+                <layer>1</layer>
+                <switches>
+                    <modelBase>false</modelBase>
+                    <ignoredByViewFitting>false</ignoredByViewFitting>
+                </switches>
+                <manipulation>
+                    <permissions>35</permissions>
+                    <translation>
+                        <disabledDuringSimulation>false</disabledDuringSimulation>
+                        <disabledDuringNonSimulation>false</disabledDuringNonSimulation>
+                        <settingsLocked>false</settingsLocked>
+                        <relativeTo>0</relativeTo>
+                        <nonDefaultStepSize>0.000000</nonDefaultStepSize>
+                    </translation>
+                    <rotation>
+                        <disabledDuringSimulation>false</disabledDuringSimulation>
+                        <disabledDuringNonSimulation>false</disabledDuringNonSimulation>
+                        <settingsLocked>false</settingsLocked>
+                        <relativeTo>2</relativeTo>
+                        <nonDefaultStepSize>0.000000</nonDefaultStepSize>
+                    </rotation>
+                </manipulation>
+                <sizeFactor>1.000000</sizeFactor>
+                <sizeValues>1.000000 1.000000 1.000000</sizeValues>
+                <dnaString_base64Coded>74wlZlCTQfOIZuw3hTRZkw==</dnaString_base64Coded>
+                <uniquePersistentString_base64Coded>RjlENTU0NDg0NjM5NUNDNw==</uniquePersistentString_base64Coded>
+                <transparentObjectDistanceOffset>0.000000</transparentObjectDistanceOffset>
+                <authorizedViewableObjects>-1</authorizedViewableObjects>
+                <extensionString></extensionString>
+                <modelAcknowledgement></modelAcknowledgement>
+            </common>
+            <meshProxy>
+                <mesh>
+                    <common>
+                        <name>sub__0</name>
+                        <dynamics>
+                            <mass>1.000000</mass>
+                            <localInertiaFrame>
+                                <position>0.000000 -0.000000 0.000000</position>
+                                <quaternion>0.806216 -0.016000 -0.577613 0.126978</quaternion>
+                                <principalMomentsOfInertia>0.001000 0.001000 0.001000</principalMomentsOfInertia>
+                            </localInertiaFrame>
+                        </dynamics>
+                        <transformationSinceGrouping>
+                            <position>0.093592 0.025000 -0.020964</position>
+                            <quaternion>1.000000 0.000000 0.000000 0.000000</quaternion>
+                        </transformationSinceGrouping>
+                        <switches>
+                            <convex>true</convex>
+                        </switches>
+                    </common>
+                    <shadingAngle>0.000000</shadingAngle>
+                    <edgeThresholdAngle>0.000000</edgeThresholdAngle>
+                    <color>
+                        <name></name>
+                        <extensionString>povray { pattern {default}}</extensionString>
+                        <ambient>0.810000 0.820000 0.890000</ambient>
+                        <diffuse>0.000000 0.000000 0.000000</diffuse>
+                        <specular>0.250000 0.250000 0.250000</specular>
+                        <emission>0.000000 0.000000 0.000000</emission>
+                        <temperature>0.500000 0.000000 0.000000</temperature>
+                        <shininess>48</shininess>
+                        <transparency>0.500000</transparency>
+                        <switches>
+                            <transparent>false</transparent>
+                        </switches>
+                        <flashing>
+                            <enabled>false</enabled>
+                            <inSimulationTime>false</inSimulationTime>
+                            <frequency>2.000000</frequency>
+                            <ratio>0.500000</ratio>
+                            <phase>0.000000</phase>
+                        </flashing>
+                    </color>
+                    <primitive>
+                        <type>none</type>
+                        <insideScaling>0.000000</insideScaling>
+                        <sizes>0.000000 0.000000 0.000000</sizes>
+                    </primitive>
+                    <verticesLocalFrame>
+                        <position>0.093592 0.025000 -0.020964</position>
+                        <quaternion>1.000000 0.000000 0.000000 0.000000</quaternion>
+                    </verticesLocalFrame>
+                    <switches>
+                        <edgesVisible>false</edgesVisible>
+                        <culling>false</culling>
+                        <wireframe>false</wireframe>
+                        <hideEdgeBorders>false</hideEdgeBorders>
+                    </switches>
+                    <heightfield>
+                        <sizes>0 0</sizes>
+                        <data></data>
+                    </heightfield>
+                    <meshData>
+                        <vertices>-0.101096 -0.128212 0.028946 -0.086089 0.078213 0.028947 -0.101096 0.078212 0.028946 -0.101096 0.078212 0.012982 -0.086089 -0.128212 0.028947 -0.086089 0.078212 0.012983 -0.086088 -0.128212 0.012982 -0.101095 -0.128212 0.012982</vertices>
+                        <indices>0 1 2 1 3 2 3 0 2 0 4 1 3 5 6 5 3 1 5 4 6 4 5 1 7 3 6 3 7 0 4 7 6 7 4 0</indices>
+                        <normals>0.000000 0.000000 1.000000 0.000000 0.000000 1.000000 0.000000 0.000000 1.000000 0.000000 1.000000 0.000000 0.000000 1.000000 0.000000 0.000000 1.000000 0.000000 -1.000000 0.000000 0.000000 -1.000000 0.000000 0.000000 -1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 1.000000 0.000000 0.000000 1.000000 0.000000 0.000000 -1.000000 0.000000 0.000000 -1.000000 0.000000 0.000000 -1.000000 0.000000 1.000000 0.000000 0.000000 1.000000 0.000000 0.000000 1.000000 0.000000 1.000000 0.000000 0.000000 1.000000 0.000000 0.000000 1.000000 0.000000 0.000000 1.000000 0.000000 0.000000 1.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 -1.000000 0.000000 0.000000 -1.000000 0.000000 0.000000 -1.000000 -1.000000 0.000000 0.000000 -1.000000 0.000000 0.000000 -1.000000 0.000000 0.000000 0.000000 -1.000000 0.000000 0.000000 -1.000000 0.000000 0.000000 -1.000000 0.000000 0.000000 -1.000000 0.000000 0.000000 -1.000000 0.000000 0.000000 -1.000000 0.000000</normals>
+                        <edges>255 255 255 255 15</edges>
+                    </meshData>
+                </mesh>
+            </meshProxy>
+            <dynamics>
+                <respondableMask>65535</respondableMask>
+                <initialLinearVelocity>0.000000 0.000000 0.000000</initialLinearVelocity>
+                <initialAngularVelocity>0.000000 0.000000 0.000000</initialAngularVelocity>
+                <switches>
+                    <static>true</static>
+                    <respondable>true</respondable>
+                    <startSleeping>false</startSleeping>
+                    <setToDynamicIfGetsParent>false</setToDynamicIfGetsParent>
+                </switches>
+                <material>
+                    <id>2290016</id>
+                    <name>usr_</name>
+                    <engines>
+                        <bullet>
+                            <restitution>0.000000</restitution>
+                            <friction>0.710000</friction>
+                            <oldfriction>0.710000</oldfriction>
+                            <lineardamping>0.000000</lineardamping>
+                            <angulardamping>0.000000</angulardamping>
+                            <nondefaultcollisionmargingfactor>0.100000</nondefaultcollisionmargingfactor>
+                            <nondefaultcollisionmargingfactorconvex>0.002000</nondefaultcollisionmargingfactorconvex>
+                            <sticky>false</sticky>
+                            <usenondefaultcollisionmargin>false</usenondefaultcollisionmargin>
+                            <usenondefaultcollisionmarginconvex>true</usenondefaultcollisionmarginconvex>
+                            <autoshrinkconvex>false</autoshrinkconvex>
+                        </bullet>
+                        <ode>
+                            <friction>0.710000</friction>
+                            <softerp>0.200000</softerp>
+                            <softcfm>0.000000</softcfm>
+                            <lineardamping>0.000000</lineardamping>
+                            <angulardamping>0.000000</angulardamping>
+                            <maxcontacts>64</maxcontacts>
+                        </ode>
+                        <vortex>
+                            <primlinearaxisfriction>0.500000</primlinearaxisfriction>
+                            <seclinearaxisfriction>0.500000</seclinearaxisfriction>
+                            <primangularaxisfriction>0.000000</primangularaxisfriction>
+                            <secangularaxisfriction>0.000000</secangularaxisfriction>
+                            <normalangularaxisfriction>0.000000</normalangularaxisfriction>
+                            <primlinearaxisstaticfrictionscale>1.100000</primlinearaxisstaticfrictionscale>
+                            <seclinearaxisstaticfrictionscale>1.100000</seclinearaxisstaticfrictionscale>
+                            <primangularaxisstaticfrictionscale>1.000000</primangularaxisstaticfrictionscale>
+                            <secangularaxisstaticfrictionscale>1.000000</secangularaxisstaticfrictionscale>
+                            <normalangularaxisstaticfrictionscale>1.000000</normalangularaxisstaticfrictionscale>
+                            <compliance>0.000000</compliance>
+                            <damping>10000000.000000</damping>
+                            <restitution>0.000000</restitution>
+                            <restitutionthreshold>0.500000</restitutionthreshold>
+                            <adhesiveforce>0.000000</adhesiveforce>
+                            <linearvelocitydamping>0.000000</linearvelocitydamping>
+                            <angularvelocitydamping>0.000000</angularvelocitydamping>
+                            <primlinearaxisslide>0.000000</primlinearaxisslide>
+                            <seclinearaxisslide>0.000000</seclinearaxisslide>
+                            <primangularaxisslide>0.000000</primangularaxisslide>
+                            <secangularaxisslide>0.000000</secangularaxisslide>
+                            <normalangularaxisslide>0.000000</normalangularaxisslide>
+                            <primlinearaxisslip>0.000000</primlinearaxisslip>
+                            <seclinearaxisslip>0.000000</seclinearaxisslip>
+                            <primangularaxisslip>0.000000</primangularaxisslip>
+                            <secangularaxisslip>0.000000</secangularaxisslip>
+                            <normalangularaxisslip>0.000000</normalangularaxisslip>
+                            <autosleeplinearspeedthreshold>0.140000</autosleeplinearspeedthreshold>
+                            <autosleeplinearaccelthreshold>0.045000</autosleeplinearaccelthreshold>
+                            <autosleepangularspeedthreshold>0.030000</autosleepangularspeedthreshold>
+                            <autosleepangularaccelthreshold>0.045000</autosleepangularaccelthreshold>
+                            <skinthickness>0.000000</skinthickness>
+                            <autoangulardampingtensionratio>0.010000</autoangulardampingtensionratio>
+                            <primaxisvectorx>0.000000</primaxisvectorx>
+                            <primaxisvectory>0.000000</primaxisvectory>
+                            <primaxisvectorz>1.000000</primaxisvectorz>
+                            <primlinearaxisfrictionmodel>4</primlinearaxisfrictionmodel>
+                            <seclinearaxisfrictionmodel>4</seclinearaxisfrictionmodel>
+                            <primangulararaxisfrictionmodel>6</primangulararaxisfrictionmodel>
+                            <secmangulararaxisfrictionmodel>6</secmangulararaxisfrictionmodel>
+                            <normalmangulararaxisfrictionmodel>6</normalmangulararaxisfrictionmodel>
+                            <autosleepsteplivethreshold>10</autosleepsteplivethreshold>
+                            <materialuniqueid>61</materialuniqueid>
+                            <pureshapesasconvex>false</pureshapesasconvex>
+                            <convexshapesasrandom>false</convexshapesasrandom>
+                            <randomshapesasterrain>false</randomshapesasterrain>
+                            <fastmoving>true</fastmoving>
+                            <autoslip>false</autoslip>
+                            <seclinaxissameasprimlinaxis>true</seclinaxissameasprimlinaxis>
+                            <secangaxissameasprimangaxis>true</secangaxissameasprimangaxis>
+                            <normangaxissameasprimangaxis>true</normangaxissameasprimangaxis>
+                            <autoangulardamping>false</autoangulardamping>
+                        </vortex>
+                        <newton>
+                            <staticfriction>0.500000</staticfriction>
+                            <kineticfriction>0.500000</kineticfriction>
+                            <restitution>0.000000</restitution>
+                            <lineardrag>0.000000</lineardrag>
+                            <angulardrag>0.000000</angulardrag>
+                            <fastmoving>false</fastmoving>
+                        </newton>
+                    </engines>
+                </material>
+            </dynamics>
+        </shape>
+    </sceneObject>
+    <sceneObject>
+        <shape>
+            <common>
+                <name>border1</name>
+                <altName>Shape5</altName>
+                <handle>30</handle>
+                <parentHandle>26</parentHandle>
+                <localFrame>
+                    <position>-0.000000 0.218591 0.014482</position>
+                    <quaternion>0.707107 0.000000 0.000000 0.707107</quaternion>
+                </localFrame>
+                <assembling>
+                    <localFrame>
+                        <position>0.000000 0.000000 0.000000</position>
+                        <quaternion>1.000000 0.000000 0.000000 0.000000</quaternion>
+                    </localFrame>
+                    <matchValues>
+                        <child>default</child>
+                        <parent>default</parent>
+                    </matchValues>
+                    <localFrameIsUsed>false</localFrameIsUsed>
+                </assembling>
+                <hierarchyColorIndex>-1</hierarchyColorIndex>
+                <collectionSelfCollisionIndicator>0</collectionSelfCollisionIndicator>
+                <localObjectProperty>
+                    <hierarchyCollapsed>false</hierarchyCollapsed>
+                    <selectable>true</selectable>
+                    <selectModelBaseInstead>true</selectModelBaseInstead>
+                    <dontShowAsInsideModel>false</dontShowAsInsideModel>
+                    <canUpdateDna>false</canUpdateDna>
+                    <selectInvisible>false</selectInvisible>
+                    <depthInvisible>false</depthInvisible>
+                    <cannotDelete>false</cannotDelete>
+                    <cannotDeleteDuringSimulation>false</cannotDeleteDuringSimulation>
+                </localObjectProperty>
+                <localObjectSpecialProperty>
+                    <collidable>true</collidable>
+                    <measurable>true</measurable>
+                    <renderable>true</renderable>
+                    <ultrasonicDetectable>true</ultrasonicDetectable>
+                    <infraredDetectable>true</infraredDetectable>
+                    <laserDetectable>true</laserDetectable>
+                    <inductiveDetectable>true</inductiveDetectable>
+                    <capacitiveDetectable>true</capacitiveDetectable>
+                </localObjectSpecialProperty>
+                <localModelProperty>
+                    <notCollidable>false</notCollidable>
+                    <notMeasurable>false</notMeasurable>
+                    <notRenderable>false</notRenderable>
+                    <notDetectable>false</notDetectable>
+                    <notDynamic>false</notDynamic>
+                    <notRespondable>false</notRespondable>
+                    <notReset>false</notReset>
+                    <notVisible>false</notVisible>
+                    <scriptsInactive>false</scriptsInactive>
+                    <notShowAsInsideModel>false</notShowAsInsideModel>
+                </localModelProperty>
+                <layer>1</layer>
+                <switches>
+                    <modelBase>false</modelBase>
+                    <ignoredByViewFitting>false</ignoredByViewFitting>
+                </switches>
+                <manipulation>
+                    <permissions>35</permissions>
+                    <translation>
+                        <disabledDuringSimulation>false</disabledDuringSimulation>
+                        <disabledDuringNonSimulation>false</disabledDuringNonSimulation>
+                        <settingsLocked>false</settingsLocked>
+                        <relativeTo>0</relativeTo>
+                        <nonDefaultStepSize>0.000000</nonDefaultStepSize>
+                    </translation>
+                    <rotation>
+                        <disabledDuringSimulation>false</disabledDuringSimulation>
+                        <disabledDuringNonSimulation>false</disabledDuringNonSimulation>
+                        <settingsLocked>false</settingsLocked>
+                        <relativeTo>2</relativeTo>
+                        <nonDefaultStepSize>0.000000</nonDefaultStepSize>
+                    </rotation>
+                </manipulation>
+                <sizeFactor>1.000000</sizeFactor>
+                <sizeValues>1.000000 1.000000 1.000000</sizeValues>
+                <dnaString_base64Coded>1vm32FmyZuviILhrsXbrLA==</dnaString_base64Coded>
+                <uniquePersistentString_base64Coded>RjhCOTFCNTdCNEYxQUNGQw==</uniquePersistentString_base64Coded>
+                <transparentObjectDistanceOffset>0.000000</transparentObjectDistanceOffset>
+                <authorizedViewableObjects>-1</authorizedViewableObjects>
+                <extensionString></extensionString>
+                <modelAcknowledgement></modelAcknowledgement>
+            </common>
+            <meshProxy>
+                <mesh>
+                    <common>
+                        <name>sub__0</name>
+                        <dynamics>
+                            <mass>1.000000</mass>
+                            <localInertiaFrame>
+                                <position>0.000000 -0.000000 0.000000</position>
+                                <quaternion>0.806216 -0.016000 -0.577613 0.126978</quaternion>
+                                <principalMomentsOfInertia>0.001000 0.001000 0.001000</principalMomentsOfInertia>
+                            </localInertiaFrame>
+                        </dynamics>
+                        <transformationSinceGrouping>
+                            <position>-0.343591 0.025000 -0.020975</position>
+                            <quaternion>1.000000 0.000000 0.000000 0.000000</quaternion>
+                        </transformationSinceGrouping>
+                        <switches>
+                            <convex>true</convex>
+                        </switches>
+                    </common>
+                    <shadingAngle>0.000000</shadingAngle>
+                    <edgeThresholdAngle>0.000000</edgeThresholdAngle>
+                    <color>
+                        <name></name>
+                        <extensionString>povray { pattern {default}}</extensionString>
+                        <ambient>0.810000 0.820000 0.890000</ambient>
+                        <diffuse>0.000000 0.000000 0.000000</diffuse>
+                        <specular>0.250000 0.250000 0.250000</specular>
+                        <emission>0.000000 0.000000 0.000000</emission>
+                        <temperature>0.500000 0.000000 0.000000</temperature>
+                        <shininess>48</shininess>
+                        <transparency>0.500000</transparency>
+                        <switches>
+                            <transparent>false</transparent>
+                        </switches>
+                        <flashing>
+                            <enabled>false</enabled>
+                            <inSimulationTime>false</inSimulationTime>
+                            <frequency>2.000000</frequency>
+                            <ratio>0.500000</ratio>
+                            <phase>0.000000</phase>
+                        </flashing>
+                    </color>
+                    <primitive>
+                        <type>none</type>
+                        <insideScaling>0.000000</insideScaling>
+                        <sizes>0.000000 0.000000 0.000000</sizes>
+                    </primitive>
+                    <verticesLocalFrame>
+                        <position>-0.343591 0.025000 -0.020975</position>
+                        <quaternion>1.000000 0.000000 0.000000 0.000000</quaternion>
+                    </verticesLocalFrame>
+                    <switches>
+                        <edgesVisible>false</edgesVisible>
+                        <culling>false</culling>
+                        <wireframe>false</wireframe>
+                        <hideEdgeBorders>false</hideEdgeBorders>
+                    </switches>
+                    <heightfield>
+                        <sizes>0 0</sizes>
+                        <data></data>
+                    </heightfield>
+                    <meshData>
+                        <vertices>0.351095 0.078211 0.012994 0.351094 -0.128212 0.028957 0.351095 -0.128212 0.012994 0.336087 -0.128212 0.028957 0.336088 0.078213 0.012993 0.351094 0.078213 0.028958 0.336087 0.078213 0.028957 0.336088 -0.128212 0.012994</vertices>
+                        <indices>0 1 2 1 3 2 4 0 2 5 1 0 5 4 6 4 5 0 3 5 6 5 3 1 7 3 6 4 7 6 3 7 2 7 4 2</indices>
+                        <normals>1.000000 0.000000 0.000000 1.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 -1.000000 0.000000 0.000000 -1.000000 0.000000 0.000000 -1.000000 0.000000 0.000000 0.000000 -1.000000 0.000000 0.000000 -1.000000 0.000000 0.000000 -1.000000 1.000000 0.000000 0.000000 1.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 1.000000 0.000000 0.000000 1.000000 0.000000 0.000000 1.000000 0.000000 0.000000 1.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 1.000000 0.000000 0.000000 1.000000 0.000000 0.000000 1.000000 0.000000 0.000000 1.000000 0.000000 0.000000 1.000000 -1.000000 0.000000 0.000000 -1.000000 0.000000 0.000000 -1.000000 0.000000 0.000000 -1.000000 0.000000 0.000000 -1.000000 0.000000 0.000000 -1.000000 0.000000 0.000000 0.000000 -1.000000 0.000000 0.000000 -1.000000 0.000000 0.000000 -1.000000 0.000000 0.000000 0.000000 -1.000000 0.000000 0.000000 -1.000000 0.000000 0.000000 -1.000000</normals>
+                        <edges>255 255 255 255 15</edges>
+                    </meshData>
+                </mesh>
+            </meshProxy>
+            <dynamics>
+                <respondableMask>65535</respondableMask>
+                <initialLinearVelocity>0.000000 0.000000 0.000000</initialLinearVelocity>
+                <initialAngularVelocity>0.000000 0.000000 0.000000</initialAngularVelocity>
+                <switches>
+                    <static>true</static>
+                    <respondable>true</respondable>
+                    <startSleeping>false</startSleeping>
+                    <setToDynamicIfGetsParent>false</setToDynamicIfGetsParent>
+                </switches>
+                <material>
+                    <id>2290017</id>
+                    <name>usr_</name>
+                    <engines>
+                        <bullet>
+                            <restitution>0.000000</restitution>
+                            <friction>0.710000</friction>
+                            <oldfriction>0.710000</oldfriction>
+                            <lineardamping>0.000000</lineardamping>
+                            <angulardamping>0.000000</angulardamping>
+                            <nondefaultcollisionmargingfactor>0.100000</nondefaultcollisionmargingfactor>
+                            <nondefaultcollisionmargingfactorconvex>0.002000</nondefaultcollisionmargingfactorconvex>
+                            <sticky>false</sticky>
+                            <usenondefaultcollisionmargin>false</usenondefaultcollisionmargin>
+                            <usenondefaultcollisionmarginconvex>true</usenondefaultcollisionmarginconvex>
+                            <autoshrinkconvex>false</autoshrinkconvex>
+                        </bullet>
+                        <ode>
+                            <friction>0.710000</friction>
+                            <softerp>0.200000</softerp>
+                            <softcfm>0.000000</softcfm>
+                            <lineardamping>0.000000</lineardamping>
+                            <angulardamping>0.000000</angulardamping>
+                            <maxcontacts>64</maxcontacts>
+                        </ode>
+                        <vortex>
+                            <primlinearaxisfriction>0.500000</primlinearaxisfriction>
+                            <seclinearaxisfriction>0.500000</seclinearaxisfriction>
+                            <primangularaxisfriction>0.000000</primangularaxisfriction>
+                            <secangularaxisfriction>0.000000</secangularaxisfriction>
+                            <normalangularaxisfriction>0.000000</normalangularaxisfriction>
+                            <primlinearaxisstaticfrictionscale>1.100000</primlinearaxisstaticfrictionscale>
+                            <seclinearaxisstaticfrictionscale>1.100000</seclinearaxisstaticfrictionscale>
+                            <primangularaxisstaticfrictionscale>1.000000</primangularaxisstaticfrictionscale>
+                            <secangularaxisstaticfrictionscale>1.000000</secangularaxisstaticfrictionscale>
+                            <normalangularaxisstaticfrictionscale>1.000000</normalangularaxisstaticfrictionscale>
+                            <compliance>0.000000</compliance>
+                            <damping>10000000.000000</damping>
+                            <restitution>0.000000</restitution>
+                            <restitutionthreshold>0.500000</restitutionthreshold>
+                            <adhesiveforce>0.000000</adhesiveforce>
+                            <linearvelocitydamping>0.000000</linearvelocitydamping>
+                            <angularvelocitydamping>0.000000</angularvelocitydamping>
+                            <primlinearaxisslide>0.000000</primlinearaxisslide>
+                            <seclinearaxisslide>0.000000</seclinearaxisslide>
+                            <primangularaxisslide>0.000000</primangularaxisslide>
+                            <secangularaxisslide>0.000000</secangularaxisslide>
+                            <normalangularaxisslide>0.000000</normalangularaxisslide>
+                            <primlinearaxisslip>0.000000</primlinearaxisslip>
+                            <seclinearaxisslip>0.000000</seclinearaxisslip>
+                            <primangularaxisslip>0.000000</primangularaxisslip>
+                            <secangularaxisslip>0.000000</secangularaxisslip>
+                            <normalangularaxisslip>0.000000</normalangularaxisslip>
+                            <autosleeplinearspeedthreshold>0.140000</autosleeplinearspeedthreshold>
+                            <autosleeplinearaccelthreshold>0.045000</autosleeplinearaccelthreshold>
+                            <autosleepangularspeedthreshold>0.030000</autosleepangularspeedthreshold>
+                            <autosleepangularaccelthreshold>0.045000</autosleepangularaccelthreshold>
+                            <skinthickness>0.000000</skinthickness>
+                            <autoangulardampingtensionratio>0.010000</autoangulardampingtensionratio>
+                            <primaxisvectorx>0.000000</primaxisvectorx>
+                            <primaxisvectory>0.000000</primaxisvectory>
+                            <primaxisvectorz>1.000000</primaxisvectorz>
+                            <primlinearaxisfrictionmodel>4</primlinearaxisfrictionmodel>
+                            <seclinearaxisfrictionmodel>4</seclinearaxisfrictionmodel>
+                            <primangulararaxisfrictionmodel>6</primangulararaxisfrictionmodel>
+                            <secmangulararaxisfrictionmodel>6</secmangulararaxisfrictionmodel>
+                            <normalmangulararaxisfrictionmodel>6</normalmangulararaxisfrictionmodel>
+                            <autosleepsteplivethreshold>10</autosleepsteplivethreshold>
+                            <materialuniqueid>63</materialuniqueid>
+                            <pureshapesasconvex>false</pureshapesasconvex>
+                            <convexshapesasrandom>false</convexshapesasrandom>
+                            <randomshapesasterrain>false</randomshapesasterrain>
+                            <fastmoving>true</fastmoving>
+                            <autoslip>false</autoslip>
+                            <seclinaxissameasprimlinaxis>true</seclinaxissameasprimlinaxis>
+                            <secangaxissameasprimangaxis>true</secangaxissameasprimangaxis>
+                            <normangaxissameasprimangaxis>true</normangaxissameasprimangaxis>
+                            <autoangulardamping>false</autoangulardamping>
+                        </vortex>
+                        <newton>
+                            <staticfriction>0.500000</staticfriction>
+                            <kineticfriction>0.500000</kineticfriction>
+                            <restitution>0.000000</restitution>
+                            <lineardrag>0.000000</lineardrag>
+                            <angulardrag>0.000000</angulardrag>
+                            <fastmoving>false</fastmoving>
+                        </newton>
+                    </engines>
+                </material>
+            </dynamics>
+        </shape>
+    </sceneObject>
+</CoppeliaSim>

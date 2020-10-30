@@ -41,7 +41,7 @@ def setAonPos(a_obj, pos):
 
 def create_table(pr, length: float, width: float, height: float):
     table = pr.import_model("models/Table.ttm")
-    print(table.get_name())
+    # print(table.get_name())
 
     # Its not @Table, its at the name of this specific table!
     script_call("table_length_callback@{}".format(table.get_name()), sim.sim_scripttype_customizationscript,

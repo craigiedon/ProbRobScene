@@ -144,7 +144,7 @@ def require(reqID, req, line, prob=1):
     # so we need to save the current values of all referenced names; throw in
     # the ego object too since it can be referred to implicitly
     assert reqID not in pendingRequirements
-    pendingRequirements[reqID] = (req, getAllGlobals(req), egoObject, line, prob)
+    pendingRequirements[reqID] = (req, getAllGlobals(req), line, prob)
 
 
 def getAllGlobals(req, restrictTo=None):
@@ -630,9 +630,9 @@ def RightRough(obj: Union[Object, Point3D], min_amount: float = 0.0, max_amount:
 
 def AheadRough(obj: Union[Object, Point3D], min_amount: float = 0.0, max_amount: float = 1000.0):
     if isinstance(obj, Object):
-        new = PointInRegionDistribution(front_plane(obj, min_amount, max_amount))
+        new = DelayedArgument({'length'}, lambda s: PointInRegionDistribution(front_plane(s, obj, min_amount, max_amount)))
     elif isinstance(obj, Point3D):
-        new = PointInRegionDistribution(HalfSpaceRegion(obj.position + Vector3D(0, min_amount, 0), Vector3D(0, 1, 0), max_amount - min_amount))
+        new = DelayedArgument({'length'}, lambda s: PointInRegionDistribution(HalfSpaceRegion(obj.position + Vector3D(0, s.length / 2.0 + min_amount, 0), Vector3D(0, 1, 0), max_amount - min_amount)))
     else:
         raise TypeError(f'Object {obj} of type {type(obj)} not supported by Ahead. Only supports Point3D and Object types')
 
@@ -651,8 +651,9 @@ def right_plane(ref_obj: Object, min_amount: float, max_amount: float) -> HalfSp
     return HalfSpaceRegion(point, normal, max_amount - min_amount)
 
 
-def front_plane(ref_obj: Object, min_amount: float, max_amount: float) -> HalfSpaceRegion:
-    point = ref_obj.position + rotate_euler_v3d(Vector3D(0, ref_obj.length / 2.0 + min_amount, 0.0), ref_obj.orientation)
+def front_plane(obj_to_place: Object, ref_obj: Object, min_amount: float, max_amount: float) -> HalfSpaceRegion:
+    offset_amount = obj_to_place.length / 2.0 + ref_obj.length / 2.0 + min_amount
+    point = ref_obj.position + rotate_euler_v3d(Vector3D(0, offset_amount, 0.0), ref_obj.orientation)
     normal = rotate_euler_v3d(Vector3D(0, 1, 0), ref_obj.orientation)
     return HalfSpaceRegion(point, normal, max_amount - min_amount)
 

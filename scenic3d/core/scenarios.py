@@ -156,8 +156,9 @@ def try_sample(external_sampler, dependencies, objects, workspace, active_reqs):
     if any(cuboids_intersect(vi, vj) for (i, vi) in enumerate(collidable) for vj in collidable[:i]):
         return None, 'object intersection'
 
-    if any(not req(sample) for req in active_reqs):
-        return None, 'user-specified requirement'
+    for (i, req) in enumerate(active_reqs):
+        if not req(sample):
+            return None, f'user-specified requirement {i}'
 
     return sample, None
 

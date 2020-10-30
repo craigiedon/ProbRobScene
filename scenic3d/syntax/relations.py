@@ -9,24 +9,21 @@ from scenic3d.core.object_types import Object
 from scenic3d.core.utils import InvalidScenarioError, InconsistentScenarioError
 
 
-def inferRelationsFrom(reqNode, namespace, ego, line):
+def inferRelationsFrom(reqNode, namespace, line):
     """Infer relations between objects implied by a requirement."""
     matcher = RequirementMatcher(namespace)
 
-    inferRelativeHeadingRelations(matcher, reqNode, ego, line)
-    inferDistanceRelations(matcher, reqNode, ego, line)
+    inferRelativeHeadingRelations(matcher, reqNode, line)
+    inferDistanceRelations(matcher, reqNode, line)
 
 
-def inferRelativeHeadingRelations(matcher, reqNode, ego, line):
+def inferRelativeHeadingRelations(matcher, reqNode, line):
     """Infer bounds on relative headings from a requirement."""
     rhMatcher = lambda node: matcher.matchUnaryFunction('RelativeHeading', node)
     allBounds = matcher.matchBounds(reqNode, rhMatcher)
     for target, bounds in allBounds.items():
         if not isinstance(target, Object):
             continue
-        assert target is not ego
-        if ego is None:
-            raise InvalidScenarioError('relative heading w.r.t. unassigned ego on line {line}')
         lower, upper = bounds
         if lower < -math.pi:
             lower = -math.pi
@@ -35,30 +32,21 @@ def inferRelativeHeadingRelations(matcher, reqNode, ego, line):
         if lower == -math.pi and upper == math.pi:
             continue  # skip trivial bounds
         rel = RelativeHeadingRelation(target, lower, upper)
-        ego._relations.append(rel)
-        conv = RelativeHeadingRelation(ego, -upper, -lower)
-        target._relations.append(conv)
 
 
-def inferDistanceRelations(matcher, reqNode, ego, line):
+def inferDistanceRelations(matcher, reqNode, line):
     """Infer bounds on distances from a requirement."""
     distMatcher = lambda node: matcher.matchUnaryFunction('DistanceFrom', node)
     allBounds = matcher.matchBounds(reqNode, distMatcher)
     for target, bounds in allBounds.items():
         if not isinstance(target, Object):
             continue
-        assert target is not ego
-        if ego is None:
-            raise InvalidScenarioError('distance w.r.t. unassigned ego on line {line}')
         lower, upper = bounds
         if lower < 0:
             lower = 0
             if upper == float('inf'):
                 continue  # skip trivial bounds
         rel = DistanceRelation(target, lower, upper)
-        ego._relations.append(rel)
-        conv = DistanceRelation(ego, lower, upper)
-        target._relations.append(conv)
 
 
 class BoundRelation:

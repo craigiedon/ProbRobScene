@@ -1219,7 +1219,7 @@ def storeScenarioStateIn(namespace, requirementSyntax, filename):
     namespace['_requirements'] = finalReqs
     namespace['_requirementDeps'] = requirementDeps
 
-    def makeClosure(req, bindings, ego, line):
+    def makeClosure(req, bindings, line):
         """Create a closure testing the requirement in the correct runtime state."""
 
         def evaluator():
@@ -1238,22 +1238,17 @@ def storeScenarioStateIn(namespace, requirementSyntax, filename):
             # evaluate requirement condition, reporting errors on the correct line
             try:
                 veneer.evaluatingRequirement = True
-                # rebind ego object, which can be referred to implicitly
-                assert veneer.egoObject is None
-                if ego is not None:
-                    veneer.egoObject = values[ego]
                 result = executePythonFunction(evaluator, filename)
             finally:
                 veneer.evaluatingRequirement = False
-                veneer.egoObject = None
             return result
 
         return closure
 
-    for reqID, (req, bindings, ego, line, prob) in requirements.items():
+    for reqID, (req, bindings, line, prob) in requirements.items():
         # Check whether requirement implies any relations used for pruning
         reqNode = requirementSyntax[reqID]
-        relations.inferRelationsFrom(reqNode, bindings, ego, line)
+        relations.inferRelationsFrom(reqNode, bindings, line)
         # Gather dependencies of the requirement
         for value in bindings.values():
             if needs_sampling(value):
@@ -1261,11 +1256,8 @@ def storeScenarioStateIn(namespace, requirementSyntax, filename):
             if needs_lazy_evaluation(value):
                 raise InvalidScenarioError(f'requirement on line {line} uses value {value}'
                                            ' undefined outside of object definition')
-        if ego is not None:
-            assert isinstance(ego, Samplable)
-            requirementDeps.add(ego)
         # Construct closure
-        finalReqs.append((makeClosure(req, bindings, ego, line), prob))
+        finalReqs.append((makeClosure(req, bindings, line), prob))
 
 
 def constructScenarioFrom(namespace):
