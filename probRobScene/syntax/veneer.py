@@ -7,7 +7,7 @@ global state such as the list of all created Scenic objects.
 
 __all__ = (
     # Primitive statements and functions
-    'require', 'resample', 'param', 'mutate', 'verbosePrint',
+    'require', 'resample', 'param', 'verbosePrint',
     'sin', 'cos', 'hypot', 'max', 'min',
     # Prefix operators
     'Front', 'Back', 'Left', 'Right',
@@ -58,8 +58,7 @@ from probRobScene.core.vectors import Vector, VectorField, PolygonalVectorField,
 
 Uniform = lambda *opts: Options(opts)  # TODO separate these?
 Discrete = Options
-from probRobScene.core.external_params import (VerifaiParameter, VerifaiRange, VerifaiDiscreteRange,
-                                               VerifaiOptions)
+from probRobScene.core.external_params import (VerifaiParameter, VerifaiRange, VerifaiDiscreteRange, VerifaiOptions)
 from probRobScene.core.object_types import Mutator, Object, Point3D, OrientedPoint3D, Oriented
 from probRobScene.core.specifiers import PropertyDefault  # TODO remove
 
@@ -172,11 +171,10 @@ def resample(dist):
     return dist.clone() if isinstance(dist, Distribution) else dist
 
 
-def verbosePrint(msg):
+def verbosePrint(msg, verbosity):
     """Built-in function printing a message when the verbosity is >0."""
-    import probRobScene.syntax.translator as translator
-    if translator.verbosity >= 1:
-        indent = '  ' * activity if translator.verbosity >= 2 else '  '
+    if verbosity >= 1:
+        indent = '  ' * activity if verbosity >= 2 else '  '
         print(indent + msg)
 
 
@@ -190,18 +188,6 @@ def param(*quotedParams, **params):
     it = iter(quotedParams)
     for name, value in zip(it, it):
         globalParameters[name] = to_distribution(value)
-
-
-def mutate(*objects):  # TODO update syntax
-    """Function implementing the mutate statement."""
-    if evaluatingRequirement:
-        raise RuntimeParseError('used mutate statement inside a requirement')
-    if len(objects) == 0:
-        objects = allObjects
-    for obj in objects:
-        if not isinstance(obj, Object):
-            raise RuntimeParseError('"mutate X" with X not an object')
-        obj.mutationEnabled = True
 
 
 ### Prefix operators

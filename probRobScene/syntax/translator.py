@@ -46,7 +46,6 @@ from tokenize import LPAR, RPAR, LSQB, RSQB, COMMA, DOUBLESLASH, DOUBLESLASHEQUA
 from tokenize import NAME, NL, NEWLINE, ENDMARKER, NUMBER, COLON, COMMENT, ENCODING
 
 import probRobScene.core.pruning as pruning
-import probRobScene.syntax.relations as relations
 import probRobScene.syntax.veneer as veneer
 from probRobScene.core.distributions import Samplable, needs_sampling
 from probRobScene.core.lazy_eval import needs_lazy_evaluation
@@ -63,15 +62,15 @@ def scenarioFromString(string, filename='<string>', cacheImports=False):
 
     The optional **filename** is used for error messages."""
     stream = io.BytesIO(string.encode())
-    return scenarioFromStream(stream, filename=filename, cacheImports=cacheImports)
+    return scenarioFromStream(stream, filename=filename, cache_imports=cacheImports)
 
 
-def scenarioFromFile(path, cacheImports=False):
+def scenarioFromFile(path, cache_imports=False):
     """Compile a Scenic file into a `Scenario`.
 
     Args:
         path (str): path to a Scenic file
-        cacheImports (bool): Whether to cache any imported Scenic modules.
+        cache_imports (bool): Whether to cache any imported Scenic modules.
           The default behavior is to not do this, so that subsequent attempts
           to import such modules will cause them to be recompiled. If it is
           safe to cache Scenic modules across multiple compilations, set this
@@ -89,14 +88,12 @@ def scenarioFromFile(path, cacheImports=False):
         ok = ', '.join(scenicExtensions)
         err = f'Scenic scenario does not have valid extension ({ok})'
         raise RuntimeError(err)
-    directory, name = os.path.split(head)
 
     with open(path, 'rb') as stream:
-        return scenarioFromStream(stream, filename=fullpath, path=path,
-                                  cacheImports=cacheImports)
+        return scenarioFromStream(stream, filename=fullpath, path=path, cache_imports=cache_imports)
 
 
-def scenarioFromStream(stream, filename='<stream>', path=None, cacheImports=False):
+def scenarioFromStream(stream, filename='<stream>', path=None, cache_imports=False):
     """Compile a stream of Scenic code into a `Scenario`."""
     # Compile the code as if it were a top-level module
     old_modules = list(sys.modules.keys())
@@ -104,7 +101,7 @@ def scenarioFromStream(stream, filename='<stream>', path=None, cacheImports=Fals
         with topLevelNamespace(path) as namespace:
             compileStream(stream, namespace, filename=filename)
     finally:
-        if not cacheImports:
+        if not cache_imports:
             to_remove = []
             for name, module in sys.modules.items():
                 if name not in old_modules and getattr(module, '_isScenicModule', False):
@@ -135,7 +132,7 @@ def topLevelNamespace(path=None):
         del sys.path[0]
 
 
-def compileStream(stream, namespace, filename='<stream>'):
+def compileStream(stream, namespace, filename='<stream>', verbosity=0):
     """Compile a stream of Scenic code and execute it in a namespace.
 
     The compilation procedure consists of the following main steps:
@@ -153,8 +150,8 @@ def compileStream(stream, namespace, filename='<stream>'):
            This is done by the `storeScenarioStateIn` function.
     """
     if verbosity >= 2:
-        veneer.verbosePrint(f'  Compiling Scenic module from {filename}...')
-        startTime = time.time()
+        veneer.verbosePrint(f'  Compiling Scenic module from {filename}...', verbosity)
+        start_time = time.time()
     # Tokenize input stream
     try:
         tokens = list(tokenize.tokenize(stream.readline))
@@ -173,7 +170,7 @@ def compileStream(stream, namespace, filename='<stream>'):
         # Execute each block
         for blockNum, block in enumerate(blocks):
             # Find all custom constructors defined so far (possibly imported)
-            constructors = findConstructorsIn(namespace)
+            constructors = find_constructors_in(namespace)
             # Translate tokens to valid Python syntax
             startLine = max(1, block[0][2][0])
             translator = TokenTranslator(constructors)
@@ -195,14 +192,14 @@ def compileStream(stream, namespace, filename='<stream>'):
             # Compile the modified tree
             code = compileTranslatedTree(newTree, filename)
             # Execute it
-            executeCodeIn(code, namespace, filename)
+            execute_python_function(lambda: exec(code, namespace), filename)
         # Extract scenario state from veneer and store it
         storeScenarioStateIn(namespace, requirements, filename)
     finally:
         veneer.deactivate()
     if verbosity >= 2:
-        totalTime = time.time() - startTime
-        veneer.verbosePrint(f'  Compiled Scenic module in {totalTime:.4g} seconds.')
+        totalTime = time.time() - start_time
+        veneer.verbosePrint(f'  Compiled Scenic module in {totalTime:.4g} seconds.', verbosity)
     allNewSource = ''.join(newSourceBlocks)
     return code, allNewSource
 
@@ -214,7 +211,6 @@ def compileStream(stream, namespace, filename='<stream>'):
 showInternalBacktrace = False
 dumpTranslatedPython = False
 dumpFinalAST = False
-verbosity = 0
 usePruning = True
 
 ## Preamble
@@ -243,7 +239,7 @@ for imp in internalFunctions:
 
 requireStatement = 'require'
 paramStatement = 'param'
-functionStatements = {requireStatement, paramStatement, 'mutate'}
+functionStatements = {requireStatement, paramStatement}
 
 # sanity check: implementations of statements actually exist
 for imp in functionStatements:
@@ -538,7 +534,7 @@ def partitionByImports(tokens):
     return blocks
 
 
-def findConstructorsIn(namespace):
+def find_constructors_in(namespace):
     """Find all constructors (Scenic classes) defined in a namespace."""
     constructors = []
     for name, value in namespace.items():
@@ -925,18 +921,6 @@ def parseTranslatedSource(source, filename):
 
 ### TRANSLATION PHASE FOUR: modifying the parse tree
 
-noArgs = ast.arguments(
-    args=[], vararg=None,
-    kwonlyargs=[], kw_defaults=[],
-    kwarg=None, defaults=[])
-selfArg = ast.arguments(
-    args=[ast.arg(arg='self', annotation=None)], vararg=None,
-    kwonlyargs=[], kw_defaults=[],
-    kwarg=None, defaults=[])
-
-if sys.version_info >= (3, 8):  # TODO cleaner way to handle this?
-    noArgs.posonlyargs = []
-    selfArg.posonlyargs = []
 
 
 class AttributeFinder(NodeVisitor):
@@ -973,6 +957,20 @@ class ASTSurgeon(NodeTransformer):
         super().__init__()
         self.constructors = set(constructors.keys())
         self.requirements = []
+
+        self.no_args = ast.arguments(
+            args=[], vararg=None,
+            kwonlyargs=[], kw_defaults=[],
+            kwarg=None, defaults=[])
+
+        self.self_args = ast.arguments(
+            args=[ast.arg(arg='self', annotation=None)], vararg=None,
+            kwonlyargs=[], kw_defaults=[],
+            kwarg=None, defaults=[])
+
+        if sys.version_info >= (3, 8):  # TODO cleaner way to handle this?
+            self.no_args.posonlyargs = []
+            self.self_args.posonlyargs = []
 
     def parseError(self, node, message):
         raise ASTParseError(node.lineno, message)
@@ -1034,7 +1032,7 @@ class ASTSurgeon(NodeTransformer):
             req = self.visit(cond)
             reqID = Num(len(self.requirements))  # save ID number
             self.requirements.append(req)  # save condition for later inspection when pruning
-            closure = Lambda(noArgs, req)  # enclose requirement in a lambda
+            closure = Lambda(self.no_args, req)  # enclose requirement in a lambda
             lineNum = Num(node.lineno)  # save line number for error messages
             copy_location(closure, req)
             copy_location(lineNum, req)
@@ -1093,7 +1091,7 @@ class ASTSurgeon(NodeTransformer):
                     args = [
                         Set([Str(prop) for prop in properties]),
                         Set([Str(attr) for attr in metaAttrs]),
-                        Lambda(selfArg, origValue)
+                        Lambda(self.self_args, origValue)
                     ]
                     value = Call(Name(createDefault, Load()), args, [])
                     copy_location(value, origValue)
@@ -1180,12 +1178,7 @@ class InterpreterParseError(ParseError):
         super().__init__(f'Parse error in line {line}: {exc_name}: {exc}')
 
 
-def executeCodeIn(code, namespace, filename):
-    """Execute the final translated Python code in the given namespace."""
-    executePythonFunction(lambda: exec(code, namespace), filename)
-
-
-def executePythonFunction(func, filename):
+def execute_python_function(func, filename):
     """Execute a Python function, giving correct Scenic backtraces for any exceptions."""
     try:
         return func()
@@ -1238,7 +1231,7 @@ def storeScenarioStateIn(namespace, requirementSyntax, filename):
             # evaluate requirement condition, reporting errors on the correct line
             try:
                 veneer.evaluatingRequirement = True
-                result = executePythonFunction(evaluator, filename)
+                result = execute_python_function(evaluator, filename)
             finally:
                 veneer.evaluatingRequirement = False
             return result
@@ -1246,9 +1239,7 @@ def storeScenarioStateIn(namespace, requirementSyntax, filename):
         return closure
 
     for reqID, (req, bindings, line, prob) in requirements.items():
-        # Check whether requirement implies any relations used for pruning
         reqNode = requirementSyntax[reqID]
-        relations.inferRelationsFrom(reqNode, bindings, line)
         # Gather dependencies of the requirement
         for value in bindings.values():
             if needs_sampling(value):
@@ -1260,7 +1251,7 @@ def storeScenarioStateIn(namespace, requirementSyntax, filename):
         finalReqs.append((makeClosure(req, bindings, line), prob))
 
 
-def constructScenarioFrom(namespace):
+def constructScenarioFrom(namespace, verbosity=0):
     """Build a Scenario object from an executed Scenic module."""
     # Extract workspace, if one is specified
     if 'workspace' in namespace:
