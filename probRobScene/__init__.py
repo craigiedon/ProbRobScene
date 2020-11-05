@@ -1,0 +1,1 @@
+from probRobScene.syntax.translator import scenarioFromFile, scenarioFromString

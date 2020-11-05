@@ -1,17 +1,10 @@
 from pyrep import PyRep
 from pyrep.robots.arms.panda import Panda
 from pyrep.robots.end_effectors.panda_gripper import PandaGripper
-from pyrep.objects import Object
-from pyrep.backend.utils import script_call
-from pyrep.const import PrimitiveShape
-from pyrep.objects import Camera, Shape, VisionSensor
-from pyrep.backend import sim
-from multiprocessing import Process
+from pyrep.objects import Camera, VisionSensor
 import numpy as np
-import matplotlib.pyplot as plt
-from setupFuncs import setAonB, setAonPos, create_table, top_of
-import robotControl as rc
-
+from setupFuncs import setAonB, create_table
+from wrappers import robotControl as rc
 
 ### SETUP CODE ###
 pr = PyRep()

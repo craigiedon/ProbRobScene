@@ -4,9 +4,9 @@ import math
 from ast import Compare, BinOp, Eq, Lt, LtE, Gt, GtE, Call, Add, Sub, Expression, Name
 from collections import defaultdict
 
-from scenic3d.core.distributions import needs_sampling
-from scenic3d.core.object_types import Object
-from scenic3d.core.utils import InvalidScenarioError, InconsistentScenarioError
+from probRobScene.core.distributions import needs_sampling
+from probRobScene.core.object_types import Object
+from probRobScene.core.utils import InvalidScenarioError, InconsistentScenarioError
 
 
 def inferRelationsFrom(reqNode, namespace, line):

@@ -1,8 +1,8 @@
 import numpy
 from dotmap import DotMap
 
-from scenic3d.core.distributions import Distribution, Options, Bucketable
-from scenic3d.core.utils import InvalidScenarioError
+from probRobScene.core.distributions import Distribution, Options, Bucketable
+from probRobScene.core.utils import InvalidScenarioError
 
 
 class ExternalSampler:
@@ -144,7 +144,7 @@ class ExternalParameter(Distribution):
     def __init__(self):
         super().__init__()
         self.sampler = None
-        import scenic3d.syntax.veneer as veneer  # TODO improve?
+        import probRobScene.syntax.veneer as veneer  # TODO improve?
         veneer.registerExternalParameter(self)
 
     def sample_given_dependencies(self, dep_values):
@@ -181,7 +181,7 @@ class VerifaiParameter(ExternalParameter):
 
 
 class VerifaiRange(VerifaiParameter):
-    """A :obj:`~scenic3d.core.distributions.Range` (real interval) sampled by VerifAI."""
+    """A :obj:`~probRobScene.core.distributions.Range` (real interval) sampled by VerifAI."""
 
     def __init__(self, low, high, buckets=None, weights=None):
         import verifai.features
@@ -206,7 +206,7 @@ class VerifaiRange(VerifaiParameter):
 
 
 class VerifaiDiscreteRange(VerifaiParameter):
-    """A :obj:`~scenic3d.core.distributions.DiscreteRange` (integer interval) sampled by VerifAI."""
+    """A :obj:`~probRobScene.core.distributions.DiscreteRange` (integer interval) sampled by VerifAI."""
 
     def __init__(self, low, high, weights=None):
         import verifai.features
@@ -227,7 +227,7 @@ class VerifaiDiscreteRange(VerifaiParameter):
 
 
 class VerifaiOptions(Options):
-    """An :obj:`~scenic3d.core.distributions.Options` (discrete set) sampled by VerifAI."""
+    """An :obj:`~probRobScene.core.distributions.Options` (discrete set) sampled by VerifAI."""
 
     @staticmethod
     def makeSelector(n, weights):

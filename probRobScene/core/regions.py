@@ -12,13 +12,13 @@ from scipy.optimize import linprog
 from scipy.spatial import ConvexHull, HalfspaceIntersection
 from scipy.spatial.transform import Rotation as R
 
-from scenic3d.core.distributions import Samplable, RejectionException, needs_sampling, distributionFunction
-from scenic3d.core.geometry import cuboid_contains_point, normalize
-from scenic3d.core.geometry import sin, cos, hypot, min_and_max
-from scenic3d.core.lazy_eval import value_in_context
-from scenic3d.core.type_support import toVector
-from scenic3d.core.utils import areEquivalent
-from scenic3d.core.vectors import Vector, OrientedVector, VectorDistribution, Vector3D, rotate_euler_v3d, rotation_to_euler, reverse_euler, rotate_euler
+from probRobScene.core.distributions import Samplable, RejectionException, needs_sampling, distributionFunction
+from probRobScene.core.geometry import cuboid_contains_point, normalize
+from probRobScene.core.geometry import sin, cos, hypot, min_and_max
+from probRobScene.core.lazy_eval import value_in_context
+from probRobScene.core.type_support import toVector
+from probRobScene.core.utils import areEquivalent
+from probRobScene.core.vectors import Vector, OrientedVector, VectorDistribution, Vector3D, rotate_euler_v3d, rotation_to_euler, reverse_euler, rotate_euler
 
 
 class Region(Samplable, abc.ABC):
@@ -44,7 +44,7 @@ class Region(Samplable, abc.ABC):
 
     def __contains__(self, thing):
         """Check if this `Region` contains an object or vector."""
-        from scenic3d.core.object_types import Object
+        from probRobScene.core.object_types import Object
         if isinstance(thing, Object):
             return self.contains_object(thing)
         vec = toVector(thing, '"X in Y" with X not an Object or a vector')
@@ -551,7 +551,7 @@ def hit_and_run(hsi: HalfspaceIntersection, num_steps: int = 10) -> np.array:
 class PointSetRegion(Region):
     """Region consisting of a set of discrete points.
 
-    No :obj:`~scenic3d.core.object_types.Object` can be contained in a `PointSetRegion`,
+    No :obj:`~probRobScene.core.object_types.Object` can be contained in a `PointSetRegion`,
     since the latter is discrete. (This may not be true for subclasses, e.g.
     `GridRegion`.)
 
@@ -560,7 +560,7 @@ class PointSetRegion(Region):
         points (iterable): set of points comprising the region
         kd_tree (:obj:`scipy.spatial.KDTree`, optional): k-D tree for the points (one will
           be computed if none is provided)
-        orientation (:obj:`~scenic3d.core.vectors.VectorField`, optional): orientation for
+        orientation (:obj:`~probRobScene.core.vectors.VectorField`, optional): orientation for
           the region
         tolerance (float, optional): distance tolerance for checking whether a point lies
           in the region

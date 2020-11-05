@@ -9,11 +9,11 @@ from math import sin, cos
 import numpy as np
 from scipy.spatial.transform import Rotation as R
 
-import scenic3d.core.utils as utils
-from scenic3d.core.distributions import (Samplable, Distribution, MethodDistribution,
-                                         needs_sampling, makeOperatorHandler, distributionMethod, distributionFunction)
-from scenic3d.core.geometry import normalize_angle
-from scenic3d.core.lazy_eval import value_in_context, needs_lazy_evaluation, makeDelayedFunctionCall
+import probRobScene.core.utils as utils
+from probRobScene.core.distributions import (Samplable, Distribution, MethodDistribution,
+                                             needs_sampling, makeOperatorHandler, distributionMethod, distributionFunction)
+from probRobScene.core.geometry import normalize_angle
+from probRobScene.core.lazy_eval import value_in_context, needs_lazy_evaluation, makeDelayedFunctionCall
 
 
 class VectorDistribution(Distribution):

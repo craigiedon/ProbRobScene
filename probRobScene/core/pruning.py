@@ -4,14 +4,14 @@ from typing import List
 
 import numpy as np
 
-from scenic3d.core.distributions import (Samplable, MethodDistribution, OperatorDistribution,
-                                         support_interval, underlying_function, distributionFunction, condition_to, needs_sampling)
-from scenic3d.core.geometry import normalize_angle
-from scenic3d.core.object_types import Object
-from scenic3d.core.regions import PointInRegionDistribution, Intersect, cube_to_hsi, Region, EmptyRegion, erode_hsis, Convex, ConvexPolyhedronRegion, IntersectionRegion, intersect_many
-from scenic3d.core.utils import InvalidScenarioError
-from scenic3d.core.vectors import VectorField, PolygonalVectorField, VectorMethodDistribution, Vector3D
-from scenic3d.syntax.relations import RelativeHeadingRelation, DistanceRelation
+from probRobScene.core.distributions import (Samplable, MethodDistribution, OperatorDistribution,
+                                             support_interval, underlying_function, distributionFunction, condition_to, needs_sampling)
+from probRobScene.core.geometry import normalize_angle
+from probRobScene.core.object_types import Object
+from probRobScene.core.regions import PointInRegionDistribution, Intersect, cube_to_hsi, Region, EmptyRegion, erode_hsis, Convex, ConvexPolyhedronRegion, IntersectionRegion, intersect_many
+from probRobScene.core.utils import InvalidScenarioError
+from probRobScene.core.vectors import VectorField, PolygonalVectorField, VectorMethodDistribution, Vector3D
+from probRobScene.syntax.relations import RelativeHeadingRelation, DistanceRelation
 
 
 def prune(scenario, verbosity=1):

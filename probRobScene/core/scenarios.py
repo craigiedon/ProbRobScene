@@ -2,13 +2,13 @@
 
 import random
 
-from scenic3d.core.distributions import Samplable, RejectionException, needs_sampling, sample_all
-from scenic3d.core.external_params import ExternalSampler
-from scenic3d.core.geometry import cuboids_intersect
-from scenic3d.core.lazy_eval import needs_lazy_evaluation
-from scenic3d.core.plotUtil3d import draw_cube
-from scenic3d.core.regions import Region
-from scenic3d.core.utils import areEquivalent, InvalidScenarioError, RuntimeParseError
+from probRobScene.core.distributions import Samplable, RejectionException, needs_sampling, sample_all
+from probRobScene.core.external_params import ExternalSampler
+from probRobScene.core.geometry import cuboids_intersect
+from probRobScene.core.lazy_eval import needs_lazy_evaluation
+from probRobScene.core.plotUtil3d import draw_cube
+from probRobScene.core.regions import Region
+from probRobScene.core.utils import areEquivalent, InvalidScenarioError, RuntimeParseError
 import numpy as np
 
 

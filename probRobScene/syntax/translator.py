@@ -45,15 +45,15 @@ from tokenize import LEFTSHIFTEQUAL, RIGHTSHIFTEQUAL, VBAREQUAL, AMPEREQUAL, CIR
 from tokenize import LPAR, RPAR, LSQB, RSQB, COMMA, DOUBLESLASH, DOUBLESLASHEQUAL
 from tokenize import NAME, NL, NEWLINE, ENDMARKER, NUMBER, COLON, COMMENT, ENCODING
 
-import scenic3d.core.pruning as pruning
-import scenic3d.syntax.relations as relations
-import scenic3d.syntax.veneer as veneer
-from scenic3d.core.distributions import Samplable, needs_sampling
-from scenic3d.core.lazy_eval import needs_lazy_evaluation
-from scenic3d.core.object_types import Constructible
-from scenic3d.core.regions import Region
-from scenic3d.core.scenarios import Scenario
-from scenic3d.core.utils import ParseError, RuntimeParseError, InvalidScenarioError
+import probRobScene.core.pruning as pruning
+import probRobScene.syntax.relations as relations
+import probRobScene.syntax.veneer as veneer
+from probRobScene.core.distributions import Samplable, needs_sampling
+from probRobScene.core.lazy_eval import needs_lazy_evaluation
+from probRobScene.core.object_types import Constructible
+from probRobScene.core.regions import Region
+from probRobScene.core.scenarios import Scenario
+from probRobScene.core.utils import ParseError, RuntimeParseError, InvalidScenarioError
 
 
 ### THE TOP LEVEL: compiling a Scenic program
@@ -221,7 +221,7 @@ usePruning = True
 # (included at the beginning of every module to be translated;
 # imports the implementations of the public language features)
 preamble = """\
-from scenic3d.syntax.veneer import *
+from probRobScene.syntax.veneer import *
 """
 
 ## Get Python names of various elements

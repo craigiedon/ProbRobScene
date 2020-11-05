@@ -5,11 +5,11 @@ import sys
 
 import numpy as np
 
-from scenic3d.core.distributions import Distribution
-from scenic3d.core.lazy_eval import (DelayedArgument, value_in_context, requiredProperties,
-                                     needs_lazy_evaluation)
-from scenic3d.core.utils import RuntimeParseError
-from scenic3d.core.vectors import Vector, Vector3D
+from probRobScene.core.distributions import Distribution
+from probRobScene.core.lazy_eval import (DelayedArgument, value_in_context, requiredProperties,
+                                         needs_lazy_evaluation)
+from probRobScene.core.utils import RuntimeParseError
+from probRobScene.core.vectors import Vector, Vector3D
 
 
 # Typing and coercion rules:

@@ -11,9 +11,9 @@ from typing import Iterable, Tuple
 import numpy
 import scipy
 
-from scenic3d.core.lazy_eval import (LazilyEvaluable, requiredProperties, needs_lazy_evaluation, value_in_context,
-                                     makeDelayedFunctionCall)
-from scenic3d.core.utils import argsToString, areEquivalent, RuntimeParseError, cached, sqrt2
+from probRobScene.core.lazy_eval import (LazilyEvaluable, requiredProperties, needs_lazy_evaluation, value_in_context,
+                                         makeDelayedFunctionCall)
+from probRobScene.core.utils import argsToString, areEquivalent, RuntimeParseError, cached, sqrt2
 
 
 ## Misc
@@ -498,7 +498,7 @@ def makeOperatorHandler(op):
 for op in allowedOperators:
     setattr(Distribution, op, makeOperatorHandler(op))
 
-import scenic3d.core.type_support as type_support
+import probRobScene.core.type_support as type_support
 
 
 class MultiplexerDistribution(Distribution):

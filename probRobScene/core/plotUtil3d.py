@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 from scipy.spatial.transform import Rotation as R
 
-from scenic3d.core.vectors import offset_beyond, Vector3D, rotate_euler_v3d
+from probRobScene.core.vectors import offset_beyond, Vector3D, rotate_euler_v3d
 
 
 def draw_cube(ax, pos: np.array, size: np.array, rot: np.array, color: str = 'b', alpha: float = 0.5):

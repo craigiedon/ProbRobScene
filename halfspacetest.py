@@ -4,11 +4,11 @@ import numpy as np
 from scipy.spatial import ConvexHull, HalfspaceIntersection
 from scipy.linalg import inv
 
-from scenic3d.core.regions import cube_to_hsi, intersect_hsis, erode_hsis, feasible_point
-from scenic3d.core.plotUtil3d import draw_polyhedron, draw_polygon_3d
+from probRobScene.core.regions import cube_to_hsi, intersect_hsis, erode_hsis, feasible_point
+from probRobScene.core.plotUtil3d import draw_polyhedron, draw_polygon_3d
 import matplotlib.pyplot as plt
-from scenic3d.core.regions import PlaneRegion
-from scenic3d.core.vectors import Vector3D, reverse_euler, rotate_euler_v3d, rotate_euler
+from probRobScene.core.regions import PlaneRegion
+from probRobScene.core.vectors import Vector3D, reverse_euler, rotate_euler_v3d, rotate_euler
 
 if __name__ == "__main__":
     hs_1 = cube_to_hsi(np.array([0.0, 0.0, 0.0]), np.ones(3), np.array([0.4, np.pi / 2.5, np.pi / 2.0]))

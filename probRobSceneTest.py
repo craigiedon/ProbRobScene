@@ -1,7 +1,7 @@
-import scenic3d
+import probRobScene
 import numpy as np
 
-scenario = scenic3d.scenarioFromFile("scenarios/tableCube.scenic")
+scenario = probRobScene.scenarioFromFile("scenarios/tableCubeNaive.scenic")
 
 max_generations = 1
 rejections_per_scene = []
@@ -11,5 +11,5 @@ for i in range(max_generations):
     rejections_per_scene.append(used_its)
     ex_world.show_3d()
 #
-# avg_rejections = np.average(rejections_per_scene)
-# print(avg_rejections)
+avg_rejections = np.average(rejections_per_scene)
+print(avg_rejections)

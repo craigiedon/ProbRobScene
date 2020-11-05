@@ -4,10 +4,10 @@ import math
 import warnings
 
 import numpy as np
-import scenic3d.core.utils as utils
-from scenic3d.core.distributions import (needs_sampling, distributionFunction,
-                                         monotonicDistributionFunction)
-from scenic3d.core.lazy_eval import needs_lazy_evaluation
+import probRobScene.core.utils as utils
+from probRobScene.core.distributions import (needs_sampling, distributionFunction,
+                                             monotonicDistributionFunction)
+from probRobScene.core.lazy_eval import needs_lazy_evaluation
 
 
 @distributionFunction
@@ -110,8 +110,8 @@ def apparentHeadingAtPoint(point, heading, base):
 
 
 def cuboid_contains_point(obj, point):
-    from scenic3d.core.vectors import rotate_euler_v3d
-    from scenic3d.core.vectors import reverse_euler
+    from probRobScene.core.vectors import rotate_euler_v3d
+    from probRobScene.core.vectors import reverse_euler
     diff = point - obj.position
     need_to_sample = needs_sampling(obj)
     need_to_lazy = needs_lazy_evaluation(obj)
@@ -133,8 +133,8 @@ def cuboids_intersect(cuboid_a, cuboid_b):
 
 
 def cube_edge_separates(cuboid_a, cuboid_b):
-    from scenic3d.core.vectors import reverse_euler
-    from scenic3d.core.vectors import rotate_euler_v3d
+    from probRobScene.core.vectors import reverse_euler
+    from probRobScene.core.vectors import rotate_euler_v3d
     base = cuboid_a.position.to_vector_3d()
 
     # A reversal of the first one's rotation

@@ -1,25 +1,16 @@
-import scenic3d
-from scenic3d.core.object_types import Point3D
-from scenic3d.core.vectors import Vector3D
-from scenic3d.syntax.veneer import With
+import probRobScene
 from pyrep import PyRep
 from pyrep.robots.arms.panda import Panda
 from pyrep.robots.end_effectors.panda_gripper import PandaGripper
-from pyrep.backend.utils import script_call
-from pyrep.const import PrimitiveShape
-from pyrep.objects import Camera, Shape, VisionSensor
-from pyrep.backend import sim
-from multiprocessing import Process
+from pyrep.objects import Camera
 import numpy as np
-import matplotlib.pyplot as plt
-from setupFuncs import setAonB, create_table, top_of
-import robotControl as rc
+from wrappers import robotControl as rc
 
-from scenicCoppeliaSimWrapper import cop_from_scenic
+from wrappers.prbCoppeliaWrapper import cop_from_scenic
 
 pr = PyRep()
 
-scenario = scenic3d.scenarioFromFile("scenarios/tableCube.scenic")
+scenario = probRobScene.scenarioFromFile("scenarios/tableCube.scenic")
 
 max_sims = 1
 sim_result = []
@@ -56,6 +47,10 @@ for i in range(max_sims):
     ## Robot movement code
 
     try:
+        for steps in range(50000):
+            print(steps)
+            pr.step()
+
         cube_pos_from_im = rc.location_from_depth_cam(pr, d_cam, cube)
 
         rc.move_to_pos(pr, panda_1, cube_pos_from_im, z_offset=-0.021)
@@ -77,7 +72,7 @@ for i in range(max_sims):
         rc.grasp(pr, gripper_2, False)
 
         target_diff = np.abs(np.array(cube.get_position()) - np.array(tr2.get_position()))
-        if (target_diff[0] <= 0.453  and target_diff[1] <= 0.453):
+        if target_diff[0] <= 0.453  and target_diff[1] <= 0.453:
             sim_result.append("Success!")
         else:
             sim_result.append("Failure: Missed Target")

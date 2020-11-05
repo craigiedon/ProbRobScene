@@ -47,33 +47,33 @@ __all__ = (
 
 from typing import Union
 
-from scenic3d.core.distributions import Range, Options, Normal, distributionFunction
+from probRobScene.core.distributions import Range, Options, Normal, distributionFunction
 # various Python types and functions used in the language but defined elsewhere
-from scenic3d.core.geometry import sin, cos, hypot, max, min
-from scenic3d.core.regions import (Region, PointSetRegion,
-                                   everywhere, nowhere, CuboidRegion, SphericalRegion,
-                                   HalfSpaceRegion, PointInRegionDistribution, Rectangle3DRegion)
-from scenic3d.core.vectors import Vector, VectorField, PolygonalVectorField, Vector3D, offset_beyond, \
+from probRobScene.core.geometry import sin, cos, hypot, max, min
+from probRobScene.core.regions import (Region, PointSetRegion,
+                                       everywhere, nowhere, CuboidRegion, SphericalRegion,
+                                       HalfSpaceRegion, PointInRegionDistribution, Rectangle3DRegion)
+from probRobScene.core.vectors import Vector, VectorField, PolygonalVectorField, Vector3D, offset_beyond, \
     rotation_to_euler, rotate_euler_v3d, VectorField3D
 
 Uniform = lambda *opts: Options(opts)  # TODO separate these?
 Discrete = Options
-from scenic3d.core.external_params import (VerifaiParameter, VerifaiRange, VerifaiDiscreteRange,
-                                           VerifaiOptions)
-from scenic3d.core.object_types import Mutator, Object, Point3D, OrientedPoint3D, Oriented
-from scenic3d.core.specifiers import PropertyDefault  # TODO remove
+from probRobScene.core.external_params import (VerifaiParameter, VerifaiRange, VerifaiDiscreteRange,
+                                               VerifaiOptions)
+from probRobScene.core.object_types import Mutator, Object, Point3D, OrientedPoint3D, Oriented
+from probRobScene.core.specifiers import PropertyDefault  # TODO remove
 
 # everything that should not be directly accessible from the language is imported here:
 import inspect
-from scenic3d.core.distributions import Distribution, to_distribution
-from scenic3d.core.type_support import isA, toType, toTypes, toScalar, toHeading, toVector
-from scenic3d.core.type_support import evaluateRequiringEqualTypes, underlyingType
-from scenic3d.core.geometry import normalize_angle, apparentHeadingAtPoint
-from scenic3d.core.object_types import Constructible
-from scenic3d.core.specifiers import Specifier
-from scenic3d.core.lazy_eval import DelayedArgument
-from scenic3d.core.utils import RuntimeParseError
-from scenic3d.core.external_params import ExternalParameter
+from probRobScene.core.distributions import Distribution, to_distribution
+from probRobScene.core.type_support import isA, toType, toTypes, toScalar, toHeading, toVector
+from probRobScene.core.type_support import evaluateRequiringEqualTypes, underlyingType
+from probRobScene.core.geometry import normalize_angle, apparentHeadingAtPoint
+from probRobScene.core.object_types import Constructible
+from probRobScene.core.specifiers import Specifier
+from probRobScene.core.lazy_eval import DelayedArgument
+from probRobScene.core.utils import RuntimeParseError
+from probRobScene.core.external_params import ExternalParameter
 
 ### Internals
 
@@ -174,7 +174,7 @@ def resample(dist):
 
 def verbosePrint(msg):
     """Built-in function printing a message when the verbosity is >0."""
-    import scenic3d.syntax.translator as translator
+    import probRobScene.syntax.translator as translator
     if translator.verbosity >= 1:
         indent = '  ' * activity if translator.verbosity >= 2 else '  '
         print(indent + msg)

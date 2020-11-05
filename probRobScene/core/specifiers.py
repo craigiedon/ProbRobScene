@@ -1,9 +1,9 @@
 """Specifiers and associated objects."""
 
-from scenic3d.core.distributions import to_distribution
-from scenic3d.core.lazy_eval import (DelayedArgument, toDelayedArgument, requiredProperties,
-                                     needs_lazy_evaluation)
-from scenic3d.core.utils import RuntimeParseError
+from probRobScene.core.distributions import to_distribution
+from probRobScene.core.lazy_eval import (DelayedArgument, toDelayedArgument, requiredProperties,
+                                         needs_lazy_evaluation)
+from probRobScene.core.utils import RuntimeParseError
 
 
 ## Specifiers themselves

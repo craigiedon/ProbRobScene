@@ -7,16 +7,16 @@ import math
 import random
 import numpy as np
 
-from scenic3d.core.distributions import Samplable, needs_sampling, to_distribution
-from scenic3d.core.geometry import averageVectors, hypot, min
-from scenic3d.core.lazy_eval import needs_lazy_evaluation, makeDelayedFunctionCall
-from scenic3d.core.regions import SphericalRegion, Oriented, intersect_many, PointInRegionDistribution, \
+from probRobScene.core.distributions import Samplable, needs_sampling, to_distribution
+from probRobScene.core.geometry import averageVectors, hypot, min
+from probRobScene.core.lazy_eval import needs_lazy_evaluation, makeDelayedFunctionCall
+from probRobScene.core.regions import SphericalRegion, Oriented, intersect_many, PointInRegionDistribution, \
     IntersectionRegion
-from scenic3d.core.specifiers import Specifier, PropertyDefault
-from scenic3d.core.type_support import toVector, toScalar, toType
-from scenic3d.core.utils import areEquivalent, RuntimeParseError, group_by
-from scenic3d.core.vectors import Vector, Vector3D, rotate_euler_v3d
-from scenic3d.core.plotUtil3d import draw_cube
+from probRobScene.core.specifiers import Specifier, PropertyDefault
+from probRobScene.core.type_support import toVector, toScalar, toType
+from probRobScene.core.utils import areEquivalent, RuntimeParseError, group_by
+from probRobScene.core.vectors import Vector, Vector3D, rotate_euler_v3d
+from probRobScene.core.plotUtil3d import draw_cube
 
 
 ## Abstract base class
@@ -243,7 +243,7 @@ class Object(Point3D, Oriented):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        import scenic3d.syntax.veneer as veneer  # TODO improve?
+        import probRobScene.syntax.veneer as veneer  # TODO improve?
         veneer.registerObject(self)
 
         self.hw = hw = self.width / 2

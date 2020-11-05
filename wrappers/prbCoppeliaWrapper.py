@@ -6,7 +6,7 @@ from numpy.core.multiarray import ndarray
 from pyrep import PyRep
 from pyrep.const import PrimitiveShape
 from pyrep.objects import Shape, VisionSensor
-from scenic3d.core.scenarios import Scene
+from probRobScene.core.scenarios import Scene
 from setupFuncs import create_table
 
 
