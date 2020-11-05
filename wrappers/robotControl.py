@@ -1,5 +1,5 @@
 import numpy as np
-from setupFuncs import top_of
+from wrappers.setupFuncs import top_of
 
 
 def grasp(pr, gripper, close: bool) -> None:

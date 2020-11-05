@@ -4,7 +4,7 @@ from pyrep.robots.end_effectors.panda_gripper import PandaGripper
 from pyrep.const import PrimitiveShape
 from pyrep.objects import Camera, Shape, VisionSensor
 import numpy as np
-from setupFuncs import setAonB, create_table, top_of
+from wrappers.setupFuncs import setAonB, create_table, top_of
 from wrappers import robotControl as rc
 
 ### SETUP CODE ###

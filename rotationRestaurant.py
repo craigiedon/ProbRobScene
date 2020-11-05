@@ -4,7 +4,7 @@ from pyrep.robots.end_effectors.panda_gripper import PandaGripper
 from pyrep.const import PrimitiveShape
 from pyrep.objects import Camera, Shape, VisionSensor
 import numpy as np
-import setupFuncs as sf
+from wrappers import setupFuncs as sf
 
 ### SETUP CODE ###
 

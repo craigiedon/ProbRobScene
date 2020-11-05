@@ -7,7 +7,7 @@ from pyrep import PyRep
 from pyrep.const import PrimitiveShape
 from pyrep.objects import Shape, VisionSensor
 from probRobScene.core.scenarios import Scene
-from setupFuncs import create_table
+from wrappers.setupFuncs import create_table
 
 
 # class CoppeliaScene:

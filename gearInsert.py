@@ -3,7 +3,7 @@ from pyrep.robots.arms.panda import Panda
 from pyrep.robots.end_effectors.panda_gripper import PandaGripper
 from pyrep.objects import Camera, VisionSensor
 import numpy as np
-from setupFuncs import setAonB, create_table
+from wrappers.setupFuncs import setAonB, create_table
 from wrappers import robotControl as rc
 
 ### SETUP CODE ###
