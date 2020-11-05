@@ -34,76 +34,87 @@ from probRobScene.core.lazy_eval import DelayedArgument
 from probRobScene.core.utils import RuntimeParseError
 from probRobScene.core.external_params import ExternalParameter
 
+
 ### Internals
 
-activity = 0
-evaluatingRequirement = False
-allObjects = []  # ordered for reproducibility
-globalParameters = {}
-externalParameters = []  # ordered for reproducibility
-pendingRequirements = {}
-inheritedReqs = []  # TODO improve handling of these?
-
-
-def isActive():
-    """Are we in the middle of compiling a Scenic module?
-
-    The 'activity' global can be >1 when Scenic modules in turn import other
-    Scenic modules."""
-    return activity > 0
-
-
-def activate():
-    """Activate the veneer when beginning to compile a Scenic module."""
-    global activity
-    activity += 1
-    assert not evaluatingRequirement
-
-
-def deactivate():
-    """Deactivate the veneer after compiling a Scenic module."""
-    global activity, allObjects, globalParameters, externalParameters
-    global pendingRequirements, inheritedReqs
-    activity -= 1
-    assert activity >= 0
-    assert not evaluatingRequirement
-    allObjects = []
+class VeneerState:
+    activity = 0
+    evaluatingRequirement = False
+    allObjects = []  # ordered for reproducibility
     globalParameters = {}
-    externalParameters = []
+    externalParameters = []  # ordered for reproducibility
     pendingRequirements = {}
-    inheritedReqs = []
+    inheritedReqs = []  # TODO improve handling of these?
 
+    def isActive(self):
+        """Are we in the middle of compiling a Scenic module?
 
-def registerObject(obj):
-    """Add a Scenic object to the global list of created objects.
+        The 'activity' global can be >1 when Scenic modules in turn import other
+        Scenic modules."""
+        return self.activity > 0
 
-    This is called by the Object constructor."""
-    if activity > 0:
-        assert not evaluatingRequirement
-        assert isinstance(obj, Constructible)
-        allObjects.append(obj)
-    elif evaluatingRequirement:
-        raise RuntimeParseError('tried to create an object inside a requirement')
+    def activate(self):
+        """Activate the veneer when beginning to compile a Scenic module."""
+        self.activity += 1
+        assert not self.evaluatingRequirement
 
+    def deactivate(self):
+        """Deactivate the veneer after compiling a Scenic module."""
+        self.activity -= 1
+        assert self.activity >= 0
+        assert not self.evaluatingRequirement
+        self.allObjects = []
+        self.globalParameters = {}
+        self.externalParameters = []
+        self.pendingRequirements = {}
+        self.inheritedReqs = []
 
-def registerExternalParameter(value):
-    """Register a parameter whose value is given by an external sampler."""
-    if activity > 0:
-        assert isinstance(value, ExternalParameter)
-        externalParameters.append(value)
+    def registerObject(self, obj):
+        """Add a Scenic object to the global list of created objects.
+
+        This is called by the Object constructor."""
+        if self.activity > 0:
+            assert not self.evaluatingRequirement
+            assert isinstance(obj, Constructible)
+            self.allObjects.append(obj)
+        elif self.evaluatingRequirement:
+            raise RuntimeParseError('tried to create an object inside a requirement')
+
+    def registerExternalParameter(self, value):
+        """Register a parameter whose value is given by an external sampler."""
+        if self.activity > 0:
+            assert isinstance(value, ExternalParameter)
+            self.externalParameters.append(value)
+
+    def require(self, reqID, req, line, prob=1):
+        """Function implementing the require statement."""
+        if self.evaluatingRequirement:
+            raise RuntimeParseError('tried to create a requirement inside a requirement')
+        # the translator wrapped the requirement in a lambda to prevent evaluation,
+        # so we need to save the current values of all referenced names; throw in
+        # the ego object too since it can be referred to implicitly
+        assert reqID not in self.pendingRequirements
+        self.pendingRequirements[reqID] = (req, getAllGlobals(req), line, prob)
+
+    def verbosePrint(self, msg, verbosity):
+        """Built-in function printing a message when the verbosity is >0."""
+        if verbosity >= 1:
+            indent = '  ' * self.activity if verbosity >= 2 else '  '
+            print(indent + msg)
+
+    def param(self, *quotedParams, **params):
+        """Function implementing the param statement."""
+        if self.evaluatingRequirement:
+            raise RuntimeParseError('tried to create a global parameter inside a requirement')
+        for name, value in params.items():
+            self.globalParameters[name] = to_distribution(value)
+        assert len(quotedParams) % 2 == 0, quotedParams
+        it = iter(quotedParams)
+        for name, value in zip(it, it):
+            self.globalParameters[name] = to_distribution(value)
 
 
 ### Primitive statements and functions
-
-def require(reqID, req, line, prob=1):
-    """Function implementing the require statement."""
-    if evaluatingRequirement:
-        raise RuntimeParseError('tried to create a requirement inside a requirement')
-    # the translator wrapped the requirement in a lambda to prevent evaluation,
-    # so we need to save the current values of all referenced names; throw in
-    # the ego object too since it can be referred to implicitly
-    assert reqID not in pendingRequirements
-    pendingRequirements[reqID] = (req, getAllGlobals(req), line, prob)
 
 
 def getAllGlobals(req, restrictTo=None):
@@ -131,25 +142,6 @@ def resample(dist):
     return dist.clone() if isinstance(dist, Distribution) else dist
 
 
-def verbosePrint(msg, verbosity):
-    """Built-in function printing a message when the verbosity is >0."""
-    if verbosity >= 1:
-        indent = '  ' * activity if verbosity >= 2 else '  '
-        print(indent + msg)
-
-
-def param(*quotedParams, **params):
-    """Function implementing the param statement."""
-    if evaluatingRequirement:
-        raise RuntimeParseError('tried to create a global parameter inside a requirement')
-    for name, value in params.items():
-        globalParameters[name] = to_distribution(value)
-    assert len(quotedParams) % 2 == 0, quotedParams
-    it = iter(quotedParams)
-    for name, value in zip(it, it):
-        globalParameters[name] = to_distribution(value)
-
-
 ### Prefix operators
 
 
@@ -175,95 +167,10 @@ for op in ops:
 
 ### Infix operators
 
-def FieldAt(X, Y):
-    """The '<VectorField> at <vector>' operator."""
-    if not isinstance(X, VectorField):
-        raise RuntimeParseError('"X at Y" with X not a vector field')
-    Y = toVector(Y, '"X at Y" with Y not a vector')
-    return X[Y]
-
-
-def RelativeTo(X, Y):
-    """The 'X relative to Y' polymorphic operator.
-
-    Allowed forms:
-        F relative to G (with at least one a field, the other a field or heading)
-        <vector> relative to <oriented point> (and vice versa)
-        <vector> relative to <vector>
-        <heading> relative to <heading>
-    """
-    xf, yf = isA(X, VectorField), isA(Y, VectorField)
-    if xf or yf:
-        if xf and yf and X.valueType != Y.valueType:
-            raise RuntimeParseError('"X relative to Y" with X, Y fields of different types')
-        field_type = X.valueType if xf else Y.valueType
-        error = '"X relative to Y" with field and value of different types'
-
-        def helper(context):
-            pos = context.position.toVector()
-            xp = X[pos] if xf else toType(X, field_type, error)
-            yp = Y[pos] if yf else toType(Y, field_type, error)
-            return xp + yp
-
-        return DelayedArgument({'position'}, helper)
-    else:
-        if isinstance(X, OrientedPoint):  # TODO too strict?
-            if isinstance(Y, OrientedPoint):
-                raise RuntimeParseError('"X relative to Y" with X, Y both oriented points')
-            Y = toVector(Y, '"X relative to Y" with X an oriented point but Y not a vector')
-            return X.relativize(Y)
-        elif isinstance(Y, OrientedPoint):
-            X = toVector(X, '"X relative to Y" with Y an oriented point but X not a vector')
-            return Y.relativize(X)
-        else:
-            X = toTypes(X, (Vector, float), '"X relative to Y" with X neither a vector nor scalar')
-            Y = toTypes(Y, (Vector, float), '"X relative to Y" with Y neither a vector nor scalar')
-            return evaluateRequiringEqualTypes(lambda: X + Y, X, Y,
-                                               '"X relative to Y" with vector and scalar')
-
-
 def RelativeTo3D(X, Y):
     X = toTypes(X, (Vector3D, float))
     Y = toTypes(Y, (Vector3D, float))
     return evaluateRequiringEqualTypes(lambda: X + Y, X, Y, "X relative to Y with different types")
-
-
-def OffsetAlong(X, H, Y):
-    """The 'X offset along H by Y' polymorphic operator.
-
-    Allowed forms:
-        <vector> offset along <heading> by <vector>
-        <vector> offset along <field> by <vector>
-    """
-    X = toVector(X, '"X offset along H by Y" with X not a vector')
-    Y = toVector(Y, '"X offset along H by Y" with Y not a vector')
-    if isinstance(H, VectorField):
-        H = H[X]
-    H = toHeading(H, '"X offset along H by Y" with H not a heading or vector field')
-    return X.offsetRotated(H, Y)
-
-
-def RelativePosition(X, Y):
-    """The 'relative position of <vector> [from <vector>]' operator."""
-    X = toVector(X, '"relative position of X from Y" with X not a vector')
-    Y = toVector(Y, '"relative position of X from Y" with Y not a vector')
-    return X - Y
-
-
-def RelativeHeading(X, Y):
-    """The 'relative heading of <heading> [from <heading>]' operator.
-    """
-    X = toHeading(X, '"relative heading of X from Y" with X not a heading')
-    Y = toHeading(Y, '"relative heading of X from Y" with Y not a heading')
-    return normalize_angle(X - Y)
-
-
-def ApparentHeading(X, Y):
-    """The 'apparent heading of <oriented point> [from <vector>]' operator."""
-    if not isinstance(X, OrientedPoint):
-        raise RuntimeParseError('"apparent heading of X from Y" with X not an OrientedPoint')
-    Y = toVector(Y, '"relative heading of X from Y" with Y not a vector')
-    return apparentHeadingAtPoint(X.position, X.heading, Y)
 
 
 def DistanceFrom(X, Y):
@@ -271,22 +178,6 @@ def DistanceFrom(X, Y):
     X = toVector(X, '"distance from X to Y" with X not a vector')
     Y = toVector(Y, '"distance from X to Y" with Y not a vector')
     return X.distanceTo(Y)
-
-
-def CanSee(X, Y):
-    """The 'X can see Y' polymorphic operator.
-
-    Allowed forms:
-        <point> can see <object>
-        <point> can see <vector>
-    """
-    if not isinstance(X, Point):
-        raise RuntimeParseError('"X can see Y" with X not a Point')
-    if isinstance(Y, Point):
-        return X.canSee(Y)
-    else:
-        Y = toVector(Y, '"X can see Y" with Y not a vector')
-        return X.visibleRegion.contains_point(Y)
 
 
 ### Specifiers
@@ -299,14 +190,6 @@ def With(prop, val):
     return Specifier(prop, val)
 
 
-def At(pos):
-    """The 'at <vector>' specifier.
-
-    Specifies 'position', with no dependencies."""
-    pos = toVector(pos, 'specifier "at X" with X not a vector')
-    return Specifier('position', pos)
-
-
 def At3D(pos):
     """
     Specifies the 3d position with no dependencies
@@ -314,17 +197,6 @@ def At3D(pos):
 
     pos = toType(pos, Vector3D)
     return Specifier('position', pos)
-
-
-def In(region):
-    """The 'in/on <region>' specifier.
-
-    Specifies 'position', with no dependencies. Optionally specifies 'heading'
-    if the given Region has a preferred orientation.
-    """
-    region = toType(region, Region, 'specifier "in/on R" with R not a Region')
-    extras = {'heading'} if alwaysProvidesOrientation(region) else {}
-    return Specifier('position', PointInRegionDistribution(region), optionals=extras)
 
 
 def In3D(region):
@@ -342,26 +214,6 @@ def alwaysProvidesOrientation(region):
         return False
 
 
-def Beyond(pos, offset, fromPt):
-    """The 'beyond X by Y [from Z]' polymorphic specifier.
-
-    Specifies 'position', with no dependencies.
-
-    Allowed forms:
-        beyond <vector> by <number> [from <vector>]
-        beyond <vector> by <vector> [from <vector>]
-    """
-    pos = toVector(pos, 'specifier "beyond X by Y" with X not a vector')
-    dType = underlyingType(offset)
-    if dType is float or dType is int:
-        offset = Vector(0, offset)
-    elif dType is not Vector:
-        raise RuntimeParseError('specifier "beyond X by Y" with Y not a number or vector')
-    fromPt = toVector(fromPt, 'specifier "beyond X by Y from Z" with Z not a vector')
-    lineOfSight = fromPt.angleTo(pos)
-    return Specifier('position', pos.offsetRotated(lineOfSight, offset))
-
-
 def Beyond3D(pos, offset, from_pt):
     pos = toType(pos, Vector3D)
     d_type = underlyingType(offset)
@@ -374,50 +226,10 @@ def Beyond3D(pos, offset, from_pt):
     return Specifier('position', new_pos)
 
 
-def VisibleFrom(base):
-    """The 'visible from <Point>' specifier.
-
-    Specifies 'position', with no dependencies.
-
-    This uses the given object's 'visibleRegion' property, and so correctly
-    handles the view regions of Points, OrientedPoints, and Objects.
-    """
-    if not isinstance(base, Point):
-        raise RuntimeParseError('specifier "visible from O" with O not a Point')
-    return Specifier('position', PointInRegionDistribution(base.visibleRegion))
-
-
 def OffsetBy3D(offset):
     offset = toType(offset, Vector3D)
     pos = RelativeTo3D(offset, ego()).to_vector_3d()
     return Specifier('position', pos)
-
-
-def OffsetAlongSpec(direction, offset):
-    """The 'offset along X by Y' polymorphic specifier.
-
-    Specifies 'position', with no dependencies.
-
-    Allowed forms:
-        offset along <heading> by <vector>
-        offset along <field> by <vector>
-    """
-    return Specifier('position', OffsetAlong(ego(), direction, offset))
-
-
-def Facing(heading):
-    """The 'facing X' polymorphic specifier.
-
-    Specifies 'heading', with dependencies depending on the form:
-        facing <number> -- no dependencies;
-        facing <field> -- depends on 'position'.
-    """
-    if isinstance(heading, VectorField):
-        return Specifier('heading', DelayedArgument({'position'},
-                                                    lambda self: heading[self.position]))
-    else:
-        heading = toHeading(heading, 'specifier "facing X" with X not a heading or vector field')
-        return Specifier('heading', heading)
 
 
 def Facing3D(direction: Vector3D) -> Specifier:
@@ -425,67 +237,12 @@ def Facing3D(direction: Vector3D) -> Specifier:
     return Specifier('orientation', orientation)
 
 
-def FacingToward(pos):
-    """The 'facing toward <vector>' specifier.
-
-    Specifies 'heading', depending on 'position'.
-    """
-    pos = toVector(pos, 'specifier "facing toward X" with X not a vector')
-    return Specifier('heading', DelayedArgument({'position'},
-                                                lambda self: self.position.angleTo(pos)))
-
-
 def FacingToward3D(pos):
     pos = toType(pos, Vector3D)
     return Specifier('orientation', DelayedArgument({'position'}, lambda s: rotation_to_euler(Vector3D(0, 1, 0), Vector3D(pos[0], pos[1], s.position[2]) - s.position)))
 
 
-def ApparentlyFacing(heading, fromPt):
-    """The 'apparently facing <heading> [from <vector>]' specifier.
-
-    Specifies 'heading', depending on 'position'.
-    """
-    heading = toHeading(heading, 'specifier "apparently facing X" with X not a heading')
-    fromPt = toVector(fromPt, 'specifier "apparently facing X from Y" with Y not a vector')
-    value = lambda self: fromPt.angleTo(self.position) + heading
-    return Specifier('heading', DelayedArgument({'position'}, value))
-
-
-def LeftSpec(pos, dist=0):
-    return left_spec_helper('left of', pos, dist, 'width', lambda dist: (dist, 0),
-                            lambda self, dx, dy: Vector(-self.width / 2 - dx, dy))
-
-
-def RightSpec(pos, dist=0):
-    return left_spec_helper('right of', pos, dist, 'width', lambda dist: (dist, 0),
-                            lambda self, dx, dy: Vector(self.width / 2 + dx, dy))
-
-
-def Ahead(pos, dist=0):
-    return left_spec_helper('ahead of', pos, dist, 'height', lambda dist: (0, dist),
-                            lambda self, dx, dy: Vector(dx, self.height / 2.0 + dy))
-
-
-def Behind(pos, dist=0):
-    return left_spec_helper('behind', pos, dist, 'height', lambda dist: (0, dist),
-                            lambda self, dx, dy: Vector(dx, -self.height / 2.0 - dy))
-
-
 eps = 1e-9
-
-
-# def LeftSpec3D(pos, dist=eps) -> Specifier:
-#     return directional_spec_helper(syntax='left of',
-#                                    pos=pos,
-#                                    dist=dist,
-#                                    axis='width',
-#                                    to_components=lambda d: (d, 0, 0),
-#                                    make_offset=lambda self, dx, dy, dz: Vector3D(-self.width / 2.0 - dx, dy, dz))
-
-
-# def RightSpec3D(pos, dist=eps) -> Specifier:
-#     return directional_spec_helper('right of', pos, dist, 'width', lambda dist: (dist, 0, 0),
-#                                    lambda self, dx, dy, dz: Vector3D(self.width / 2.0 + dx, dy, dz))
 
 
 def Ahead3D(pos, dist=eps) -> Specifier:
@@ -622,29 +379,6 @@ def top_surface_region(obj_to_place: Object, ref_obj: Object, dist: float, stric
         # assert ref_obj.width > obj_to_place.width and ref_obj.length > obj_to_place.length
         return Rectangle3DRegion(ref_obj.width - obj_to_place.width, ref_obj.length - obj_to_place.length, region_pos, ref_obj.orientation)
     return Rectangle3DRegion(ref_obj.width, ref_obj.length, region_pos, ref_obj.orientation)
-
-
-def left_spec_helper(syntax, pos, dist, axis, to_components, make_offset):
-    raise NotImplementedError
-
-
-def Following(field, dist, fromPt):
-    """The 'following F [from X] for D' specifier.
-
-    Specifies 'position', and optionally 'heading', with no dependencies.
-
-    Allowed forms:
-        following <field> [from <vector>] for <number>
-    """
-    dist, fromPt = fromPt, dist
-    if not isinstance(field, VectorField):
-        raise RuntimeParseError('"following F" specifier with F not a vector field')
-    fromPt = toVector(fromPt, '"following F from X for D" with X not a vector')
-    dist = toScalar(dist, '"following F for D" with D not a number')
-    pos = field.followFrom(fromPt, dist)
-    heading = field[pos]
-    val = OrientedPoint(position=pos, heading=heading)
-    return Specifier('position', val, optionals={'heading'})
 
 
 def Following3D(field: VectorField3D, dist: float, from_pt):
