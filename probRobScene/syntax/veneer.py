@@ -5,46 +5,6 @@ defining the built-in functions, operators, specifiers, etc., it also stores
 global state such as the list of all created Scenic objects.
 """
 
-__all__ = (
-    # Primitive statements and functions
-    'require', 'resample', 'param', 'verbosePrint',
-    'sin', 'cos', 'hypot', 'max', 'min',
-    # Prefix operators
-    'Front', 'Back', 'Left', 'Right',
-    'FrontLeft', 'FrontRight', 'BackLeft', 'BackRight',
-    # Infix operators
-    'FieldAt', 'RelativeTo', 'OffsetAlong', 'RelativePosition',
-    'RelativeHeading', 'ApparentHeading',
-    'DistanceFrom', 'CanSee',
-    # Primitive types
-    'Vector', 'VectorField', 'PolygonalVectorField', 'Point3D', 'Vector3D',
-    'Region', 'PointSetRegion', 'CuboidRegion', 'SphericalRegion', 'Rectangle3DRegion',
-    'Mutator',
-    'Range', 'Options', 'Uniform', 'Discrete', 'Normal',
-    'VerifaiParameter', 'VerifaiRange', 'VerifaiDiscreteRange', 'VerifaiOptions',
-    # Constructible types
-    'Object', 'OrientedPoint3D',
-    # Specifiers
-    'With',
-    'At', 'In', 'Beyond', 'VisibleFrom', 'OffsetAlongSpec',
-    'Facing', 'FacingToward', 'ApparentlyFacing',
-    'LeftSpec', 'RightSpec', 'Ahead', 'Behind',
-    'Following',
-    # 3D Specifiers
-    'At3D', 'In3D', 'Beyond3D', 'OffsetBy3D',
-    'Facing3D', 'FacingToward3D',
-    'LeftRough', 'RightRough', 'Ahead3D', 'Behind3D', 'Above3D', 'Below3D',
-    'Following3D', 'OnTopOf', 'OnTopOfStrict', 'AheadRough',
-    # 3D Prefix Ops
-    'Top', 'Bottom', 'TopFront', 'TopBack',
-    # 3D Infix Operators
-    'RelativeTo3D',
-    # Constants
-    'everywhere', 'nowhere',
-    # Temporary stuff... # TODO remove
-    'PropertyDefault'
-)
-
 from typing import Union
 
 from probRobScene.core.distributions import Range, Options, Normal, distributionFunction

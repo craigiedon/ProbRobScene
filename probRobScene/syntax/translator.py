@@ -220,20 +220,11 @@ preamble = """\
 from probRobScene.syntax.veneer import *
 """
 
-## Get Python names of various elements
-## (for checking consistency between the translator and the veneer)
-
-api = set(veneer.__all__)
-
 ## Functions used internally
 
 rangeConstructor = 'Range'
 createDefault = 'PropertyDefault'
 internalFunctions = {rangeConstructor, createDefault}
-
-# sanity check: these functions actually exist
-for imp in internalFunctions:
-    assert imp in api, imp
 
 ## Statements implemented by functions
 
@@ -241,17 +232,10 @@ requireStatement = 'require'
 paramStatement = 'param'
 functionStatements = {requireStatement, paramStatement}
 
-# sanity check: implementations of statements actually exist
-for imp in functionStatements:
-    assert imp in api, imp
 
 ## Built-in functions
 
 builtinFunctions = {'resample', 'verbosePrint'}
-
-# sanity check: implementations of built-in functions actually exist
-for imp in builtinFunctions:
-    assert imp in api, imp
 
 ## Constructors and specifiers
 
@@ -287,11 +271,6 @@ orientedPoint3DSpecifiers = {
 objectSpecifiers = {
 }
 
-# sanity check: implementations of specifiers actually exist
-for imp in objectSpecifiers.values():
-    assert imp in api, imp
-for imp in point3dSpecifiers.values():
-    assert imp in api, imp
 
 builtinConstructors = {
     'Point3D': Constructor('Point3D', None, point3dSpecifiers),
@@ -300,12 +279,8 @@ builtinConstructors = {
 }
 functionStatements.update(builtinConstructors)
 
-# sanity check: built-in constructors actually exist
-for const in builtinConstructors:
-    assert const in api, const
 
 # Prefix operators
-
 prefixOperators = {
     ('relative', 'position'): 'RelativePosition',
     ('relative', 'heading'): 'RelativeHeading',
@@ -328,10 +303,6 @@ prefixOperators = {
 assert all(1 <= len(op) <= 2 for op in prefixOperators)
 prefixIncipits = {op[0] for op in prefixOperators}
 assert not any(op in functionStatements for op in prefixIncipits)
-
-# sanity check: implementations of prefix operators actually exist
-for imp in prefixOperators.values():
-    assert imp in api, imp
 
 ## Infix operators
 
@@ -374,7 +345,6 @@ for op in infixOperators:
     # if necessary, set up map from Python to Scenic semantics
     imp = op.implementation
     if imp is not None:
-        assert imp in api, op
         node = op.node
         if node in infixImplementations:  # two operators may have the same implementation
             oldArity, oldName = infixImplementations[node]
@@ -538,14 +508,8 @@ def find_constructors_in(namespace):
     """Find all constructors (Scenic classes) defined in a namespace."""
     constructors = []
     for name, value in namespace.items():
-        if inspect.isclass(value) and issubclass(value, Constructible):
-            if name in builtinConstructors:
-                continue
-            parent = None
-            for base in value.__bases__:
-                if issubclass(base, Constructible):
-                    assert parent is None
-                    parent = base
+        if inspect.isclass(value) and issubclass(value, Constructible) and value != Constructible and name not in builtinConstructors:
+            parent = next(x for x in value.__bases__ if issubclass(x, Constructible))
             constructors.append(Constructor(name, parent.__name__, {}))
     return constructors
 
