@@ -23,7 +23,7 @@ class Scene:
         fig = plt.figure()
         ax = fig.add_subplot(111, projection='3d')
 
-        print("Num objects:", len(self.objects))
+        # print("Num objects:", len(self.objects))
         for obj in self.objects:
             obj.show_3d(ax)
 

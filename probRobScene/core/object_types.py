@@ -243,8 +243,6 @@ class Object(Point3D, Oriented):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        import probRobScene.syntax.veneer as veneer  # TODO improve?
-        veneer.registerObject(self)
 
         self.hw = hw = self.width / 2
         self.hh = hh = self.height / 2

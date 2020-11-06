@@ -38,89 +38,37 @@ from probRobScene.core.external_params import ExternalParameter
 ### Internals
 
 class VeneerState:
-    activity = 0
-    evaluatingRequirement = False
-    allObjects = []  # ordered for reproducibility
     globalParameters = {}
-    externalParameters = []  # ordered for reproducibility
     pendingRequirements = {}
-    inheritedReqs = []  # TODO improve handling of these?
 
-    def isActive(self):
-        """Are we in the middle of compiling a Scenic module?
 
-        The 'activity' global can be >1 when Scenic modules in turn import other
-        Scenic modules."""
-        return self.activity > 0
+v_state = VeneerState()
 
-    def activate(self):
-        """Activate the veneer when beginning to compile a Scenic module."""
-        self.activity += 1
-        assert not self.evaluatingRequirement
 
-    def deactivate(self):
-        """Deactivate the veneer after compiling a Scenic module."""
-        self.activity -= 1
-        assert self.activity >= 0
-        assert not self.evaluatingRequirement
-        self.allObjects = []
-        self.globalParameters = {}
-        self.externalParameters = []
-        self.pendingRequirements = {}
-        self.inheritedReqs = []
+def require(reqID, req, line, prob=1):
+    """Function implementing the require statement."""
+    # the translator wrapped the requirement in a lambda to prevent evaluation,
+    # so we need to save the current values of all referenced names; throw in
 
-    def registerObject(self, obj):
-        """Add a Scenic object to the global list of created objects.
+    v_state.pendingRequirements[reqID] = (req, getAllGlobals(req), line, prob)
 
-        This is called by the Object constructor."""
-        if self.activity > 0:
-            assert not self.evaluatingRequirement
-            assert isinstance(obj, Constructible)
-            self.allObjects.append(obj)
-        elif self.evaluatingRequirement:
-            raise RuntimeParseError('tried to create an object inside a requirement')
 
-    def registerExternalParameter(self, value):
-        """Register a parameter whose value is given by an external sampler."""
-        if self.activity > 0:
-            assert isinstance(value, ExternalParameter)
-            self.externalParameters.append(value)
-
-    def require(self, reqID, req, line, prob=1):
-        """Function implementing the require statement."""
-        if self.evaluatingRequirement:
-            raise RuntimeParseError('tried to create a requirement inside a requirement')
-        # the translator wrapped the requirement in a lambda to prevent evaluation,
-        # so we need to save the current values of all referenced names; throw in
-        # the ego object too since it can be referred to implicitly
-        assert reqID not in self.pendingRequirements
-        self.pendingRequirements[reqID] = (req, getAllGlobals(req), line, prob)
-
-    def verbosePrint(self, msg, verbosity):
-        """Built-in function printing a message when the verbosity is >0."""
-        if verbosity >= 1:
-            indent = '  ' * self.activity if verbosity >= 2 else '  '
-            print(indent + msg)
-
-    def param(self, *quotedParams, **params):
-        """Function implementing the param statement."""
-        if self.evaluatingRequirement:
-            raise RuntimeParseError('tried to create a global parameter inside a requirement')
-        for name, value in params.items():
-            self.globalParameters[name] = to_distribution(value)
-        assert len(quotedParams) % 2 == 0, quotedParams
-        it = iter(quotedParams)
-        for name, value in zip(it, it):
-            self.globalParameters[name] = to_distribution(value)
+def param(*quotedParams, **params):
+    """Function implementing the param statement."""
+    for name, value in params.items():
+        v_state.globalParameters[name] = to_distribution(value)
+    it = iter(quotedParams)
+    for name, value in zip(it, it):
+        v_state.globalParameters[name] = to_distribution(value)
 
 
 ### Primitive statements and functions
 
 
-def getAllGlobals(req, restrictTo=None):
+def getAllGlobals(req, restrict_to=None):
     """Find all names the given lambda depends on, along with their current bindings."""
     namespace = req.__globals__
-    if restrictTo is not None and restrictTo is not namespace:
+    if restrict_to is not None and restrict_to is not namespace:
         return {}
     externals = inspect.getclosurevars(req)
     assert not externals.nonlocals  # TODO handle these
@@ -128,7 +76,7 @@ def getAllGlobals(req, restrictTo=None):
     for name, value in externals.globals.items():
         globs[name] = value
         if inspect.isfunction(value):
-            subglobs = getAllGlobals(value, restrictTo=namespace)
+            subglobs = getAllGlobals(value, restrict_to=namespace)
             for n, v in subglobs.items():
                 if n in globs:
                     assert v is globs[n]
