@@ -39,7 +39,14 @@ A stacked plate on a rotating sushi conveyor belt must be picked up and placed o
 
 ## Setup / Running
 
-First, make sure you have the latest version of [Coppellia-Sim](https://www.coppeliarobotics.com/) installed.
+To sample from a raw scenario and just visualize the samples in matplotlib, run
+
+```
+python runScenarioRaw <scenarios/scenario-file> <max_generations>
+```
+
+
+To run an example in simulation: First, make sure you have the latest version of [Coppellia-Sim](https://www.coppeliarobotics.com/) installed.
 
 Next, install [PyRep](https://github.com/stepjam/PyRep), either by [following the instructions on their repository](https://github.com/stepjam/PyRep), or with:
 
@@ -47,13 +54,8 @@ Next, install [PyRep](https://github.com/stepjam/PyRep), either by [following th
 pip install pyrep
 ```
 
-To sample from a raw scenario and just visualize the samples in matplotlib, run
 
-```
-python runScenarioRaw <scenarios/scenario-file> <max_generations>
-```
-
-To run a scenario in coppeliaSim, along with example robot controller from the paper, try:
+To run a scenario in CoppeliaSim, along with example robot controller from the paper, try:
 
 ```
 python coppeliaTest.py
