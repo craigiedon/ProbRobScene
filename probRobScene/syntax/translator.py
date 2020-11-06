@@ -44,28 +44,31 @@ from tokenize import LEFTSHIFT, RIGHTSHIFT, VBAR, AMPER, TILDE, CIRCUMFLEX, STAR
 from tokenize import LEFTSHIFTEQUAL, RIGHTSHIFTEQUAL, VBAREQUAL, AMPEREQUAL, CIRCUMFLEXEQUAL
 from tokenize import LPAR, RPAR, LSQB, RSQB, COMMA, DOUBLESLASH, DOUBLESLASHEQUAL
 from tokenize import NAME, NL, NEWLINE, ENDMARKER, NUMBER, COLON, COMMENT, ENCODING
+from typing import List
 
 import probRobScene.core.pruning as pruning
 import probRobScene.syntax.veneer as veneer
-from probRobScene.core.distributions import Samplable, needs_sampling
+from probRobScene.core.distributions import needs_sampling
+from probRobScene.core.external_params import ExternalParameter
 from probRobScene.core.lazy_eval import needs_lazy_evaluation
 from probRobScene.core.object_types import Constructible
 from probRobScene.core.regions import Region
 from probRobScene.core.scenarios import Scenario
 from probRobScene.core.utils import ParseError, RuntimeParseError, InvalidScenarioError
 
-
 ### THE TOP LEVEL: compiling a Scenic program
+from probRobScene.syntax.veneer import VeneerState
 
-def scenarioFromString(string, filename='<string>', cacheImports=False):
+
+def scenario_from_string(string, filename='<string>', cacheImports=False):
     """Compile a string of Scenic code into a `Scenario`.
 
     The optional **filename** is used for error messages."""
     stream = io.BytesIO(string.encode())
-    return scenarioFromStream(stream, filename=filename, cache_imports=cacheImports)
+    return scenario_from_stream(stream, filename=filename, cache_imports=cacheImports)
 
 
-def scenarioFromFile(path, cache_imports=False):
+def scenario_from_file(path, cache_imports=False):
     """Compile a Scenic file into a `Scenario`.
 
     Args:
@@ -90,16 +93,16 @@ def scenarioFromFile(path, cache_imports=False):
         raise RuntimeError(err)
 
     with open(path, 'rb') as stream:
-        return scenarioFromStream(stream, filename=fullpath, path=path, cache_imports=cache_imports)
+        return scenario_from_stream(stream, filename=fullpath, path=path, cache_imports=cache_imports)
 
 
-def scenarioFromStream(stream, filename='<stream>', path=None, cache_imports=False):
+def scenario_from_stream(stream, filename='<stream>', path=None, cache_imports=False):
     """Compile a stream of Scenic code into a `Scenario`."""
     # Compile the code as if it were a top-level module
     old_modules = list(sys.modules.keys())
     try:
         with topLevelNamespace(path) as namespace:
-            compileStream(stream, namespace, filename=filename)
+            compile_stream(stream, namespace, filename=filename)
     finally:
         if not cache_imports:
             to_remove = []
@@ -132,7 +135,7 @@ def topLevelNamespace(path=None):
         del sys.path[0]
 
 
-def compileStream(stream, namespace, filename='<stream>', verbosity=0):
+def compile_stream(stream, namespace, filename='<stream>', verbosity=0):
     """Compile a stream of Scenic code and execute it in a namespace.
 
     The compilation procedure consists of the following main steps:
@@ -149,9 +152,7 @@ def compileStream(stream, namespace, filename='<stream>', verbosity=0):
         7. After executing all blocks, extract the global state (e.g. objects).
            This is done by the `storeScenarioStateIn` function.
     """
-    if verbosity >= 2:
-        veneer.verbosePrint(f'  Compiling Scenic module from {filename}...', verbosity)
-        start_time = time.time()
+
     # Tokenize input stream
     try:
         tokens = list(tokenize.tokenize(stream.readline))
@@ -161,47 +162,44 @@ def compileStream(stream, namespace, filename='<stream>', verbosity=0):
     # Partition into blocks with all imports at the end (since imports could
     # pull in new constructor (Scenic class) definitions, which change the way
     # subsequent tokens are transformed)
-    blocks = partitionByImports(tokens)
-    veneer.activate()
-    newSourceBlocks = []
-    try:
-        # Execute preamble
-        exec(compile(preamble, '<veneer>', 'exec'), namespace)
-        # Execute each block
-        for blockNum, block in enumerate(blocks):
-            # Find all custom constructors defined so far (possibly imported)
-            constructors = find_constructors_in(namespace)
-            # Translate tokens to valid Python syntax
-            startLine = max(1, block[0][2][0])
-            translator = TokenTranslator(constructors)
-            newSource, allConstructors = translator.translate(block)
-            trimmed = newSource[2 * (startLine - 1):]  # remove blank lines used to align errors
-            newSourceBlocks.append(trimmed)
-            if dumpTranslatedPython:
-                print(f'### Begin translated Python from block {blockNum} of {filename}')
-                print(newSource)
-                print('### End translated Python')
-            # Parse the translated source
-            tree = parseTranslatedSource(newSource, filename)
-            # Modify the parse tree to produce the correct semantics
-            newTree, requirements = translateParseTree(tree, allConstructors)
-            if dumpFinalAST:
-                print(f'### Begin final AST from block {blockNum} of {filename}')
-                print(ast.dump(newTree, include_attributes=True))
-                print('### End final AST')
-            # Compile the modified tree
-            code = compileTranslatedTree(newTree, filename)
-            # Execute it
-            execute_python_function(lambda: exec(code, namespace), filename)
-        # Extract scenario state from veneer and store it
-        storeScenarioStateIn(namespace, requirements, filename)
-    finally:
-        veneer.deactivate()
-    if verbosity >= 2:
-        totalTime = time.time() - start_time
-        veneer.verbosePrint(f'  Compiled Scenic module in {totalTime:.4g} seconds.', verbosity)
-    allNewSource = ''.join(newSourceBlocks)
-    return code, allNewSource
+    blocks = partition_by_imports(tokens)
+    new_source_blocks = []
+
+    exec(compile(preamble, '<veneer>', 'exec'), namespace)
+
+    # Execute each block
+    for blockNum, block in enumerate(blocks):
+        # Find all custom constructors defined so far (possibly imported)
+        constructors = find_constructors_in(namespace)
+        # Translate tokens to valid Python syntax
+        start_line = max(1, block[0][2][0])
+        translator = TokenTranslator(constructors)
+        new_source, all_constructors = translator.translate(block)
+        trimmed = new_source[2 * (start_line - 1):]  # remove blank lines used to align errors
+        new_source_blocks.append(trimmed)
+        if dumpTranslatedPython:
+            print(f'### Begin translated Python from block {blockNum} of {filename}')
+            print(new_source)
+            print('### End translated Python')
+        # Parse the translated source
+        tree = parseTranslatedSource(new_source, filename)
+        # Modify the parse tree to produce the correct semantics
+        new_tree, requirements = translateParseTree(tree, all_constructors)
+        if dumpFinalAST:
+            print(f'### Begin final AST from block {blockNum} of {filename}')
+            print(ast.dump(new_tree, include_attributes=True))
+            print('### End final AST')
+        # Compile the modified tree
+        code = compileTranslatedTree(new_tree, filename)
+        # Execute it
+        execute_python_function(lambda: exec(code, namespace), filename)
+    # Extract scenario state from veneer and store it
+    c_objs = find_constructibles(namespace)
+    externs = find_external_params(namespace)
+    store_scenario_state_in(namespace, requirements, filename, veneer.v_state, c_objs, externs)
+
+    all_new_source = ''.join(new_source_blocks)
+    return code, all_new_source
 
 
 ### TRANSLATION PHASE ZERO: definitions of language elements not already in Python
@@ -220,20 +218,11 @@ preamble = """\
 from probRobScene.syntax.veneer import *
 """
 
-## Get Python names of various elements
-## (for checking consistency between the translator and the veneer)
-
-api = set(veneer.__all__)
-
 ## Functions used internally
 
 rangeConstructor = 'Range'
 createDefault = 'PropertyDefault'
 internalFunctions = {rangeConstructor, createDefault}
-
-# sanity check: these functions actually exist
-for imp in internalFunctions:
-    assert imp in api, imp
 
 ## Statements implemented by functions
 
@@ -241,17 +230,9 @@ requireStatement = 'require'
 paramStatement = 'param'
 functionStatements = {requireStatement, paramStatement}
 
-# sanity check: implementations of statements actually exist
-for imp in functionStatements:
-    assert imp in api, imp
-
 ## Built-in functions
 
 builtinFunctions = {'resample', 'verbosePrint'}
-
-# sanity check: implementations of built-in functions actually exist
-for imp in builtinFunctions:
-    assert imp in api, imp
 
 ## Constructors and specifiers
 
@@ -283,15 +264,8 @@ orientedPoint3DSpecifiers = {
 
 }
 
-
 objectSpecifiers = {
 }
-
-# sanity check: implementations of specifiers actually exist
-for imp in objectSpecifiers.values():
-    assert imp in api, imp
-for imp in point3dSpecifiers.values():
-    assert imp in api, imp
 
 builtinConstructors = {
     'Point3D': Constructor('Point3D', None, point3dSpecifiers),
@@ -300,12 +274,7 @@ builtinConstructors = {
 }
 functionStatements.update(builtinConstructors)
 
-# sanity check: built-in constructors actually exist
-for const in builtinConstructors:
-    assert const in api, const
-
 # Prefix operators
-
 prefixOperators = {
     ('relative', 'position'): 'RelativePosition',
     ('relative', 'heading'): 'RelativeHeading',
@@ -328,10 +297,6 @@ prefixOperators = {
 assert all(1 <= len(op) <= 2 for op in prefixOperators)
 prefixIncipits = {op[0] for op in prefixOperators}
 assert not any(op in functionStatements for op in prefixIncipits)
-
-# sanity check: implementations of prefix operators actually exist
-for imp in prefixOperators.values():
-    assert imp in api, imp
 
 ## Infix operators
 
@@ -374,7 +339,6 @@ for op in infixOperators:
     # if necessary, set up map from Python to Scenic semantics
     imp = op.implementation
     if imp is not None:
-        assert imp in api, op
         node = op.node
         if node in infixImplementations:  # two operators may have the same implementation
             oldArity, oldName = infixImplementations[node]
@@ -448,7 +412,7 @@ class ScenicLoader(importlib.abc.InspectLoader):
         with open(self.filepath, 'r') as stream:
             source = stream.read()
         with open(self.filepath, 'rb') as stream:
-            code, pythonSource = compileStream(stream, module.__dict__, filename=self.filepath)
+            code, pythonSource = compile_stream(stream, module.__dict__, filename=self.filepath)
         # Mark as a Scenic module
         module._isScenicModule = True
         # Save code, source, and translated source for later inspection
@@ -473,64 +437,50 @@ class ScenicLoader(importlib.abc.InspectLoader):
 # register the meta path finder
 sys.meta_path.insert(0, ScenicMetaFinder())
 
-
 ## Post-import hook to inherit objects, etc. from imported Scenic modules
 
-def hooked_import(*args, **kwargs):
-    """Version of __import__ hooked by Scenic to capture Scenic modules."""
-    module = original_import(*args, **kwargs)
-    if getattr(module, '_isScenicModule', False):
-        if veneer.isActive():
-            veneer.allObjects.extend(module._objects)
-            veneer.globalParameters.update(module._params)
-            veneer.externalParameters.extend(module._externalParams)
-            veneer.inheritedReqs.extend(module._requirements)
-    return module
-
-
 original_import = builtins.__import__
-builtins.__import__ = hooked_import
 
 
 ## Miscellaneous utilities
 
-def partitionByImports(tokens):
+def partition_by_imports(tokens):
     """Partition the tokens into blocks ending with import statements."""
     blocks = []
-    currentBlock = []
-    duringImport = False
-    haveImported = False
-    finishLine = False
-    parenLevel = 0
+    current_block = []
+    during_import = False
+    have_imported = False
+    finish_line = False
+    paren_level = 0
     for token in tokens:
         startNewBlock = False
         if token.exact_type == LPAR:
-            parenLevel += 1
+            paren_level += 1
         elif token.exact_type == RPAR:
-            parenLevel -= 1
-        if finishLine:
-            if token.type in (NEWLINE, NL) and parenLevel == 0:
-                finishLine = False
-                if duringImport:
-                    duringImport = False
-                    haveImported = True
+            paren_level -= 1
+        if finish_line:
+            if token.type in (NEWLINE, NL) and paren_level == 0:
+                finish_line = False
+                if during_import:
+                    during_import = False
+                    have_imported = True
         else:
-            assert not duringImport
-            finishLine = True
+            assert not during_import
+            finish_line = True
             if token.type == NAME and token.string == 'import' or token.string == 'from':
-                duringImport = True
+                during_import = True
             elif token.type in (NEWLINE, NL, COMMENT, ENCODING):
-                finishLine = False
-            elif haveImported:
+                finish_line = False
+            elif have_imported:
                 # could use new constructors; needs to be in a new block
                 startNewBlock = True
         if startNewBlock:
-            blocks.append(currentBlock)
-            currentBlock = [token]
-            haveImported = False
+            blocks.append(current_block)
+            current_block = [token]
+            have_imported = False
         else:
-            currentBlock.append(token)
-    blocks.append(currentBlock)  # add last block
+            current_block.append(token)
+    blocks.append(current_block)  # add last block
     return blocks
 
 
@@ -538,16 +488,18 @@ def find_constructors_in(namespace):
     """Find all constructors (Scenic classes) defined in a namespace."""
     constructors = []
     for name, value in namespace.items():
-        if inspect.isclass(value) and issubclass(value, Constructible):
-            if name in builtinConstructors:
-                continue
-            parent = None
-            for base in value.__bases__:
-                if issubclass(base, Constructible):
-                    assert parent is None
-                    parent = base
+        if inspect.isclass(value) and issubclass(value, Constructible) and value != Constructible and name not in builtinConstructors:
+            parent = next(x for x in value.__bases__ if issubclass(x, Constructible))
             constructors.append(Constructor(name, parent.__name__, {}))
     return constructors
+
+
+def find_constructibles(namespace) -> List[Constructible]:
+    return [v for n, v in namespace.items() if isinstance(v, Constructible)]
+
+
+def find_external_params(namespace) -> List[ExternalParameter]:
+    return [v for n, v in namespace.items() if isinstance(v, ExternalParameter)]
 
 
 ### TRANSLATION PHASE TWO: translation at the level of tokens
@@ -922,7 +874,6 @@ def parseTranslatedSource(source, filename):
 ### TRANSLATION PHASE FOUR: modifying the parse tree
 
 
-
 class AttributeFinder(NodeVisitor):
     """Utility class for finding all referenced attributes of a given name."""
 
@@ -1190,27 +1141,28 @@ def execute_python_function(func, filename):
 
 ### TRANSLATION PHASE SEVEN: scenario construction
 
-def storeScenarioStateIn(namespace, requirementSyntax, filename):
+def store_scenario_state_in(namespace, requirement_syntax, filename, v_state: VeneerState, c_objs: List[Constructible], external_params: List[ExternalParameter]):
     """Post-process an executed Scenic module, extracting state from the veneer."""
     # Extract created Objects
-    namespace['_objects'] = tuple(veneer.allObjects)
+    # namespace['_objects'] = tuple(v_state.allObjects)
+    namespace['_objects'] = c_objs
 
     # Extract global parameters
-    namespace['_params'] = veneer.globalParameters
-    for name, value in veneer.globalParameters.items():
+    namespace['_params'] = v_state.globalParameters
+    for name, value in v_state.globalParameters.items():
         if needs_lazy_evaluation(value):
             raise InvalidScenarioError(f'parameter {name} uses value {value}'
                                        ' undefined outside of object definition')
 
     # Extract external parameters
-    namespace['_externalParams'] = tuple(veneer.externalParameters)
+    namespace['_externalParams'] = external_params
 
     # Extract requirements, scan for relations used for pruning, and create closures
-    requirements = veneer.pendingRequirements
-    finalReqs = veneer.inheritedReqs
-    requirementDeps = set()  # things needing to be sampled to evaluate the requirements
-    namespace['_requirements'] = finalReqs
-    namespace['_requirementDeps'] = requirementDeps
+    requirements = v_state.pendingRequirements
+    final_reqs = []
+    requirement_deps = set()  # things needing to be sampled to evaluate the requirements
+    namespace['_requirements'] = final_reqs
+    namespace['_requirementDeps'] = requirement_deps
 
     def makeClosure(req, bindings, line):
         """Create a closure testing the requirement in the correct runtime state."""
@@ -1230,25 +1182,25 @@ def storeScenarioStateIn(namespace, requirementSyntax, filename):
                     namespace[name] = values[value]
             # evaluate requirement condition, reporting errors on the correct line
             try:
-                veneer.evaluatingRequirement = True
+                v_state.evaluatingRequirement = True
                 result = execute_python_function(evaluator, filename)
             finally:
-                veneer.evaluatingRequirement = False
+                v_state.evaluatingRequirement = False
             return result
 
         return closure
 
     for reqID, (req, bindings, line, prob) in requirements.items():
-        reqNode = requirementSyntax[reqID]
+        reqNode = requirement_syntax[reqID]
         # Gather dependencies of the requirement
         for value in bindings.values():
             if needs_sampling(value):
-                requirementDeps.add(value)
+                requirement_deps.add(value)
             if needs_lazy_evaluation(value):
                 raise InvalidScenarioError(f'requirement on line {line} uses value {value}'
                                            ' undefined outside of object definition')
         # Construct closure
-        finalReqs.append((makeClosure(req, bindings, line), prob))
+        final_reqs.append((makeClosure(req, bindings, line), prob))
 
 
 def constructScenarioFrom(namespace, verbosity=0):

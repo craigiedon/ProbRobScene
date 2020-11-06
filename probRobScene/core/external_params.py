@@ -144,8 +144,6 @@ class ExternalParameter(Distribution):
     def __init__(self):
         super().__init__()
         self.sampler = None
-        import probRobScene.syntax.veneer as veneer  # TODO improve?
-        veneer.registerExternalParameter(self)
 
     def sample_given_dependencies(self, dep_values):
         """Specialization of  `Samplable.sampleGiven` for external parameters.
@@ -159,6 +157,9 @@ class ExternalParameter(Distribution):
 
 class VerifaiParameter(ExternalParameter):
     """An external parameter sampled using one of VerifAI's samplers."""
+
+    def evaluateInner(self, context):
+        raise NotImplementedError
 
     def __init__(self, domain):
         super().__init__()

@@ -10,7 +10,7 @@ from wrappers.prbCoppeliaWrapper import cop_from_scenic
 
 pr = PyRep()
 
-scenario = probRobScene.scenarioFromFile("scenarios/tableCube.scenic")
+scenario = probRobScene.scenario_from_file("scenarios/tableCube.scenic")
 
 max_sims = 1
 sim_result = []
