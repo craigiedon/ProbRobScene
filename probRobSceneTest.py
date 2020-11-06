@@ -13,3 +13,5 @@ for i in range(max_generations):
 #
 avg_rejections = np.average(rejections_per_scene)
 print(avg_rejections)
+
+print("Test change")
