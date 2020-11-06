@@ -3,12 +3,12 @@ import sys
 
 if __name__ == "__main__":
 
-    if sys.argv != 3:
+    if len(sys.argv) != 3:
         print("Usage: python runScenarioRaw.py <scenario-file> <max-generations>")
         sys.exit(0)
 
     scenario_file = sys.argv[1]
-    max_generations = sys.argv[2]
+    max_generations = int(sys.argv[2])
 
     scenario = probRobScene.scenario_from_file(scenario_file)
 
