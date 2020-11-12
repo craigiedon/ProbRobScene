@@ -6,12 +6,16 @@ Wrapper included for the [Coppelia-Sim](https://www.coppeliarobotics.com/) simul
 
 ## Setup / Running
 
+### Raw Visualization 
+
 To sample from a raw scenario and just visualize the samples in matplotlib, run
 
 ```
 python runScenarioRaw <scenarios/scenario-file> <max_generations>
 ```
 
+
+### CoppeliaSim Simulator
 
 To run an example in simulation: First, make sure you have the latest version of [Coppellia-Sim](https://www.coppeliarobotics.com/) installed.
 
