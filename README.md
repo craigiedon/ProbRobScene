@@ -48,11 +48,21 @@ python runScenarioRaw <scenarios/scenario-file> <max_generations>
 
 To run an example in simulation: First, make sure you have the latest version of [Coppellia-Sim](https://www.coppeliarobotics.com/) installed.
 
-Next, install [PyRep](https://github.com/stepjam/PyRep), either by [following the instructions on their repository](https://github.com/stepjam/PyRep), or with:
+Next, install [PyRep](https://github.com/stepjam/PyRep) by [following the instructions on their repository](https://github.com/stepjam/PyRep).
+
+NOTE: for some combinations of CoppeliaSim + PyRep, users have reported getting the error:
 
 ```
-pip install pyrep
+ImportError: libcoppeliaSim.so.1: cannot open shared object file: No such file or directory
 ```
+
+A workaround for this is to create a soft-link. Go to your Coppellia-Sim root and type:
+
+```
+ln -s libcoppeliaSim.so libcoppeliaSim.so.1
+```
+
+
 
 
 To run a scenario in CoppeliaSim, along with example robot controller from the paper, try:
