@@ -3,7 +3,7 @@
 Implementation of the ProbRobScene language, along with wrapper for
 [Coppelia-Sim](https://www.coppeliarobotics.com/) simulator.
 
-Example scenarios in scenarios/ folder are (TODO: in progress):
+Example scenarios in scenarios/ folder are __(TODO: IN PROGRESS)__:
  
 #### `tableCube`
 
