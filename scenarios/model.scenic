@@ -57,12 +57,18 @@ class Cup:
     model_name: "Cup"
     color: "blue"
 
-class HexPeg
+class HexPeg:
     width: 0.2226
     length: 0.2226
     height: 0.1186
     model_name: "HexPeg"
     color: "green"
+
+class Rope:
+    width: 0.01
+    length: 0.01
+    height: 0.02
+    model_name: "Rope"
 
 class HexGear:
     width: 0.14186
