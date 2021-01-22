@@ -28,6 +28,13 @@ class ToyCube:
     length: 0.25
     color: 'blue'
 
+class Cylinder:
+    width: 0.05
+    height: 0.05
+    length: 0.05
+    color: 'blue'
+    shape_type: 'CYLINDER'
+
 class Tray:
     width: 0.2364
     length: 0.4522

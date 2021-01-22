@@ -7,4 +7,8 @@ r = Robot on Vector3D(0, -0.3, 0)
 belt = ConveyorBelt on Vector3D(0, 1.0, 0)
 
 plate = Plate on belt
+cylinder_1 = Cylinder completely on plate
+cylinder_2 = Cylinder completely on plate
+cylinder_3 = Cylinder completely on plate
+
 camera = Camera at Vector3D(table.x + (-0.1, 0.1), table.y + (-0.1, 0.1), (1.9, 2.1)), facing Vector3D(0, 0, -1)
