@@ -64,24 +64,24 @@ class Cup:
     model_name: "Cup"
     color: "blue"
 
-class HexPeg:
+class HexagonalPegBase:
     width: 0.2226
     length: 0.2226
     height: 0.1186
-    model_name: "HexPeg"
+    model_name: "HexagonalPegBase"
     color: "green"
 
-class Rope:
+class RopeLink:
     width: 0.01
     length: 0.01
     height: 0.02
-    model_name: "Rope"
+    model_name: "RopeLink"
 
-class HexGear:
+class HexagonalGear:
     width: 0.14186
     length: 0.1638
     height: 0.017663
-    model_name: "HexGear"
+    model_name: "HexagonalGear"
     color: "green"
 
 class Bucket:
@@ -91,11 +91,11 @@ class Bucket:
     model_name: "Bucket"
     color: "brown"
 
-class ConveyorBelt:
+class CircularConveyorBelt:
     width: 1.7019
     length: 1.7003
     height: 0.125
-    model_name: "ConveyorBelt"
+    model_name: "CircularConveyorBelt"
     color: "white"
 
 class DiningChair:

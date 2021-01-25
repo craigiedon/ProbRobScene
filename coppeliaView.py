@@ -5,12 +5,17 @@ from pyrep.robots.end_effectors.panda_gripper import PandaGripper
 from pyrep.objects import Camera
 import numpy as np
 from wrappers import robotControl as rc
-
+import sys
 from wrappers.prbCoppeliaWrapper import cop_from_scenic
 
 pr = PyRep()
 
-scenario = probRobScene.scenario_from_file("scenarios/gearInsert.scenic")
+if len(sys.argv) != 2:
+    print("python3 copperliaView.py <path-to-scenario-file>")
+    sys.exit(0)
+
+scenario_file = sys.argv[1]
+scenario = probRobScene.scenario_from_file(scenario_file)
 
 max_sims = 1
 sim_result = []
@@ -32,9 +37,10 @@ for i in range(max_sims):
     pr.step()
 
     try:
-        for steps in range(100000):
+        for steps in range(10000):
             pr.step()
-            print('step: '+str(steps))
+            if steps%100 == 0:
+                print(f"step: {steps}")
     except:
         print('Yikes!')
         pr.shutdown()
