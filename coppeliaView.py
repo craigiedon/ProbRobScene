@@ -40,7 +40,7 @@ for i in range(max_sims):
         for steps in range(10000):
             pr.step()
             if steps%100 == 0:
-                print(f"step: {steps}")
+                print(f"Step: {steps}")
     except:
         print('Yikes!')
         pr.shutdown()
