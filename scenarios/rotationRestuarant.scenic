@@ -6,7 +6,7 @@ chair = DiningChair on Vector3D(1.15, -1.15, 0), facing Vector3D(1, 0, 0)
 r = Robot on Vector3D(0, -0.3, 0)
 belt = CircularConveyorBelt on Vector3D(0, 1.0, 0)
 
-plate = Plate at Vector3D(belt.x - 0.1, belt.y - 0.7, belt.z+0.081)
+plate = Plate on Vector3D(belt.x, belt.y - 0.75, belt.z+0.081)
 cylinder_1 = Cylinder completely on plate
 cylinder_2 = Cylinder completely on plate
 cylinder_3 = Cylinder completely on plate

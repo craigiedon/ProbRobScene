@@ -4,7 +4,11 @@ from pyrep.robots.end_effectors.panda_gripper import PandaGripper
 from pyrep.const import PrimitiveShape
 from pyrep.objects import Camera, Shape, VisionSensor
 import numpy as np
-from wrappers import setupFuncs as sf
+import sys
+from os.path import expanduser
+home = expanduser("~")
+sys.path.insert(1, home+'/ProbRobScene/wrappers')
+import setupFuncs as sf
 
 ### SETUP CODE ###
 
