@@ -90,7 +90,11 @@ class Bucket:
     height: 0.28436
     model_name: "Bucket"
     color: "brown"
-
+class RopeBucket:
+    width: 0.01
+    length: 0.01
+    num_rope_links: 7
+    model_name: "RopeBucket"
 class CircularConveyorBelt:
     width: 1.7019
     length: 1.7003

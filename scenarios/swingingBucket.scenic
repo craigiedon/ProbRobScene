@@ -9,6 +9,6 @@ cube_1 = Cube completely on tray
 cube_2 = Cube on cube_1
 cube_3 = Cube on cube_2
 
-bucket = Bucket on table
+bucket = RopeBucket on Vector3D(r.x, r.y+0.6, r.z - 0.3)
 
 camera = Camera at Vector3D(table.x + (-0.1, 0.1), table.y + (-0.1, 0.1), (1.9, 2.1)), facing Vector3D(0, 0, -1)
