@@ -3,7 +3,7 @@ import numpy as np
 
 scenario = probRobScene.scenario_from_file("scenarios/tableCube.scenic")
 
-max_generations = 1
+max_generations = 3
 rejections_per_scene = []
 for i in range(max_generations):
     print(f"Generation {i}")
