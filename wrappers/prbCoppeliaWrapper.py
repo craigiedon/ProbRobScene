@@ -7,8 +7,7 @@ from pyrep import PyRep
 from pyrep.const import PrimitiveShape
 from pyrep.objects import Shape, VisionSensor
 from probRobScene.core.scenarios import Scene
-from wrappers.setupFuncs import create_table
-
+from wrappers.setupFuncs import create_table, create_rope, attach_to_rope
 
 # class CoppeliaScene:
 #     def __init__(self, objs):
@@ -44,6 +43,12 @@ def cop_from_scenic(pr: PyRep, scene: Scene) -> Dict[str, list]:
             c_obj.set_position(adjusted_position)
             # c_obj.set_position(scenic_to_coppelia_pos(m.position, c_obj))
             c_obj.set_orientation(reversed(m.orientation))
+        elif m.model_name == "RopeBucket":
+            c_obj = create_rope(pr, m.num_rope_links)
+            c_obj.set_position(scenic_to_coppelia_pos(m.position, c_obj))
+            c_obj.set_orientation(reversed(m.orientation))
+            c_obj_two = pr.import_model('models/Bucket.ttm')
+            attach_to_rope(pr, c_obj, c_obj_two)
         else:
             c_obj = pr.import_model(f'models/{m.model_name}.ttm')
             c_obj.set_position(scenic_to_coppelia_pos(m.position, c_obj))

@@ -28,6 +28,12 @@ class ToyCube:
     length: 0.25
     color: 'blue'
 
+class Cylinder:
+    width: 0.05
+    height: 0.05
+    length: 0.05
+    color: 'blue'
+    shape_type: 'CYLINDER'
 
 class Tray:
     width: 0.2364
@@ -57,6 +63,58 @@ class Cup:
     height: 0.1233
     model_name: "Cup"
     color: "blue"
+
+class HexagonalPegBase:
+    width: 0.2226
+    length: 0.2226
+    height: 0.1186
+    model_name: "HexagonalPegBase"
+    color: "green"
+
+class RopeLink:
+    width: 0.01
+    length: 0.01
+    height: 0.02
+    model_name: "RopeLink"
+
+class HexagonalGear:
+    width: 0.14186
+    length: 0.1638
+    height: 0.017663
+    model_name: "HexagonalGear"
+    color: "green"
+
+class Bucket:
+    width: 0.23494
+    length: 0.23495
+    height: 0.28436
+    model_name: "Bucket"
+    color: "brown"
+class RopeBucket:
+    width: 0.01
+    length: 0.01
+    num_rope_links: 7
+    model_name: "RopeBucket"
+class CircularConveyorBelt:
+    width: 1.7019
+    length: 1.7003
+    height: 0.125
+    model_name: "CircularConveyorBelt"
+    color: "white"
+
+class DiningChair:
+    width: 0.40006
+    length: 0.45002
+    height: 0.90879
+    model_name: "DiningChair"
+    color: "brown"
+
+class Plate:
+    width: 0.40073
+    length: 0.40073
+    height: 0.036588
+    model_name: "Plate"
+    color: "white"
 
 class Robot:
     width: 0.14

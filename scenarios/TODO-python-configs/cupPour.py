@@ -3,8 +3,13 @@ from pyrep.robots.arms.panda import Panda
 from pyrep.robots.end_effectors.panda_gripper import PandaGripper
 from pyrep.objects import Camera, VisionSensor
 import numpy as np
-from wrappers.setupFuncs import setAonB, setAonPos, create_table
-from wrappers import robotControl as rc
+import sys
+from os.path import expanduser
+home = expanduser("~")
+sys.path.insert(1, home+'/ProbRobScene/wrappers')
+from setupFuncs import setAonB, setAonPos, create_table
+sys.path.insert(1, home+'/ProbRobScene/wrappers')
+import robotControl as rc
 
 ### SETUP CODE ###
 pr = PyRep()
