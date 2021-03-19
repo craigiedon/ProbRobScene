@@ -39,36 +39,32 @@ To run a scenario in CoppeliaSim, along with example robot controller from the p
 python coppeliaTest.py
 ```
 
-## Example scenarios __(TODO: IN PROGRESS)__:
+## Example scenarios:
  
-#### `scenarios/tableCube`
+---
+### `scenarios/tableCube`
 
-Dual arms mounted on desk with assorted cubes.
+<img align="right" alt="" src='pictures/dualArm.png' height=150px /> Dual arms mounted on desk with assorted cubes.
 
- <img src='pictures/dualArm.png' height=150px>
+---
+### `scenarios/cupPour` 
 
-#### `scenarios/cupPour` 
-
-Table of cups filled with liquid. Another table with bowl for transfer.
-
-<img src='pictures/cupPour.png' height=150px>
-
-#### `scenarios/gearInsert`
-
-A gear with hole in it, and a a peg to insert it on.
-
- <img src='pictures/gearInsert.png' height=150px>
+<img align="right" src='pictures/cupPour.png' height=150px /> Table of cups filled with liquid. Another table with bowl for transfer.
 
 
-#### `scenarios/swingingBucket`
+---
+### `scenarios/gearInsert`
 
+<img align="right" src='pictures/gearInsert.png' height=150px/> A gear with hole in it, and a a peg to insert it on.
+
+---
+### `scenarios/swingingBucket`
+
+<img align="right" src='pictures/swingingBucket.png' height=150px/>
 A table with stacked cubes which need to be put into a wobbly swinging basket.
 
-<img src='pictures/swingingBucket.png' height=150px>
+---
+### `scenarios/rotationRestuarant`
 
-
-#### `scenarios/rotationRestuarant`
-
+<img align="right" src='pictures/rotationRestaurant.png' height=150px/>
 A stacked plate on a rotating sushi conveyor belt must be picked up and placed on a dining table.
-
-<img src='pictures/rotationRestaurant.png' height=150px>
