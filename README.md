@@ -55,8 +55,7 @@ python coppeliaView.py scenarios/<exampleName>
 - `swingingBucket` --- A table with stacked cubes which need to be put into a wobbly swinging basket.
 - `rotationRestuarant` --- A stacked plate on a rotating sushi conveyor belt must be picked up and placed on a dining table.
 
-<img src='pictures/dualArm.png' height=135/>
-<img src='pictures/cupPour.png' height=135/>
+<img src='pictures/dualArm.png' height=135/> <img src='pictures/cupPour.png' height=135/>
 <img src='pictures/gearInsert.png'  height=135/>
 <img src='pictures/swingingBucket.png'  height=135/>
 <img src='pictures/rotationRestaurant.png' height=135/>
