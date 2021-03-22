@@ -14,7 +14,7 @@ from wrappers.setupFuncs import create_table, create_rope, attach_to_rope
 #         self.objects = objs
 
 
-def cop_from_scenic(pr: PyRep, scene: Scene) -> Dict[str, list]:
+def cop_from_prs(pr: PyRep, scene: Scene) -> Dict[str, list]:
     cop_obs = defaultdict(list)
     primitives = (p for p in scene.objects if hasattr(p, 'shape_type'))
     models = (m for m in scene.objects if hasattr(m, 'model_name'))
@@ -33,32 +33,32 @@ def cop_from_scenic(pr: PyRep, scene: Scene) -> Dict[str, list]:
             c_obj = VisionSensor.create([256, 256], position=m.position, orientation=[np.pi, 0.0, 0.0])
         elif m.model_name == "Table":
             c_obj = create_table(pr, m.width, m.length, m.height)
-            c_obj.set_position(scenic_to_coppelia_pos(m.position, c_obj))
+            c_obj.set_position(prs_to_coppelia_pos(m.position, c_obj))
             c_obj.set_orientation(reversed(m.orientation))
         elif m.model_name == "Panda":
             c_obj = pr.import_model(f'models/{m.model_name}.ttm')
             bounds = c_obj.get_model_bounding_box()
             dims = np.array(bounds[1::2]) - np.array(bounds[0::2])
-            adjusted_position = scenic_to_coppelia_pos(m.position, c_obj) + np.array([0, dims[1] / 2.0 - m.length / 2.0, 0.0])
+            adjusted_position = prs_to_coppelia_pos(m.position, c_obj) + np.array([0, dims[1] / 2.0 - m.length / 2.0, 0.0])
             c_obj.set_position(adjusted_position)
             # c_obj.set_position(scenic_to_coppelia_pos(m.position, c_obj))
             c_obj.set_orientation(reversed(m.orientation))
         elif m.model_name == "RopeBucket":
             c_obj = create_rope(pr, m.num_rope_links)
-            c_obj.set_position(scenic_to_coppelia_pos(m.position, c_obj))
+            c_obj.set_position(prs_to_coppelia_pos(m.position, c_obj))
             c_obj.set_orientation(reversed(m.orientation))
             c_obj_two = pr.import_model('models/Bucket.ttm')
             attach_to_rope(pr, c_obj, c_obj_two)
         else:
             c_obj = pr.import_model(f'models/{m.model_name}.ttm')
-            c_obj.set_position(scenic_to_coppelia_pos(m.position, c_obj))
+            c_obj.set_position(prs_to_coppelia_pos(m.position, c_obj))
             c_obj.set_orientation(reversed(m.orientation))
         cop_obs[m.model_name].append(c_obj)
 
     return cop_obs
 
 
-def scenic_to_coppelia_pos(scenic_pos, coppelia_model) -> Union[list, ndarray]:
+def prs_to_coppelia_pos(prs_pos, coppelia_model) -> Union[list, ndarray]:
     """ Scenic always refers to the position as the *object-centre*
         Coppelia-Sim positions objects based on their *origin_point*"""
 
@@ -67,6 +67,6 @@ def scenic_to_coppelia_pos(scenic_pos, coppelia_model) -> Union[list, ndarray]:
     bounds_min, bounds_max = np.array(bounds[0::2]), np.array(bounds[1::2])
     # print(f"Min b: {bounds_min}: \n Max b: {bounds_max}")
 
-    new_pos = np.array(scenic_pos) - (bounds_max + bounds_min) / 2.0
+    new_pos = np.array(prs_pos) - (bounds_max + bounds_min) / 2.0
 
     return new_pos

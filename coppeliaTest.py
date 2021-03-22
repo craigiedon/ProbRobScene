@@ -6,11 +6,11 @@ from pyrep.objects import Camera
 import numpy as np
 from wrappers import robotControl as rc
 
-from wrappers.prbCoppeliaWrapper import cop_from_scenic
+from wrappers.prbCoppeliaWrapper import cop_from_prs
 
 pr = PyRep()
 
-scenario = probRobScene.scenario_from_file("scenarios/tableCube.scenic")
+scenario = probRobScene.scenario_from_file("scenarios/tableCube.prs")
 
 max_sims = 1
 sim_result = []
@@ -27,7 +27,7 @@ for i in range(max_sims):
     # ex_world.show_3d()
 
     # Import Robots
-    c_objs = cop_from_scenic(pr, ex_world)
+    c_objs = cop_from_prs(pr, ex_world)
 
     panda_1, gripper_1 = Panda(0), PandaGripper(0)
     panda_2, gripper_2 = Panda(1), PandaGripper(1)

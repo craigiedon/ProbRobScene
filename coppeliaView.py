@@ -6,7 +6,7 @@ from pyrep.objects import Camera
 import numpy as np
 from wrappers import robotControl as rc
 import sys
-from wrappers.prbCoppeliaWrapper import cop_from_scenic
+from wrappers.prbCoppeliaWrapper import cop_from_prs
 
 pr = PyRep()
 
@@ -30,8 +30,7 @@ for i in range(max_sims):
     ex_world, used_its = scenario.generate()
     inputs.append(ex_world)
 
-    # Import Robots and objects from the scenic
-    c_objs = cop_from_scenic(pr, ex_world)
+    c_objs = cop_from_prs(pr, ex_world)
 
     pr.start()
     pr.step()

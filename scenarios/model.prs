@@ -1,4 +1,4 @@
-"""Scenic model for manipulation scenarios in CoppeliaSim"""
+"""World model for manipulation scenarios in CoppeliaSim"""
 
 import math
 

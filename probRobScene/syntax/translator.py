@@ -89,7 +89,7 @@ def scenario_from_file(path, cache_imports=False):
     head, extension = os.path.splitext(fullpath)
     if not extension or extension[1:] not in scenicExtensions:
         ok = ', '.join(scenicExtensions)
-        err = f'Scenic scenario does not have valid extension ({ok})'
+        err = f'Scenario does not have valid extension ({ok})'
         raise RuntimeError(err)
 
     with open(path, 'rb') as stream:
@@ -377,7 +377,7 @@ keywords = (set(constructorStatements)
 
 ## Meta path finder and loader for Scenic files
 
-scenicExtensions = ('sc', 'scenic')
+scenicExtensions = ('prs', 'probrobscene')
 
 
 class ScenicMetaFinder(importlib.abc.MetaPathFinder):
@@ -716,7 +716,7 @@ class TokenTranslator:
                             if parent not in self.constructors:
                                 if tstring != 'class':
                                     raise TokenParseError(nextToken,
-                                                          f'superclass "{parent}" is not a Scenic class')
+                                                          f'superclass "{parent}" is not a PRS class')
                                 # appears to be a Python class definition
                                 pythonClass = True
                             else:
@@ -1064,7 +1064,7 @@ class ASTSurgeon(NodeTransformer):
                     name = base.id
                 if name is not None and name in self.constructors:
                     self.parseError(node,
-                                    f'Python class {node.name} derives from Scenic class {name}')
+                                    f'Python class {node.name} derives from PRS class {name}')
             return self.generic_visit(node)
 
 
