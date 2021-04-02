@@ -21,37 +21,37 @@ from probRobScene.core.utils import areEquivalent
 from probRobScene.core.vectors import Vector, OrientedVector, VectorDistribution, Vector3D, rotate_euler_v3d, rotation_to_euler, reverse_euler, rotate_euler
 
 
-class Region(Samplable, abc.ABC):
-    """Abstract class for regions."""
-
-    def __init__(self, name, *dependencies, orientation=None):
-        super().__init__(dependencies)
-        self.name = name
-        self.orientation = orientation
-
-    @abc.abstractmethod
-    def uniform_point_inner(self):
-        """Do the actual random sampling. Implemented by subclasses."""
-        raise NotImplementedError()
-
-    @abc.abstractmethod
-    def contains_point(self, point):
-        """Check if the `Region` contains a point. Implemented by subclasses."""
-        raise NotImplementedError()
-
-    def contains_object(self, obj):
-        return all(self.contains_point(c) for c in obj.corners)
-
-    def __contains__(self, thing):
-        """Check if this `Region` contains an object or vector."""
-        from probRobScene.core.object_types import Object
-        if isinstance(thing, Object):
-            return self.contains_object(thing)
-        vec = toVector(thing, '"X in Y" with X not an Object or a vector')
-        return self.contains_point(vec)
-
-    def __str__(self):
-        return f'<Region {self.name}>'
+# class Region(Samplable, abc.ABC):
+#     """Abstract class for regions."""
+#
+#     def __init__(self, name, *dependencies, orientation=None):
+#         super().__init__(dependencies)
+#         self.name = name
+#         self.orientation = orientation
+#
+#     @abc.abstractmethod
+#     def uniform_point_inner(self):
+#         """Do the actual random sampling. Implemented by subclasses."""
+#         raise NotImplementedError()
+#
+#     @abc.abstractmethod
+#     def contains_point(self, point):
+#         """Check if the `Region` contains a point. Implemented by subclasses."""
+#         raise NotImplementedError()
+#
+#     def contains_object(self, obj):
+#         return all(self.contains_point(c) for c in obj.corners)
+#
+#     def __contains__(self, thing):
+#         """Check if this `Region` contains an object or vector."""
+#         from probRobScene.core.object_types import Object
+#         if isinstance(thing, Object):
+#             return self.contains_object(thing)
+#         vec = toVector(thing, '"X in Y" with X not an Object or a vector')
+#         return self.contains_point(vec)
+#
+#     def __str__(self):
+#         return f'<Region {self.name}>'
 
 
 class PointInRegionDistribution(VectorDistribution):
