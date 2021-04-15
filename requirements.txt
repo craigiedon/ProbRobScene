@@ -1,5 +1,4 @@
 numpy~=1.18.2
-git+https://github.com/stepjam/PyRep.git@10cb690aca0af98a679f6de0f15eac59a2ef30c9
 scipy~=1.4.1
 matplotlib~=3.2.1
 dotmap~=1.3.17
