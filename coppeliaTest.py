@@ -4,9 +4,9 @@ from pyrep.robots.arms.panda import Panda
 from pyrep.robots.end_effectors.panda_gripper import PandaGripper
 from pyrep.objects import Camera
 import numpy as np
-from wrappers import robotControl as rc
+from probRobScene.wrappers.coppelia import robotControl as rc
 
-from wrappers.prbCoppeliaWrapper import cop_from_prs
+from probRobScene.wrappers.coppelia.prbCoppeliaWrapper import cop_from_prs
 
 pr = PyRep()
 
@@ -47,10 +47,6 @@ for i in range(max_sims):
     ## Robot movement code
 
     try:
-        for steps in range(50000):
-            print(steps)
-            pr.step()
-
         cube_pos_from_im = rc.location_from_depth_cam(pr, d_cam, cube)
 
         rc.move_to_pos(pr, panda_1, cube_pos_from_im, z_offset=-0.021)

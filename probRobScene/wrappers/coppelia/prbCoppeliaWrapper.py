@@ -7,11 +7,7 @@ from pyrep import PyRep
 from pyrep.const import PrimitiveShape
 from pyrep.objects import Shape, VisionSensor
 from probRobScene.core.scenarios import Scene
-from wrappers.setupFuncs import create_table, create_rope, attach_to_rope
-
-# class CoppeliaScene:
-#     def __init__(self, objs):
-#         self.objects = objs
+from probRobScene.wrappers.coppelia.setupFuncs import create_table, create_rope, attach_to_rope
 
 
 def cop_from_prs(pr: PyRep, scene: Scene) -> Dict[str, list]:
