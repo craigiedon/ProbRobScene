@@ -30,7 +30,6 @@ import io
 import itertools
 import os
 import sys
-import time
 import tokenize
 import traceback
 import types

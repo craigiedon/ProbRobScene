@@ -2,7 +2,7 @@ import probRobScene
 from pyrep import PyRep
 from pyrep.robots.arms.panda import Panda
 from pyrep.robots.end_effectors.panda_gripper import PandaGripper
-from pyrep.objects import Camera
+from pyrep.objects import Camera, VisionSensor
 import numpy as np
 from probRobScene.wrappers.coppelia import robotControl as rc
 
@@ -24,7 +24,6 @@ for i in range(max_sims):
 
     ex_world, used_its = scenario.generate()
     inputs.append(ex_world)
-    # ex_world.show_3d()
 
     # Import Robots
     c_objs = cop_from_prs(pr, ex_world)
@@ -36,7 +35,7 @@ for i in range(max_sims):
     pr.step()
 
     ## Neatness setup
-    d_cam = c_objs["Camera"][0]
+    d_cam: VisionSensor = c_objs["Camera"][0]
     cube = c_objs["CUBOID"][0]
     tr1, tr2 = c_objs["Tray"]
     d_cam.set_entity_to_render(cube.get_handle())
@@ -68,29 +67,20 @@ for i in range(max_sims):
         rc.grasp(pr, gripper_2, False)
 
         target_diff = np.abs(np.array(cube.get_position()) - np.array(tr2.get_position()))
-        if target_diff[0] <= 0.453  and target_diff[1] <= 0.453:
+        if target_diff[0] <= 0.453 and target_diff[1] <= 0.453:
             sim_result.append("Success!")
         else:
             sim_result.append("Failure: Missed Target")
 
         pr.stop()
-
+        input("Simulation finish, press ENTER to quit...")
+        pr.shutdown()
 
     except Exception as e:
-        print("There was an error, it was:")
-        print(e)
+        print("There was an error, it was:", e)
         sim_result.append(e)
-        # pr.stop()
-
-    # # Clean up for next iteration
-    # if i < max_sims - 1:
-    #     for o_list in c_objs.values():
-    #         for o in o_list:
-    #             o.remove()
-
-    pr.shutdown()
-
-print("Phew! We got home nice and safe...")
+        pr.stop()
+        pr.shutdown()
 
 print(len(sim_result))
 print(sim_result)

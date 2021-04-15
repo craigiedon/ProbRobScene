@@ -17,17 +17,11 @@ pr = PyRep()
 pr.launch("scenes/emptyVortex.ttt", headless=False, responsive_ui=True)
 
 ex_world, used_its = scenario.generate()
+c_objs = cop_from_prs(pr, ex_world)
 
-try:
-    c_objs = cop_from_prs(pr, ex_world)
+pr.start()
+pr.step()
 
-    pr.start()
-    pr.step()
-
-    pr.stop()
-    input("Simulation Finished. To Quit, Press Enter")
-    pr.shutdown()
-
-except:
-    pr.stop()
-    pr.shutdown()
+pr.stop()
+input("Simulation Finished. To Quit, Press Enter")
+pr.shutdown()
