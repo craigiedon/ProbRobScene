@@ -30,7 +30,6 @@ import io
 import itertools
 import os
 import sys
-import time
 import tokenize
 import traceback
 import types
@@ -246,6 +245,7 @@ point3dSpecifiers = {
     ('at',): 'At3D',
     ('in',): 'In3D',
     ('on',): 'OnTopOf',
+    ('aligned', 'with'): 'AlignedWith',
     ('completely', 'on'): 'OnTopOfStrict',
     ('beyond',): 'Beyond3D',
     ('offset', 'by'): 'OffsetBy3D',

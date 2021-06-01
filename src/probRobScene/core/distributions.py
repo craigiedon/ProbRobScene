@@ -12,7 +12,7 @@ import numpy
 import scipy
 
 from probRobScene.core.lazy_eval import (LazilyEvaluable, requiredProperties, needs_lazy_evaluation, value_in_context,
-                                         makeDelayedFunctionCall)
+                                             makeDelayedFunctionCall)
 from probRobScene.core.utils import argsToString, areEquivalent, RuntimeParseError, cached, sqrt2
 
 

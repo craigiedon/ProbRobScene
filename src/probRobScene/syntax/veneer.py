@@ -33,6 +33,7 @@ from probRobScene.core.specifiers import Specifier
 from probRobScene.core.lazy_eval import DelayedArgument
 from probRobScene.core.utils import RuntimeParseError
 from probRobScene.core.external_params import ExternalParameter
+import numpy as np
 
 
 ### Internals
@@ -255,6 +256,21 @@ def OnTopOf(thing: Union[Point3D, Vector3D, Object, Rectangle3DRegion], dist: fl
 
 def OnTopOfStrict(thing: Union[Point3D, Vector3D, Object, Rectangle3DRegion], dist=eps) -> Specifier:
     return OnTopOf(thing, dist, True)
+
+
+def AlignedWith(thing: Union[Point3D, Object], axis: str) -> Specifier:
+    align_point = thing.position
+    if axis == 'x':
+        reg = Rectangle3DRegion(100.0, 100.0, align_point, Vector3D(0.0, np.pi / 2.0, 0.0))
+    elif axis == 'y':
+        reg = Rectangle3DRegion(100.0, 100.0, align_point, Vector3D(0.0, 0.0, np.pi / 2.0))
+    elif axis == 'z':
+        reg = Rectangle3DRegion(100.0, 100.0, align_point, Vector3D(0.0, 0.0, 0.0))
+    else:
+        raise ValueError("Specified axis must be one of 'x', 'y', or 'z'")
+
+    new = PointInRegionDistribution(reg)
+    return Specifier('position', new)
 
 
 def LeftRough(obj: Union[Object, Point3D], min_amount: float = 0.0, max_amount: float = 1000.0) -> Specifier:

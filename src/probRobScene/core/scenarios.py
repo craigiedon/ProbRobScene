@@ -7,7 +7,6 @@ from probRobScene.core.external_params import ExternalSampler
 from probRobScene.core.geometry import cuboids_intersect
 from probRobScene.core.lazy_eval import needs_lazy_evaluation
 from probRobScene.core.plotUtil3d import draw_cube
-from probRobScene.core.regions import Region
 from probRobScene.core.utils import areEquivalent, InvalidScenarioError, RuntimeParseError
 import numpy as np
 

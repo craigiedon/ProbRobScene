@@ -304,7 +304,7 @@ class ConvexPolyhedronRegion(Region, Intersect, BoundingBox, Convex):
         if isinstance(other, (EmptyRegion, AllRegion)):
             return other.intersect(self)
 
-        raise NotImplementedError
+        raise NotImplementedError(f"Intersection between {type(self)} and {type(other)} not implemented")
 
     def __init__(self, hsi: HalfspaceIntersection):
         super().__init__('ConvexPoly', hsi)
@@ -410,6 +410,48 @@ class CuboidRegion(Region, Intersect, BoundingBox, Convex, Oriented):
         return f'CuboidRegion({self.position},{self.orientation},{self.width},{self.length},{self.height}'
 
 
+class PlaneRegion(Region, Intersect):
+    def __init__(self, origin: Vector3D, normal: Vector3D, dist=100.0):
+        super().__init__('Plane', origin, normal, dist)
+        self.origin = origin
+        self.normal = normal
+        self.dist = dist
+
+    def uniform_point_inner(self):
+
+        # We don't want arbitrarily chosen axis to be exactly aligned with normal
+        if 1.0 - np.abs(self.normal, Vector3D(1.0, 0.0, 0.0)) >= 1e-5:
+            u = np.cross(self.normal, Vector3D(1.0, 0.0, 0.0))
+        else:
+            u = np.cross(self.normal, Vector3D(0.0, 1.0, 0.0))
+
+        v = np.cross(self.normal, u)
+
+        a = np.random.uniform(-self.dist / 2.0, self.dist / 2.0)
+        b = np.random.uniform(-self.dist / 2.0, self.dist / 2.0)
+
+        offset = a * u + b * v
+        return self.origin + offset
+
+    def contains_point(self, point):
+        return np.abs(np.dot(self.normal - self.origin, point - self.origin)) <= 1e-8
+
+    def sample_given_dependencies(self, dep_values):
+        return PlaneRegion(dep_values[self.origin], dep_values[self.normal], dep_values[self.dist])
+
+    def evaluateInner(self, context):
+        origin = value_in_context(self.origin)
+        normal = value_in_context(self.normal)
+        dist = value_in_context(self.dist)
+        return PlaneRegion(origin, normal, dist)
+
+    def intersect(self, other):
+        if isinstance(other, PlaneRegion):
+            return intersect_planes(self, other)
+
+        raise NotImplementedError("Not yet done intersections with other types")
+
+
 class Rectangle3DRegion(Region, Convex, Intersect, Oriented):
 
     def to_orientation(self):
@@ -431,6 +473,9 @@ class Rectangle3DRegion(Region, Convex, Intersect, Oriented):
         self.rot = rot
         self.rev_rot: Vector3D = reverse_euler(self.rot)
         self.normal = rotate_euler_v3d(Vector3D(0, 0, 1), rot)
+
+        self.w_ax = rotate_euler_v3d(Vector3D(1, 0, 0), rot)
+        self.l_ax = rotate_euler_v3d(Vector3D(0, 1, 0), rot)
 
     def uniform_point_inner(self):
         x = random.uniform(-self.width / 2.0, self.width / 2.0)
@@ -460,12 +505,84 @@ class Rectangle3DRegion(Region, Convex, Intersect, Oriented):
     def intersect(self, other):
         if isinstance(other, (CuboidRegion, HalfSpaceRegion, ConvexPolyhedronRegion)):
             return intersect_poly_convex(self, other)
-        if isinstance(other, (ConvexPolygon3DRegion, Rectangle3DRegion)):
-            raise NotImplementedError("intersections resulting in lines not supported")
+        if isinstance(other, Rectangle3DRegion):
+            return intersect_rects(self, other)
+        if isinstance(other, ConvexPolygon3DRegion):
+            raise NotImplementedError("convex poly intersections resulting in lines not supported")
         if isinstance(other, (EmptyRegion, AllRegion)):
             return other.intersect(self)
 
         raise NotImplementedError("Havent yet filled in the intersection code")
+
+
+class Line3DRegion(Region, Intersect):
+    def __init__(self, origin: Vector3D, direction: Vector3D, dist: float = 100.0):
+        super().__init__('Line3DRegion', origin, direction)
+        self.origin = origin
+        self.direction = direction
+        self.dist = dist
+
+    def uniform_point_inner(self):
+        t = np.random.uniform(-self.dist / 2.0, self.dist / 2.0)
+        return self.origin + t * self.direction
+
+    def contains_point(self, point):
+        pv = point - self.origin
+        pv = pv / np.linalg.norm(pv)
+        dp_unsigned = np.abs(np.dot(pv, self.direction))
+
+        # Looking for dot product to be +-1.0 (with wiggle room)
+        return 1.0 - dp_unsigned <= 1e-8
+
+    def sample_given_dependencies(self, dep_values):
+        return Line3DRegion(dep_values[self.origin], dep_values[self.direction], dep_values[self.dist])
+
+    def evaluateInner(self, context):
+        origin = value_in_context(self.origin)
+        direction = value_in_context(self.direction)
+        dist = value_in_context(self.dist)
+        return Line3DRegion(origin, direction, dist)
+
+    def intersect(self, other):
+        raise NotImplementedError
+
+
+class LineSeg3DRegion(Region, Intersect):
+    def __init__(self, start: Vector3D, end: Vector3D):
+        super().__init__('LineSeg3DRegion', start, end)
+        self.start = start
+        self.end = end
+
+    def uniform_point_inner(self):
+        t = random.uniform(0.0, 1.0)
+        return (1.0 - t) * self.start + t * self.end
+
+    def contains_point(self, point):
+        s_e_dir = self.end - self.start / np.linalg.norm(self.end - self.start)
+
+        s_p_dir = point - self.start / np.linalg.norm(point - self.start)
+        p_e_dir = self.end - point / np.linalg.norm(self.end - point)
+
+        dp1 = np.dot(s_e_dir, s_p_dir)
+        dp2 = np.dot(s_e_dir, p_e_dir)
+
+        return np.abs(dp1 - 1.0) <= 1e-8 and np.abs(dp2 - 1.0) <= 1e-8  # A little bit of wiggle room to be a small epsilon of rounding off of the line
+
+    def sample_given_dependencies(self, dep_values):
+        return LineSeg3DRegion(dep_values[self.start], dep_values[self.end])
+
+    def evaluateInner(self, context):
+        start = value_in_context(self.start, context)
+        end = value_in_context(self.end, context)
+        return LineSeg3DRegion(start, end)
+
+    def intersect(self, other):
+        if isinstance(other, (EmptyRegion, AllRegion)):
+            return other.intersect(self)
+        if isinstance(other, ConvexPolyhedronRegion):
+            return intersect_lineseg_convex(self, other)
+
+        raise NotImplementedError(f"Intersection between {type(self)} and {type(other)} not yet implemented")
 
 
 class ConvexPolygon3DRegion(Region, Convex, Intersect, Oriented):
@@ -707,6 +824,102 @@ def intersect_convpolys(r1: ConvexPolyhedronRegion, r2: ConvexPolyhedronRegion) 
         return EmptyRegion("empty")
 
     return ConvexPolyhedronRegion(hs_intersection)
+
+@distributionFunction
+def intersect_lineseg_convex(r1: LineSeg3DRegion, r2: ConvexPolyhedronRegion) -> Region:
+    # Q: How to check for no overlap?
+    halfspaces = r2.to_hsi().halfspaces
+
+    l_origin = r1.start
+    start_end_dist = np.linalg.norm(r1.end - r1.start)
+    l_dir = (r1.end - r1.start) / start_end_dist
+
+    # The original line segment acts as initial parameters
+    t_max = start_end_dist
+    t_min = 0.0
+
+    for halfspace in halfspaces:
+        A, b = halfspace[:3], halfspace[3]
+
+        if np.dot(A, r1.start) > -b and np.dot(A, r1.end) > -b: # Line and convex poly do not intersect
+            return EmptyRegion("empty")
+
+        dir_align = np.dot(A, l_dir)
+        point_align = np.dot(A, l_origin)
+        if np.abs(dir_align) < 1e-8: # Orthogonal
+            continue
+        if dir_align > 0: # Pointing in same direction
+            t_max = np.minimum(t_max, (-b - point_align) / dir_align)
+        else:
+            t_min = np.maximum(t_min, (-b - point_align) / dir_align)
+
+    return LineSeg3DRegion(l_origin + t_min * l_dir, l_origin + t_max * l_dir)
+
+
+@distributionFunction
+def intersect_rects(r1: Rectangle3DRegion, r2: Rectangle3DRegion) -> Region:
+    # if r1.contains_object(r2):
+    #     return r2
+    # if r2.contains_object(r1):
+    #     return r1
+    #
+    # if r1.normal == r2.normal and r1.origin != r2.origin:  # Parallel
+    #     return EmptyRegion("empty")
+
+    # The infinite line between the two planes the rectangles lie on
+    line = intersect_planes(PlaneRegion(r1.origin, r1.normal), PlaneRegion(r2.origin, r2.normal))
+
+    t_max = 100.0
+    t_min = -100.0
+
+    bounding_axes = [
+        (r1.origin, r1.w_ax, r1.width / 2.0),
+        (r1.origin, r1.l_ax, r1.length / 2.0),
+
+        (r2.origin, r2.w_ax, r2.width / 2.0),
+        (r2.origin, r2.l_ax, r2.length / 2.0),
+    ]
+
+    for b_o, b_ax, m, in bounding_axes:
+        axis_alignment = np.dot(line.direction, b_ax)
+        if np.abs(axis_alignment) > 1e-8:
+            dist_along_axis = np.dot((line.origin - b_o), b_ax)
+            if axis_alignment > 0:
+                t_max = np.minimum(t_max, (m - dist_along_axis) / axis_alignment)
+                t_min = np.maximum(t_min, (-m - dist_along_axis) / axis_alignment)
+            else:
+                t_min = np.maximum(t_min, (m - dist_along_axis) / axis_alignment)
+                t_max = np.minimum(t_max, (-m - dist_along_axis) / axis_alignment)
+
+    start = line.origin + t_min * line.direction
+    end = line.origin + t_max * line.direction
+    return LineSeg3DRegion(start, end)
+
+
+@distributionFunction
+def intersect_planes(p1: PlaneRegion, p2: PlaneRegion):
+    if p1.normal == p2.normal and p1.origin == p2.origin:
+        return p1
+
+    if p1.normal == p2.normal:
+        return EmptyRegion("empty")
+
+    line_dir = Vector3D(*np.cross(p1.normal, p2.normal))
+
+    s1 = np.dot(p1.normal, p1.origin)
+    s2 = np.dot(p2.normal, p2.origin)
+
+    n1_sq = np.dot(p1.normal, p1.normal)
+    n2_sq = np.dot(p2.normal, p2.normal)
+    n1n2 = np.dot(p1.normal, p2.normal)
+
+    a = (s2 * n1n2 - s1 * n1_sq) / (n1n2 * n1n2 - n1_sq * n2_sq)
+    b = (s1 * n1n2 - s2 * n1_sq) / (n1n2 * n1n2 - n1_sq * n2_sq)
+
+    line_origin = a * p1.normal + b * p2.normal
+    line_origin = Vector3D(*line_origin)
+
+    return Line3DRegion(line_origin, line_dir)
 
 
 def cube_to_hsi(cube_centre: np.ndarray, cube_dims: np.ndarray, cube_rot: np.ndarray) -> HalfspaceIntersection:

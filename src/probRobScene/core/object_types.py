@@ -1,19 +1,16 @@
 """Implementations of the built-in Scenic classes."""
-import abc
 import collections
 import inspect
 import itertools as it
-import math
-import random
 import numpy as np
 
 from probRobScene.core.distributions import Samplable, needs_sampling, to_distribution
-from probRobScene.core.geometry import averageVectors, hypot, min
+from probRobScene.core.geometry import hypot, min
 from probRobScene.core.lazy_eval import needs_lazy_evaluation, makeDelayedFunctionCall
-from probRobScene.core.regions import SphericalRegion, Oriented, intersect_many, PointInRegionDistribution, \
+from probRobScene.core.regions import SphericalRegion, Oriented, PointInRegionDistribution, \
     IntersectionRegion
 from probRobScene.core.specifiers import Specifier, PropertyDefault
-from probRobScene.core.type_support import toVector, toScalar, toType
+from probRobScene.core.type_support import toType
 from probRobScene.core.utils import areEquivalent, RuntimeParseError, group_by
 from probRobScene.core.vectors import Vector, Vector3D, rotate_euler_v3d
 from probRobScene.core.plotUtil3d import draw_cube

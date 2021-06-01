@@ -1,5 +1,7 @@
 import numpy as np
-from wrappers.setupFuncs import top_of
+from pyrep.objects import VisionSensor
+
+from probRobScene.wrappers.coppelia.setupFuncs import top_of
 
 
 def grasp(pr, gripper, close: bool) -> None:
@@ -9,7 +11,6 @@ def grasp(pr, gripper, close: bool) -> None:
         pos = 0.9
 
     actuated = False
-    i = 0
     while not actuated:
         actuated = gripper.actuate(pos, 0.1)
         # print("Open amount: ", gripper.get_open_amount())
@@ -51,7 +52,7 @@ def move_to_pos(pr, agent, pos, z_offset=0.0, ig_cols=False):
     pr.step()
 
 
-def location_from_depth_cam(pr, d_cam, target_obj):
+def location_from_depth_cam(pr, d_cam : VisionSensor, target_obj):
     # Cheat at blob extraction - just use mask)
     d_cam.set_entity_to_render(target_obj.get_handle())
     pr.step()
@@ -81,7 +82,7 @@ def location_from_depth_cam(pr, d_cam, target_obj):
     coord[1] = depth * np.tan(np.deg2rad(p_angle * 0.5)) * (0.5 - bY) * 2.0
 
     # Coord just assumes non transformed camera, so incorporate rotations and translations
-    cam_matrix = np.reshape(d_cam.get_matrix(), (3, 4))
+    cam_matrix = d_cam.get_matrix()[:3]
 
     world_coord = np.matmul(cam_matrix, np.append(coord, 1))
     return world_coord

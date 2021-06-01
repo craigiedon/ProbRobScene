@@ -6,6 +6,12 @@ Wrapper included for the [Coppelia-Sim](https://www.coppeliarobotics.com/) simul
 
 ## Setup / Running
 
+The best way to try out ProbRobScene is to clone the git repo and try out some of the example scenarios:
+
+```
+git clone https://github.com/craigiedon/ProbRobScene.git
+```
+
 ### Raw Visualization 
 
 To sample from a raw scenario and just visualize the samples in matplotlib, run
@@ -44,6 +50,16 @@ To load one of the example scenarios (without a controller), try:
 ```
 python coppeliaView.py scenarios/<exampleName>
 ```
+
+### Using ProbRobScene in External Projects
+
+You can install ProbRobScene as an external library dependency using `pip` by running the following command at the top level directory:
+
+```
+pip install .
+```
+
+NOTE: In order to use the coppelia-sim wrapper, you will still need to install CoppeliaSim and PyRep as discussed above.
 
 ## Example scenarios:
 ---
