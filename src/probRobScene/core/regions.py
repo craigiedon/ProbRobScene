@@ -30,11 +30,6 @@ from probRobScene.core.vectors import Vector, OrientedVector, VectorDistribution
 #         self.orientation = orientation
 #
 #     @abc.abstractmethod
-#     def uniform_point_inner(self):
-#         """Do the actual random sampling. Implemented by subclasses."""
-#         raise NotImplementedError()
-#
-#     @abc.abstractmethod
 #     def contains_point(self, point):
 #         """Check if the `Region` contains a point. Implemented by subclasses."""
 #         raise NotImplementedError()
@@ -111,9 +106,6 @@ def orient_along_region(region: Region, vec):
 class AllRegion(Region, Intersect):
     """Region consisting of all space."""
 
-    def uniform_point_inner(self):
-        raise RuntimeError("Should not be sampling from the all region")
-
     def sample_given_dependencies(self, dep_values):
         raise RuntimeError("Should not be sampling from the all region")
 
@@ -147,9 +139,6 @@ class EmptyRegion(Region, Intersect):
 
     def intersect(self, other):
         return self
-
-    def uniform_point_inner(self):
-        raise RejectionException(f'sampling empty Region')
 
     def contains_point(self, point):
         return False
@@ -191,17 +180,6 @@ class SphericalRegion(Region, BoundingBox):
         point = point.to_vector_3d()
         return point.distanceTo(self.center) <= self.radius
 
-    def uniform_point_inner(self):
-        x, y, z = self.center
-        u = 2.0 * random.random() - 1.0
-        phi = 2.0 * math.pi * random.random()
-        r = random.random() ** (1 / 3.)
-        x_offset = r * cos(phi) * (1 - u ** 2) ** 0.5
-        y_offset = r * sin(phi) * (1 - u ** 2) ** 0.5
-        z_offset = r * u
-        pt = Vector3D(x + x_offset, y + y_offset, z + z_offset)
-        return pt
-
     def getAABB(self):
         x, y, z = self.center
         r = self.radius
@@ -223,9 +201,6 @@ class IntersectionRegion(Region):
         self.regions = regions
         # self.r1 = r1
         # self.r2 = r2
-
-    def uniform_point_inner(self):
-        raise RuntimeError("Should not be sampling from this region. Prune out")
 
     def contains_point(self, point):
         raise NotImplementedError
@@ -272,10 +247,6 @@ class HalfSpaceRegion(Region, Intersect, Convex):
         self.dist = dist
         self.rot = rotation_to_euler(Vector3D(0, 0, 1), self.normal)
 
-    def uniform_point_inner(self) -> Vector3D:
-        untransformed_point = Vector3D(np.random.uniform(0, self.dist, 3))
-        return rotate_euler_v3d(untransformed_point, self.rot) + self.point
-
     def contains_point(self, p):
         return np.dot(self.normal, p - self.point) >= 0
 
@@ -311,9 +282,6 @@ class ConvexPolyhedronRegion(Region, Intersect, BoundingBox, Convex):
         self.hsi = hsi
         convex_hull = ConvexHull(hsi.intersections)
         self.corners = tuple(convex_hull.points[i] for i in convex_hull.vertices)
-
-    def uniform_point_inner(self):
-        return Vector3D(*hit_and_run(self.hsi))
 
     def contains_point(self, point):
         for hs_ineq in self.hsi.halfspaces:
@@ -382,14 +350,6 @@ class CuboidRegion(Region, Intersect, BoundingBox, Convex, Oriented):
         height = value_in_context(self.height, context)
         return CuboidRegion(position, orientation, width, length, height)
 
-    def uniform_point_inner(self) -> Vector3D:
-        hw, hl, hh = self.hw, self.hl, self.hh
-        rx = random.uniform(-hw, hw)
-        ry = random.uniform(-hl, hl)
-        rz = random.uniform(-hh, hh)
-        pt = self.position + rotate_euler_v3d(Vector3D(rx, ry, rz), self.orientation)
-        return pt
-
     def getAABB(self):
         xs, ys, zs = zip(*self.corners)
         min_x, max_x = min_and_max(xs)
@@ -416,22 +376,6 @@ class PlaneRegion(Region, Intersect):
         self.origin = origin
         self.normal = normal
         self.dist = dist
-
-    def uniform_point_inner(self):
-
-        # We don't want arbitrarily chosen axis to be exactly aligned with normal
-        if 1.0 - np.abs(self.normal, Vector3D(1.0, 0.0, 0.0)) >= 1e-5:
-            u = np.cross(self.normal, Vector3D(1.0, 0.0, 0.0))
-        else:
-            u = np.cross(self.normal, Vector3D(0.0, 1.0, 0.0))
-
-        v = np.cross(self.normal, u)
-
-        a = np.random.uniform(-self.dist / 2.0, self.dist / 2.0)
-        b = np.random.uniform(-self.dist / 2.0, self.dist / 2.0)
-
-        offset = a * u + b * v
-        return self.origin + offset
 
     def contains_point(self, point):
         return np.abs(np.dot(self.normal - self.origin, point - self.origin)) <= 1e-8
@@ -477,12 +421,6 @@ class Rectangle3DRegion(Region, Convex, Intersect, Oriented):
         self.w_ax = rotate_euler_v3d(Vector3D(1, 0, 0), rot)
         self.l_ax = rotate_euler_v3d(Vector3D(0, 1, 0), rot)
 
-    def uniform_point_inner(self):
-        x = random.uniform(-self.width / 2.0, self.width / 2.0)
-        y = random.uniform(-self.length / 2.0, self.length / 2.0)
-        flat_point = Vector3D(x, y, 0)
-        return rotate_euler_v3d(flat_point, self.rot) + self.origin
-
     def contains_point(self, point):
         flat_point = rotate_euler_v3d(point - self.origin, self.rev_rot)
         return (np.abs(flat_point.x) <= self.width / 2.0 and
@@ -522,10 +460,6 @@ class Line3DRegion(Region, Intersect):
         self.direction = direction
         self.dist = dist
 
-    def uniform_point_inner(self):
-        t = np.random.uniform(-self.dist / 2.0, self.dist / 2.0)
-        return self.origin + t * self.direction
-
     def contains_point(self, point):
         pv = point - self.origin
         pv = pv / np.linalg.norm(pv)
@@ -552,10 +486,6 @@ class LineSeg3DRegion(Region, Intersect):
         super().__init__('LineSeg3DRegion', start, end)
         self.start = start
         self.end = end
-
-    def uniform_point_inner(self):
-        t = random.uniform(0.0, 1.0)
-        return (1.0 - t) * self.start + t * self.end
 
     def contains_point(self, point):
         s_e_dir = self.end - self.start / np.linalg.norm(self.end - self.start)
@@ -603,8 +533,6 @@ class ConvexPolygon3DRegion(Region, Convex, Intersect, Oriented):
         self.normal = rotate_euler_v3d(Vector3D(0, 0, 1), rot)
 
     def uniform_point_inner(self):
-        random_point_flat = Vector3D(*hit_and_run(self.hsi), 0)
-        return rotate_euler_v3d(random_point_flat, self.rot) + self.origin
 
     def contains_point(self, point):
         flat_point = rotate_euler_v3d(point - self.origin, self.rev_rot)
@@ -692,9 +620,6 @@ class PointSetRegion(Region):
         self.kd_tree = scipy.spatial.cKDTree(self.points) if kd_tree is None else kd_tree
         self.orientation = orientation
         self.tolerance = tolerance
-
-    def uniform_point_inner(self):
-        return orient_along_region(self, Vector(*random.choice(self.points)))
 
     def contains_point(self, point):
         distance, location = self.kd_tree.query(point)
