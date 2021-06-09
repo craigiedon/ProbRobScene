@@ -1,12 +1,15 @@
 """Scenario and scene objects."""
 
 import random
+from dataclasses import dataclass
+from typing import Any, List
 
 from probRobScene.core.distributions import Samplable, RejectionException, needs_sampling, sample_all
-from probRobScene.core.external_params import ExternalSampler
 from probRobScene.core.geometry import cuboids_intersect
 from probRobScene.core.lazy_eval import needs_lazy_evaluation
+from probRobScene.core.object_types import Object, show_3d
 from probRobScene.core.plotUtil3d import draw_cube
+from probRobScene.core.regions import AABB, contains
 from probRobScene.core.utils import areEquivalent, InvalidScenarioError, RuntimeParseError
 import numpy as np
 
@@ -24,18 +27,18 @@ class Scene:
 
         # print("Num objects:", len(self.objects))
         for obj in self.objects:
-            obj.show_3d(ax)
+            show_3d(obj, ax)
 
-        w_min_corner, w_max_corner = self.workspace.getAABB()
+        w_min_corner, w_max_corner = AABB(self.workspace)
         w_dims = w_max_corner - w_min_corner
 
         draw_cube(ax, (w_max_corner + w_min_corner) * 0.5, w_dims, np.zeros(3), color='purple', alpha=0.03)
 
         total_min, total_max = np.min(w_min_corner), np.max(w_max_corner)
 
-        # ax.set_xlim(total_min, total_max)
-        # ax.set_ylim(total_min, total_max)
-        # ax.set_zlim(total_min, total_max)
+        ax.set_xlim(total_min, total_max)
+        ax.set_ylim(total_min, total_max)
+        ax.set_zlim(total_min, total_max)
 
         ax.set_xlabel("X")
         ax.set_ylabel("Y")
@@ -45,32 +48,30 @@ class Scene:
         plt.show(block=block)
 
 
-def has_static_bounds(obj):
-    return not (needs_sampling(obj.position) or any(needs_sampling(corner) for corner in obj.corners))
+def has_static_bounds(obj) -> bool:
+    static_pos = not needs_sampling(obj.position)
+    static_corners = [not needs_sampling(corner) for corner in obj.corners]
+    return static_pos and all(static_corners)
+    # return not (needs_sampling(obj.position) or any(needs_sampling(corner) for corner in obj.corners))
 
 
+@dataclass(frozen=True)
 class Scenario:
     """A compiled Scenic scenario, from which scenes can be sampled."""
+    workspace: Any
+    objects: List[Object]
+    params: List
+    requirements: List
+    requirement_deps: List
 
-    def __init__(self, workspace,
-                 objects,
-                 params, external_params,
-                 requirements, requirement_deps):
-        assert workspace is not None
-
-        if needs_sampling(workspace):
-            raise RuntimeParseError('workspace region must be fixed')
-
-        self.workspace = workspace
-        self.objects = tuple(objects)
-        self.params = dict(params)
-        self.externalParams = tuple(external_params)
-        self.requirements = tuple(requirements)
-        self.external_sampler = ExternalSampler.forParameters(self.externalParams, self.params)
-        # dependencies must use fixed order for reproducibility
-        param_deps = tuple(p for p in self.params.values() if isinstance(p, Samplable))
-        self.dependencies = self.objects + param_deps + tuple(requirement_deps)
+    def __post_init__(self):
+        assert self.workspace is not None
         self.validate()
+
+    @property
+    def dependencies(self):
+        param_deps = tuple(p for p in self.params.values() if isinstance(p, Samplable))
+        return tuple(self.objects) + param_deps + tuple(self.requirement_deps)
 
     def isEquivalentTo(self, other):
         if type(other) is not Scenario:
@@ -78,7 +79,6 @@ class Scenario:
         return (areEquivalent(other.workspace, self.workspace)
                 and areEquivalent(other.objects, self.objects)
                 and areEquivalent(other.params, self.params)
-                and areEquivalent(other.externalParams, self.externalParams)
                 and areEquivalent(other.requirements, self.requirements)
                 and other.external_sampler == self.external_sampler)
 
@@ -93,7 +93,8 @@ class Scenario:
                 continue
             # Require object to be contained in the workspace/valid region
             container = self.workspace
-            if not needs_sampling(container) and not container.contains_object(oi):
+            if not needs_sampling(container) and not contains(container, oi):
+                contains(container, oi)
                 raise InvalidScenarioError(f'Object at {oi.position} does not fit in container')
             for j in range(i):
                 oj = objects[j]
@@ -107,7 +108,7 @@ class Scenario:
         active_reqs = [req for req, prob in self.requirements if random.random() <= prob]
 
         sample, iterations = rejection_sample(self.objects, self.dependencies, self.workspace,
-                                              active_reqs, self.external_sampler, max_iterations, verbosity)
+                                              active_reqs, max_iterations, verbosity)
 
         # obtained a valid sample; assemble a scene from it
         sampled_objects = tuple(sample[obj] for obj in self.objects)
@@ -119,17 +120,10 @@ class Scenario:
         scene = Scene(self.workspace, sampled_objects, sampled_params)
         return scene, iterations
 
-    def reset_external_sampler(self):
-        """Reset the scenario's external sampler, if any.
 
-        If the Python random seed is reset before calling this function, this
-        should cause the sequence of generated scenes to be deterministic."""
-        self.external_sampler = ExternalSampler.forParameters(self.externalParams, self.params)
-
-
-def rejection_sample(objects, dependencies, workspace, active_reqs, external_sampler, max_iterations, verbosity):
+def rejection_sample(objects, dependencies, workspace, active_reqs, max_iterations, verbosity):
     for i in range(max_iterations):
-        sample, rejection_reason = try_sample(external_sampler, dependencies, objects, workspace, active_reqs)
+        sample, rejection_reason = try_sample(dependencies, objects, workspace, active_reqs)
         if sample is not None:
             return sample, i
         if verbosity >= 2:
@@ -137,19 +131,21 @@ def rejection_sample(objects, dependencies, workspace, active_reqs, external_sam
     raise RejectionException(f'failed to generate scenario in {max_iterations} iterations')
 
 
-def try_sample(external_sampler, dependencies, objects, workspace, active_reqs):
+def try_sample(dependencies, objects, workspace, active_reqs):
     try:
-        if external_sampler is not None:
-            external_sampler.sample(external_sampler.rejectionFeedback)
         sample = sample_all(dependencies)
     except RejectionException as e:
         return None, e
 
     obj_samples = [sample[o] for o in objects]
+
+    ns = [needs_sampling(o) for o in obj_samples]
+    assert not any(ns)
+
     collidable = [o for o in obj_samples if not o.allowCollisions]
 
     for o in obj_samples:
-        if not workspace.contains_object(o):
+        if not contains(workspace, o):
             return None, 'object containment'
 
     if any(cuboids_intersect(vi, vj) for (i, vi) in enumerate(collidable) for vj in collidable[:i]):

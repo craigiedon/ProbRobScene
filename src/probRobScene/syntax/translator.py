@@ -48,7 +48,6 @@ from typing import List
 import probRobScene.core.pruning as pruning
 import probRobScene.syntax.veneer as veneer
 from probRobScene.core.distributions import needs_sampling
-from probRobScene.core.external_params import ExternalParameter
 from probRobScene.core.lazy_eval import needs_lazy_evaluation
 from probRobScene.core.object_types import Constructible
 from probRobScene.core.regions import Region
@@ -194,8 +193,7 @@ def compile_stream(stream, namespace, filename='<stream>', verbosity=0):
         execute_python_function(lambda: exec(code, namespace), filename)
     # Extract scenario state from veneer and store it
     c_objs = find_constructibles(namespace)
-    externs = find_external_params(namespace)
-    store_scenario_state_in(namespace, requirements, filename, veneer.v_state, c_objs, externs)
+    store_scenario_state_in(namespace, requirements, filename, veneer.v_state, c_objs)
 
     all_new_source = ''.join(new_source_blocks)
     return code, all_new_source
@@ -254,9 +252,9 @@ point3dSpecifiers = {
     ('left', 'of'): 'LeftRough',
     ('right', 'of'): 'RightRough',
     ('ahead', 'of'): 'AheadRough',
-    ('behind',): 'Behind3D',
-    ('above',): 'Above3D',
-    ('below',): 'Below3D',
+    ('behind',): 'BehindRough',
+    ('above',): 'AboveRough',
+    ('below',): 'BelowRough',
     ('following',): 'Following3D',
 }
 
@@ -497,9 +495,6 @@ def find_constructors_in(namespace):
 def find_constructibles(namespace) -> List[Constructible]:
     return [v for n, v in namespace.items() if isinstance(v, Constructible)]
 
-
-def find_external_params(namespace) -> List[ExternalParameter]:
-    return [v for n, v in namespace.items() if isinstance(v, ExternalParameter)]
 
 
 ### TRANSLATION PHASE TWO: translation at the level of tokens
@@ -1141,7 +1136,7 @@ def execute_python_function(func, filename):
 
 ### TRANSLATION PHASE SEVEN: scenario construction
 
-def store_scenario_state_in(namespace, requirement_syntax, filename, v_state: VeneerState, c_objs: List[Constructible], external_params: List[ExternalParameter]):
+def store_scenario_state_in(namespace, requirement_syntax, filename, v_state: VeneerState, c_objs: List[Constructible]):
     """Post-process an executed Scenic module, extracting state from the veneer."""
     # Extract created Objects
     # namespace['_objects'] = tuple(v_state.allObjects)
@@ -1154,8 +1149,6 @@ def store_scenario_state_in(namespace, requirement_syntax, filename, v_state: Ve
             raise InvalidScenarioError(f'parameter {name} uses value {value}'
                                        ' undefined outside of object definition')
 
-    # Extract external parameters
-    namespace['_externalParams'] = external_params
 
     # Extract requirements, scan for relations used for pruning, and create closures
     requirements = v_state.pendingRequirements
@@ -1221,7 +1214,7 @@ def constructScenarioFrom(namespace, verbosity=0):
     # Create Scenario object
     scenario = Scenario(workspace,
                         namespace['_objects'],
-                        namespace['_params'], namespace['_externalParams'],
+                        namespace['_params'],
                         namespace['_requirements'], namespace['_requirementDeps'])
 
     # Prune infeasible parts of the space

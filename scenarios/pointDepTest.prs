@@ -1,0 +1,4 @@
+from model import *
+c1 = Cube below Vector3D(0.0, 0.0, 2.5), with width 0.3, with height 0.3, with length 0.3
+c2 = Cube right of c1 by 0.2, above c1 by 0.2, ahead of c1 by 0.1, with width 0.3, with height 0.3, with length 0.3, with color 'red'
+

@@ -1,7 +1,7 @@
 import probRobScene
 import numpy as np
 
-scenario = probRobScene.scenario_from_file("scenarios/tableCube.prs")
+scenario = probRobScene.scenario_from_file("scenarios/tableCubeNaive.prs")
 
 max_generations = 3
 rejections_per_scene = []

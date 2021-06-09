@@ -2,7 +2,7 @@
 import collections
 import functools
 import math
-from typing import List, TypeVar, Callable, Dict
+from typing import List, TypeVar, Callable, Dict, Sequence
 
 sqrt2 = math.sqrt(2)
 
@@ -115,3 +115,14 @@ class InconsistentScenarioError(InvalidScenarioError):
     def __init__(self, line, message):
         self.lineno = line
         super().__init__('Inconsistent requirement on line ' + str(line) + ': ' + message)
+
+
+def min_and_max(xs: Sequence):
+    min_v = float('inf')
+    max_v = float('-inf')
+    for val in xs:
+        if val < min_v:
+            min_v = val
+        if val > max_v:
+            max_v = val
+    return min_v, max_v

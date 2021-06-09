@@ -1,12 +1,14 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
+from multimethod import multimethod
 from scipy.spatial.qhull import HalfspaceIntersection, ConvexHull
 from scipy.spatial.transform import Rotation as R
 
-from probRobScene.core.regions import PlaneRegion, Line3DRegion, LineSeg3DRegion, intersect_planes, Rectangle3DRegion, intersect_rects, CuboidRegion, intersect_lineseg_convex
+from probRobScene.core.distributions import needs_sampling
 from probRobScene.core.vectors import offset_beyond, Vector3D, rotate_euler_v3d, rotation_to_euler
 from numpy.random import uniform as unif
+
 
 
 def draw_cube(ax, pos: np.array, size: np.array, rot: np.array, color: str = 'b', alpha: float = 0.5):

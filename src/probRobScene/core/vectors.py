@@ -1,25 +1,24 @@
-"""Scenic vectors and vector fields."""
-
+from __future__ import annotations
 import collections
 import functools
 import itertools
 import math
+from collections import Sequence, Callable
+from dataclasses import dataclass
 from math import sin, cos
+from typing import Tuple, Mapping, List
 
 import numpy as np
 from scipy.spatial.transform import Rotation as R
 
 import probRobScene.core.utils as utils
 from probRobScene.core.distributions import (Samplable, Distribution, MethodDistribution,
-                                             needs_sampling, makeOperatorHandler, distributionMethod, distributionFunction)
-from probRobScene.core.geometry import normalize_angle
-from probRobScene.core.lazy_eval import value_in_context, needs_lazy_evaluation, makeDelayedFunctionCall
+                                             makeOperatorHandler, distributionFunction, needs_sampling)
+from probRobScene.core.lazy_eval import needs_lazy_evaluation, makeDelayedFunctionCall
 
 
 class VectorDistribution(Distribution):
     """A distribution over Vectors."""
-    defaultValueType = None  # will be set after Vector is defined
-
     def toVector(self):
         return self
 
@@ -50,51 +49,41 @@ class VectorOperatorDistribution(VectorDistribution):
     """Vector version of OperatorDistribution."""
 
     def __init__(self, operator, obj, operands):
-        super().__init__(obj, *operands)
         self.operator = operator
-        self.object = obj
+        self.obj = obj
         self.operands = operands
 
     def sample_given_dependencies(self, dep_values):
-        first = dep_values[self.object]
+        first = dep_values[self.obj]
         rest = (dep_values[child] for child in self.operands)
         op = getattr(first, self.operator)
         return op(*rest)
 
-    def evaluateInner(self, context):
-        obj = value_in_context(self.object, context)
-        operands = tuple(value_in_context(arg, context) for arg in self.operands)
-        return VectorOperatorDistribution(self.operator, obj, operands)
-
     def __str__(self):
         ops = utils.argsToString(self.operands)
-        return f'{self.object}.{self.operator}{ops}'
+        return f'{self.obj}.{self.operator}{ops}'
 
 
+@dataclass(frozen=True, eq=False)
 class VectorMethodDistribution(VectorDistribution):
     """Vector version of MethodDistribution."""
-
-    def __init__(self, method, obj, args, kwargs):
-        super().__init__(*args, *kwargs.values())
-        self.method = method
-        self.object = obj
-        self.arguments = args
-        self.kwargs = kwargs
+    method: Callable
+    obj: Vector3D
+    args: Tuple
+    kwargs: Mapping
 
     def sample_given_dependencies(self, dep_values):
-        args = (dep_values[arg] for arg in self.arguments)
+        args = [dep_values[arg] for arg in self.args]
         kwargs = {name: dep_values[arg] for name, arg in self.kwargs.items()}
-        return self.method(self.object, *args, **kwargs)
+        samp = self.method(self.obj, *args, **kwargs)
+        return samp
 
-    def evaluateInner(self, context):
-        obj = value_in_context(self.object, context)
-        arguments = tuple(value_in_context(arg, context) for arg in self.arguments)
-        kwargs = {name: value_in_context(arg, context) for name, arg in self.kwargs.items()}
-        return VectorMethodDistribution(self.method, obj, arguments, kwargs)
+    def dependencies(self) -> List:
+        return [x for x in (self.obj, *self.args, *self.kwargs.values()) if needs_sampling(x) or needs_lazy_evaluation(x)]
 
     def __str__(self):
-        args = utils.argsToString(itertools.chain(self.arguments, self.kwargs.values()))
-        return f'{self.object}.{self.method.__name__}{args}'
+        args = utils.argsToString(itertools.chain(self.args, self.kwargs.values()))
+        return f'{self.obj}.{self.method.__name__}{args}'
 
 
 def scalarOperator(method):
@@ -144,6 +133,7 @@ def vectorDistributionMethod(method):
 
     @functools.wraps(method)
     def helper(self, *args, **kwargs):
+        from probRobScene.core.sampling import needs_sampling
         if any(needs_sampling(arg) for arg in itertools.chain(args, kwargs.values())):
             return VectorMethodDistribution(method, self, args, kwargs)
         elif any(needs_lazy_evaluation(arg) for arg in itertools.chain(args, kwargs.values())):
@@ -155,29 +145,15 @@ def vectorDistributionMethod(method):
     return helper
 
 
+@dataclass(frozen=True, eq=False)
 class Vector(Samplable, collections.abc.Sequence):
     """A 2D vector, whose coordinates can be distributions."""
-
-    def __init__(self, x, y):
-        self.coordinates = (x, y)
-        super().__init__(self.coordinates)
+    x: float
+    y: float
 
     @property
-    def x(self):
-        return self.coordinates[0]
-
-    @property
-    def y(self):
-        return self.coordinates[1]
-
-    def toVector(self):
-        return self
-
-    def sample_given_dependencies(self, dep_values):
-        return Vector(*(dep_values[coord] for coord in self.coordinates))
-
-    def evaluateInner(self, context):
-        return Vector(*(value_in_context(coord, context) for coord in self.coordinates))
+    def coordinates(self):
+        return [self.x, self.y]
 
     @vectorOperator
     def rotatedBy(self, angle):
@@ -227,48 +203,19 @@ class Vector(Samplable, collections.abc.Sequence):
     def __getitem__(self, index):
         return self.coordinates[index]
 
-    def __repr__(self):
-        return f'({self.x} @ {self.y})'
 
-    def __eq__(self, other):
-        if type(other) is not Vector:
-            return NotImplemented
-        return other.coordinates == self.coordinates
-
-    def __hash__(self):
-        return hash(self.coordinates)
-
-
-VectorDistribution.defaultValueType = Vector
-
-
-class Vector3D(Samplable, collections.abc.Sequence):
-    """A 3D Vector, whose coordinates can be distributions"""
-
-    def __init__(self, x, y, z):
-        self.coordinates = (x, y, z)
-        super().__init__(self.coordinates)
-
-    @property
-    def x(self):
-        return self.coordinates[0]
-
-    @property
-    def y(self):
-        return self.coordinates[1]
-
-    @property
-    def z(self):
-        return self.coordinates[2]
+@dataclass(frozen=True, eq=False)
+class Vector3D(Samplable, Sequence):
+    x: float
+    y: float
+    z: float
 
     def to_vector_3d(self):
         return self
 
-    def sample_given_dependencies(self, dep_values):
-        return Vector3D(*(dep_values[coord] for coord in self.coordinates))
-
-    def evaluateInner(self, context):
-        return Vector3D(*(value_in_context(coord, context) for coord in self.coordinates))
+    @property
+    def coordinates(self):
+        return [self.x, self.y, self.z]
 
     @scalarOperator
     def distanceTo(self, other):
@@ -306,100 +253,6 @@ class Vector3D(Samplable, collections.abc.Sequence):
 
     def __getitem__(self, index):
         return self.coordinates[index]
-
-    def __repr__(self):
-        return f'({self.x} @ {self.y} @ {self.z})'
-
-    def __eq__(self, other):
-        if type(other) is not Vector3D:
-            return False
-        return other.coordinates == self.coordinates
-
-    def __hash__(self):
-        return hash(self.coordinates)
-
-
-class OrientedVector(Vector):
-    def __init__(self, x, y, heading):
-        super().__init__(x, y)
-        self.heading = heading
-
-    def toHeading(self):
-        return self.heading
-
-    def __eq__(self, other):
-        if type(other) is not OrientedVector:
-            return NotImplemented
-        return (other.coordinates == self.coordinates
-                and other.heading == self.heading)
-
-    def __hash__(self):
-        return hash((self.coordinates, self.heading))
-
-
-class VectorField:
-    def __init__(self, name, value):
-        self.name = name
-        self.value = value
-        self.valueType = float
-
-    @distributionMethod
-    def __getitem__(self, pos):
-        return self.value(pos)
-
-    @vectorDistributionMethod
-    def followFrom(self, pos, dist, steps=4):
-        step = dist / steps
-        for i in range(steps):
-            pos = pos.offsetRadially(step, self[pos])
-        return pos
-
-    def __str__(self):
-        return f'<{type(self).__name__} {self.name}>'
-
-
-class VectorField3D:
-    def __init__(self, name, value):
-        self.name = name
-        self.value = value
-        self.valueType = float
-
-    @distributionMethod
-    def __getitem__(self, pos):
-        return self.value(pos)
-
-    @vectorDistributionMethod
-    def follow_from(self, pos, dist, steps=4):
-        step_size = dist / steps
-        followed_pos = pos
-        for i in range(steps):
-            followed_pos += rotate_euler_v3d(Vector3D(step_size, 0.0, 0.0), self[pos])
-        return followed_pos
-
-    def __str__(self):
-        return f'<{type(self).__name__} {self.name}>'
-
-
-class PolygonalVectorField(VectorField):
-    def __init__(self, name, cells, headingFunction=None, defaultHeading=None):
-        self.cells = tuple(cells)
-        if headingFunction is None and defaultHeading is not None:
-            headingFunction = lambda pos: defaultHeading
-        self.headingFunction = headingFunction
-        for cell, heading in self.cells:
-            if heading is None and headingFunction is None and defaultHeading is None:
-                raise RuntimeError(f'missing heading for cell of PolygonalVectorField')
-        self.defaultHeading = defaultHeading
-        super().__init__(name, self.valueAt)
-
-    def valueAt(self, pos):
-        point = shapely.geometry.Point(pos)
-        for cell, heading in self.cells:
-            if cell.intersects(point):
-                return self.headingFunction(pos) if heading is None else heading
-        if self.defaultHeading is not None:
-            return self.defaultHeading
-        raise RuntimeError(f'evaluated PolygonalVectorField at undefined point {pos}')
 
 
 @distributionFunction
@@ -452,3 +305,12 @@ def reverse_euler(euler_rot: Vector3D) -> Vector3D:
     rot = R.from_euler('zyx', euler_rot)
     inv = rot.inv()
     return inv.as_euler('zyx')
+
+
+def normalize_angle(angle):
+    while angle > math.pi:
+        angle -= math.tau
+    while angle < -math.pi:
+        angle += math.tau
+    assert -math.pi <= angle <= math.pi
+    return angle

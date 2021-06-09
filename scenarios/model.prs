@@ -5,8 +5,8 @@ import math
 width = 5
 length = 5
 height = 5
-workspace = CuboidRegion(Vector3D(0, 0, height / 2.0), Vector3D(0,0,0), width, length, height)
-floor = Rectangle3DRegion(width, length, Vector3D(0, 0, 0), Vector3D(0, 0, 0))
+workspace = Cuboid(Vector3D(0, 0, height / 2.0), Vector3D(0,0,0), width, length, height)
+floor = Rectangle3D(width, length, Vector3D(0, 0, 0), Vector3D(0, 0, 0))
 
 class Cube:
     width: 0.04
@@ -90,11 +90,13 @@ class Bucket:
     height: 0.28436
     model_name: "Bucket"
     color: "brown"
+
 class RopeBucket:
     width: 0.01
     length: 0.01
     num_rope_links: 7
     model_name: "RopeBucket"
+
 class CircularConveyorBelt:
     width: 1.7019
     length: 1.7003

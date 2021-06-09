@@ -1,19 +1,23 @@
 """Implementations of the built-in Scenic classes."""
 import collections
+import dataclasses
 import inspect
 import itertools as it
-import numpy as np
+from dataclasses import dataclass, is_dataclass, fields
+from typing import List
 
-from probRobScene.core.distributions import Samplable, needs_sampling, to_distribution
-from probRobScene.core.geometry import hypot, min
-from probRobScene.core.lazy_eval import needs_lazy_evaluation, makeDelayedFunctionCall
-from probRobScene.core.regions import SphericalRegion, Oriented, PointInRegionDistribution, \
-    IntersectionRegion
-from probRobScene.core.specifiers import Specifier, PropertyDefault
-from probRobScene.core.type_support import toType
-from probRobScene.core.utils import areEquivalent, RuntimeParseError, group_by
-from probRobScene.core.vectors import Vector, Vector3D, rotate_euler_v3d
+import numpy as np
+from multimethod import multimethod
+
+import probRobScene.core.distributions
+from probRobScene.core.distributions import Samplable, needs_sampling
+import probRobScene.core.geometry as g
+from probRobScene.core.lazy_eval import needs_lazy_evaluation, makeDelayedFunctionCall, evaluate_in, DelayedArgument
 from probRobScene.core.plotUtil3d import draw_cube
+from probRobScene.core.regions import PointInRegionDistribution, Intersection, Spherical
+from probRobScene.core.specifiers import Specifier, PropertyDefault, pd_for_value
+from probRobScene.core.utils import areEquivalent, RuntimeParseError, group_by
+from probRobScene.core.vectors import Vector3D, rotate_euler_v3d
 
 
 ## Abstract base class
@@ -35,16 +39,32 @@ class Constructible(Samplable):
     def defaults(cls):  # TODO improve so this need only be done once?
         # find all defaults provided by the class or its superclasses
         allDefs = collections.defaultdict(list)
-        for sc in inspect.getmro(cls):
+
+        # Get the inheritance chain for this class
+        base_classes = inspect.getmro(cls)
+        for sc in base_classes:
+            # Ok, so what is going on here is that scenic's parser bakes default arguments for properties DIRECTLY INTO THE TYPE ANNOTATIONS
+            # TODO: Figure out how to make this not absolutely wild
             if hasattr(sc, '__annotations__'):
-                for prop, value in sc.__annotations__.items():
-                    allDefs[prop].append(PropertyDefault.forValue(value))
+                annots = sc.__annotations__
+                for prop, value in annots.items():
+                    if isinstance(value, PropertyDefault):
+                        allDefs[prop].append(value)
+                    elif is_dataclass(sc):
+                        field = next(f for f in fields(sc) if f.name == prop)
+                        if field.default != dataclasses.MISSING:
+                            allDefs[prop].append(field.default)
 
         # resolve conflicting defaults
         resolvedDefs = {}
         for prop, defs in allDefs.items():
             primary, rest = defs[0], defs[1:]
-            spec = primary.resolveFor(prop, rest)
+            # TODO: unbreak what you've broken here
+            # spec = primary.resolve_for(prop, rest)
+            if isinstance(primary, PropertyDefault):
+                spec = primary.resolve_for(prop)
+            else:
+                spec = Specifier(prop, primary)
             resolvedDefs[prop] = spec
         return resolvedDefs
 
@@ -56,6 +76,7 @@ class Constructible(Samplable):
         return cls(*specs)
 
     def __init__(self, *args, **kwargs):
+        self._conditioned = self
         # Validate specifiers
         name = type(self).__name__
         defs = self.defaults()
@@ -109,7 +130,7 @@ class Constructible(Samplable):
         order = []
         seen, done = set(), set()
 
-        def dfs(spec):
+        def dfs(spec : Specifier):
             if spec in done:
                 return
             elif spec in seen:
@@ -132,7 +153,7 @@ class Constructible(Samplable):
 
         # Evaluate and apply specifiers
         for spec in order:
-            v = to_distribution(spec.value.evaluateIn(self))
+            v = probRobScene.core.distributions.to_distribution(evaluate_in(spec.value, self))
             assert not needs_lazy_evaluation(v)
             setattr(self, spec.property, v)
             for opt in optionals_for_spec[spec]:
@@ -140,8 +161,10 @@ class Constructible(Samplable):
                 setattr(self, opt, getattr(v, opt))
 
         # Set up dependencies
-        super().__init__(dependencies=[getattr(self, p) for p in properties if needs_sampling(getattr(self, p))])
         self.properties = set(properties)
+
+    def dependencies(self) -> List:
+        return [getattr(self, p) for p in self.properties if needs_sampling(getattr(self, p))]
 
     def sample_given_dependencies(self, dep_values):
         return self.withProperties({prop: dep_values[getattr(self, prop)]
@@ -169,56 +192,38 @@ class Constructible(Samplable):
 
 
 def intersect_distribution(*regions) -> PointInRegionDistribution:
-    return PointInRegionDistribution(IntersectionRegion(*regions))
+    return PointInRegionDistribution(Intersection(regions))
 
 
-class Mutator:
-    """An object controlling how the ``mutate`` statement affects an `Object`.
-
-    A `Mutator` can be assigned to the ``mutator`` property of an `Object` to
-    control the effect of the ``mutate`` statement. When mutation is enabled
-    for such an object using that statement, the mutator's `appliedTo` method
-    is called to compute a mutated version.
-    """
-
-    def appliedTo(self, obj):
-        """Return a mutated copy of the object. Implemented by subclasses."""
-        raise NotImplementedError
-
-
+@dataclass(eq=False)
 class Point3D(Constructible):
-    position: Vector3D(0, 0, 0)
-    visibleDistance: 50
+    position: Vector3D = Vector3D(0, 0, 0)
+    visibleDistance: float = 50
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+    def __post_init__(self):
         self.corners = (self.position,)
-        self.visibleRegion = SphericalRegion(self.position, self.visibleDistance)
+        self.visibleRegion = Spherical(self.position, self.visibleDistance)
 
     def to_vector_3d(self):
-        return self.position.to_vector_3d()
+        return self.position
 
     def sample_given_dependencies(self, dep_values):
         sample = super().sample_given_dependencies(dep_values)
-        # TODO: Mutation stuff here?
         return sample
 
     def __getattr__(self, attr):
-        if hasattr(Vector3D, attr):
+        if hasattr(self.position, attr):
             return getattr(self.to_vector_3d(), attr)
         else:
             raise AttributeError(f"'{type(self).__name__}' object has no attribute '{attr}'")
 
 
-class OrientedPoint3D(Point3D, Oriented):
-    orientation: Vector3D(0, 0, 0)
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.orientation = toType(self.orientation, Vector3D)
-
-    def to_orientation(self):
-        return self.orientation
+@dataclass(eq=False)
+class OrientedPoint3D(Point3D):
+    orientation: Vector3D = Vector3D(0, 0, 0)
 
 
 def rel_pos_3d(rel_pos, reference_pos, reference_orientation):
@@ -226,60 +231,106 @@ def rel_pos_3d(rel_pos, reference_pos, reference_orientation):
     return OrientedPoint3D(position=pos, orientation=reference_orientation)
 
 
-class Object(Point3D, Oriented):
-    width: 1
-    height: 1
-    length: 1
-    orientation: Vector3D(0, 0, 0)
-    allowCollisions: False
-    requireVisible: True
-    cameraOffset: Vector(0, 0)
-
-    def to_orientation(self):
-        return self.orientation
+@dataclass(eq=False)
+class Object(Point3D):
+    width: float = 1
+    height: float = 1
+    length: float = 1
+    orientation: Vector3D = Vector3D(0, 0, 0)
+    allowCollisions: bool = False
+    requireVisible: bool = True
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.hw = hw = self.width / 2
-        self.hh = hh = self.height / 2
-        self.hl = hl = self.length / 2
+    @property
+    def hw(self):
+        return self.width / 2.0
 
-        self.radius = hypot(hw, hl, hh)  # circumcircle; for collision detection
-        self.inradius = min(hw, hl, hh)  # incircle; for collision detection
+    @property
+    def hh(self):
+        return self.height / 2.0
 
-        self.left = rel_pos_3d(Vector3D(-hw, 0, 0), self.position, self.orientation)
-        self.right = rel_pos_3d(Vector3D(hw, 0, 0), self.position, self.orientation)
-        self.front = rel_pos_3d(Vector3D(0, hl, 0), self.position, self.orientation)
-        self.back = rel_pos_3d(Vector3D(0, -hl, 0), self.position, self.orientation)
+    @property
+    def hl(self):
+        return self.length / 2.0
 
-        self.top = rel_pos_3d(Vector3D(0, 0, hh), self.position, self.orientation)
-        self.top_front = rel_pos_3d(Vector3D(0, hl, hh), self.position, self.orientation)
-        self.top_back = rel_pos_3d(Vector3D(0, -hl, hh), self.position, self.orientation)
+    @property
+    def radius(self):
+        return g.hypot(self.hw, self.hl, self.hh)
 
-        self.bottom = rel_pos_3d(Vector3D(0, 0, -hh), self.position, self.orientation)
+    @property
+    def inradius(self):
+        return g.min(self.hw, self.hl, self.hh)
 
-        self.front_left = rel_pos_3d(Vector3D(-hw, hl, 0), self.position, self.orientation)
-        self.front_right = rel_pos_3d(Vector3D(hw, hl, 0), self.position, self.orientation)
-        self.back_left = rel_pos_3d(Vector3D(-hw, -hl, 0), self.position, self.orientation)
-        self.back_right = rel_pos_3d(Vector3D(-hw, hl, 0), self.position, self.orientation)
+    @property
+    def left(self):
+        return rel_pos_3d(Vector3D(-self.hw, 0, 0), self.position, self.orientation)
 
-        self.corners = tuple(self.position + rotate_euler_v3d(Vector3D(*offset), self.orientation)
-                             for offset in it.product((hw, -hw), (hl, -hl), (hh, -hh)))
-        self.forward = rotate_euler_v3d(Vector3D(0, 1, 0), self.orientation)
-        # camera = self.position.offsetRotated(self.heading, self.cameraOffset)
-        # self.visibleRegion = SectorRegion(camera, self.visibleDistance, self.heading, self.viewAngle)
-        self._relations = []
+    @property
+    def right(self):
+        return rel_pos_3d(Vector3D(self.hw, 0, 0), self.position, self.orientation)
 
+    @property
+    def front(self):
+        return rel_pos_3d(Vector3D(0, self.hl, 0), self.position, self.orientation)
+
+    @property
+    def back(self):
+        return rel_pos_3d(Vector3D(0, -self.hl, 0), self.position, self.orientation)
+
+    @property
+    def top(self):
+        return rel_pos_3d(Vector3D(0, 0, self.hh), self.position, self.orientation)
+
+    @property
+    def corners(self):
+        return tuple(self.position + rotate_euler_v3d(Vector3D(*offset), self.orientation)
+                     for offset in it.product((self.hw, -self.hw), (self.hl, -self.hl), (self.hh, -self.hh)))
+
+    @property
+    def top_front(self):
+        return rel_pos_3d(Vector3D(0, self.hl, self.hh), self.position, self.orientation)
+
+    @property
+    def top_back(self):
+        return rel_pos_3d(Vector3D(0, -self.hl, self.hh), self.position, self.orientation)
+
+    @property
+    def bottom(self):
+        return rel_pos_3d(Vector3D(0, 0, -self.hh), self.position, self.orientation)
+
+    @property
+    def front_left(self):
+        return rel_pos_3d(Vector3D(-self.hw, self.hl, 0), self.position, self.orientation)
+
+    @property
+    def front_right(self):
+        return rel_pos_3d(Vector3D(self.hw, self.hl, 0), self.position, self.orientation)
+
+    @property
+    def back_left(self):
+        return rel_pos_3d(Vector3D(-self.hw, -self.hl, 0), self.position, self.orientation)
+
+    @property
+    def back_right(self):
+        return rel_pos_3d(Vector3D(-self.hw, self.hl, 0), self.position, self.orientation)
+
+    @property
+    def forward(self):
+        return rotate_euler_v3d(Vector3D(0, 1, 0), self.orientation)
+
+    @property
     def dimensions(self) -> Vector3D:
         return Vector3D(self.width, self.length, self.height)
 
-    def show_3d(self, ax, highlight=False):
-        if needs_sampling(self):
-            raise RuntimeError('tried to show_3d() symbolic Object')
 
-        color = self.color if hasattr(self, 'color') else (1, 0, 0)
-        draw_cube(ax, np.array([*self.position]), np.array([self.width, self.length, self.height]),
-                  np.array([*self.orientation]), color=color)
-        ax.quiver(self.position[0], self.position[1], self.position[2], self.forward[0], self.forward[1],
-                  self.forward[2], length=0.2, normalize=True)
+def show_3d(o: Object, ax, highlight=False):
+    if needs_sampling(o):
+        raise RuntimeError('tried to show_3d() symbolic Object')
+
+    color = o.color if hasattr(o, 'color') else (1, 0, 0)
+    draw_cube(ax, np.array([*o.position]), np.array([o.width, o.length, o.height]),
+              np.array([*o.orientation]), color=color)
+    ax.quiver(o.position[0], o.position[1], o.position[2], o.forward[0], o.forward[1],
+              o.forward[2], length=0.2, normalize=True)

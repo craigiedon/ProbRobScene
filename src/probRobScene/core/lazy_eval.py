@@ -1,6 +1,10 @@
 """Support for lazy evaluation of expressions and specifiers."""
 import abc
 import itertools
+from inspect import signature
+from typing import Mapping, Any, Sequence, Callable
+
+from multimethod import multimethod
 
 
 class LazilyEvaluable(abc.ABC):
@@ -11,27 +15,9 @@ class LazilyEvaluable(abc.ABC):
     properties.
     """
 
-    def __init__(self, required_props):
-        self._dependencies = ()  # TODO improve?
-        self._requiredProperties = set(required_props)
-
-    def evaluateIn(self, context):
-        """Evaluate this value in the context of an object being constructed.
-
-        The object must define all of the properties on which this value depends.
-        """
-        assert all(hasattr(context, prop) for prop in self._requiredProperties)
-        value = self.evaluateInner(context)
-        if needs_lazy_evaluation(value):
-            print(needs_lazy_evaluation(value))
-            print(self.evaluateInner(context))
-        assert not needs_lazy_evaluation(value)  # value should not require further evaluation
-        return value
-
     @abc.abstractmethod
-    def evaluateInner(self, context):
-        """Actually evaluate in the given context, which provides all required properties."""
-        raise NotImplementedError
+    def required_properties(self) -> set:
+        pass
 
 
 class DelayedArgument(LazilyEvaluable):
@@ -41,29 +27,59 @@ class DelayedArgument(LazilyEvaluable):
     construction) to a value.
     """
 
-    def __init__(self, required_props, value):
-        self.value = value
-        super().__init__(required_props)
+    def required_properties(self) -> set:
+        return self.rps
 
-    def evaluateInner(self, context):
-        return self.value(context)
+    def __init__(self, required_props, valuation_func: Callable):
+        self.value_func : Callable = valuation_func
+        self.rps = required_props
 
     def __getattr__(self, name):
-        return DelayedArgument(self._requiredProperties,
-                               lambda context: getattr(self.evaluateIn(context), name))
+        return DelayedArgument(self.rps,
+                               lambda context: getattr(evaluate_in(self, context), name))
 
     def __call__(self, *args, **kwargs):
         dargs = [toDelayedArgument(arg) for arg in args]
         kwdargs = {name: toDelayedArgument(arg) for name, arg in kwargs.items()}
-        subprops = (darg._requiredProperties for darg in itertools.chain(dargs, kwdargs.values()))
-        props = self._requiredProperties.union(*subprops)
+        subprops = (darg.required_properties() for darg in itertools.chain(dargs, kwdargs.values()))
+        props = self.required_properties().union(*subprops)
 
         def value(context):
-            subvalues = (darg.evaluateIn(context) for darg in dargs)
-            kwsvs = {name: darg.evaluateIn(context) for name, darg in kwdargs.items()}
-            return self.evaluateIn(context)(*subvalues, **kwsvs)
+            subvalues = (evaluate_in(darg, context) for darg in dargs)
+            kwsvs = {name: darg.evaluate_in(context) for name, darg in kwdargs.items()}
+            return evaluate_in(self, context)(*subvalues, **kwsvs)
 
         return DelayedArgument(props, value)
+
+
+@multimethod
+def evaluate_inner(x: LazilyEvaluable, context: Mapping[Any, Any]) -> Any:
+    cls = x.__class__
+    init_params = list(signature(cls.__init__).parameters.keys())[1:]
+    current_vals = [x.__getattribute__(p) for p in init_params]
+    context_vals = [value_in_context(cv, context) for cv in current_vals]
+
+    return cls(*context_vals)
+
+@multimethod
+def evaluate_inner(x: DelayedArgument, context: Any) -> Any:
+    return x.value_func(context)
+
+
+def evaluate_in(x: LazilyEvaluable, context: Any) -> Any:
+    """Evaluate this value in the context of an object being constructed.
+
+    The object must define all of the properties on which this value depends.
+    """
+    assert all(hasattr(context, prop) for prop in x.required_properties())
+    value = evaluate_inner(x, context)
+    if needs_lazy_evaluation(value):
+        print(needs_lazy_evaluation(value))
+        print(evaluate_inner(x, context))
+    assert not needs_lazy_evaluation(value), f"value {value} should not require further evaluation"
+    return value
+
+
 
 
 # Operators which can be applied to DelayedArguments
@@ -91,11 +107,11 @@ allowedOperators = [
 def make_delayed_operator_handler(op):
     def handler(self, *args):
         dargs = [toDelayedArgument(arg) for arg in args]
-        props = self._requiredProperties.union(*(darg._requiredProperties for darg in dargs))
+        props = self.required_properties().union(*(darg._requiredProperties for darg in dargs))
 
         def value(context):
-            subvalues = (darg.evaluateIn(context) for darg in dargs)
-            return getattr(self.evaluateIn(context), op)(*subvalues)
+            subvalues = (evaluate_in(darg, context) for darg in dargs)
+            return getattr(self.evaluate_in(context), op)(*subvalues)
 
         return DelayedArgument(props, value)
 
@@ -110,21 +126,32 @@ def makeDelayedFunctionCall(func, args, kwargs):
     """Utility function for creating a lazily-evaluated function call."""
     dargs = [toDelayedArgument(arg) for arg in args]
     kwdargs = {name: toDelayedArgument(arg) for name, arg in kwargs.items()}
-    props = set().union(*(darg._requiredProperties
+    props = set().union(*(darg.required_properties()
                           for darg in itertools.chain(dargs, kwdargs.values())))
 
     def value(context):
-        subvalues = (darg.evaluateIn(context) for darg in dargs)
-        kwsubvals = {name: darg.evaluateIn(context) for name, darg in kwdargs.items()}
+        subvalues = (evaluate_in(darg, context) for darg in dargs)
+        kwsubvals = {name: darg.evaluate_in(context) for name, darg in kwdargs.items()}
         return func(*subvalues, **kwsubvals)
 
     return DelayedArgument(props, value)
 
 
-def value_in_context(value, context):
+@multimethod
+def value_in_context(l: Sequence, context: Mapping) -> Sequence:
+    return [value_in_context(x, context) for x in l]
+
+
+@multimethod
+def value_in_context(d: Mapping, context: Mapping) -> Mapping:
+    return {k: value_in_context(v, context) for k, v in d.items()}
+
+
+@multimethod
+def value_in_context(value: Any, context: Mapping) -> Any:
     """Evaluate something in the context of an object being constructed."""
     try:
-        return value.evaluateIn(context)
+        return value.evaluate_in(context)
     except AttributeError:
         return value
 
@@ -136,10 +163,12 @@ def toDelayedArgument(thing):
 
 
 def requiredProperties(thing):
-    if hasattr(thing, '_requiredProperties'):
-        return thing._requiredProperties
+    if isinstance(thing, LazilyEvaluable):
+        return thing.required_properties()
     return set()
 
 
-def needs_lazy_evaluation(thing):
-    return isinstance(thing, DelayedArgument) or requiredProperties(thing)
+def needs_lazy_evaluation(thing) -> bool:
+    del_arg = isinstance(thing, DelayedArgument)
+    req_p = requiredProperties(thing)
+    return del_arg or req_p

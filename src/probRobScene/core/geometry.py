@@ -1,13 +1,10 @@
 """Utility functions for geometric computation."""
-import abc
 import math
-import warnings
 
 import numpy as np
-import probRobScene.core.utils as utils
-from probRobScene.core.distributions import (needs_sampling, distributionFunction,
-                                             monotonicDistributionFunction)
-from probRobScene.core.lazy_eval import needs_lazy_evaluation
+
+from probRobScene.core.distributions import distributionFunction, monotonicDistributionFunction
+from probRobScene.core.utils import min_and_max
 
 
 @distributionFunction
@@ -40,15 +37,6 @@ def min(*args):
     return __builtins__['min'](*args)
 
 
-def normalize_angle(angle):
-    while angle > math.pi:
-        angle -= math.tau
-    while angle < -math.pi:
-        angle += math.tau
-    assert -math.pi <= angle <= math.pi
-    return angle
-
-
 def averageVectors(a, b, weight=0.5):
     ax, ay = a[0], a[1]
     bx, by = b[0], b[1]
@@ -60,17 +48,6 @@ def rotate_vector(vector, angle):
     x, y = vector
     c, s = cos(angle), sin(angle)
     return (c * x) - (s * y), (s * x) + (c * y)
-
-
-def min_and_max(iterable):
-    min_v = float('inf')
-    max_v = float('-inf')
-    for val in iterable:
-        if val < min_v:
-            min_v = val
-        if val > max_v:
-            max_v = val
-    return min_v, max_v
 
 
 def radialToCartesian(point, radius, heading):
@@ -107,16 +84,6 @@ def apparentHeadingAtPoint(point, heading, base):
         a -= math.tau
     assert -math.pi <= a <= math.pi
     return a
-
-
-def cuboid_contains_point(obj, point):
-    from probRobScene.core.vectors import rotate_euler_v3d
-    from probRobScene.core.vectors import reverse_euler
-    diff = point - obj.position
-    need_to_sample = needs_sampling(obj)
-    need_to_lazy = needs_lazy_evaluation(obj)
-    x, y, z = rotate_euler_v3d(diff, reverse_euler(obj.orientation))
-    return abs(x) <= obj.hw and abs(y) <= obj.hl and abs(z) <= obj.hh
 
 
 def cuboids_intersect(cuboid_a, cuboid_b):
@@ -157,9 +124,3 @@ def cube_edge_separates(cuboid_a, cuboid_b):
         return True
 
     return False
-
-
-def get_constant_polygon(cuboid):
-    assert not any(needs_sampling(c) or needs_lazy_evaluation(c) for c in cuboid.corners)
-    corners = [(x, y, z) for x, y, z in cuboid.corners]  # convert Vectors to tuples
-    return shapely.geometry.Polygon(corners)

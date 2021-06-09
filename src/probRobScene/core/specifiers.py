@@ -1,8 +1,9 @@
 """Specifiers and associated objects."""
+from typing import Any
 
 from probRobScene.core.distributions import to_distribution
 from probRobScene.core.lazy_eval import (DelayedArgument, toDelayedArgument, requiredProperties,
-                                         needs_lazy_evaluation)
+                                         needs_lazy_evaluation, LazilyEvaluable)
 from probRobScene.core.utils import RuntimeParseError
 
 
@@ -17,7 +18,9 @@ class Specifier:
     def __init__(self, prop, value, deps=None, optionals=None):
         if deps is None:
             deps = set()
-        deps |= requiredProperties(value)
+
+        if isinstance(value, LazilyEvaluable):
+            deps |= value.required_properties()
         if optionals is None:
             optionals = {}
         self.property = prop
@@ -40,38 +43,13 @@ class PropertyDefault:
         self.requiredProperties = requiredProperties
         self.value = value
 
-        def enabled(thing, default):
-            if thing in attributes:
-                attributes.remove(thing)
-                return True
-            else:
-                return default
-
-        self.isAdditive = enabled('additive', False)
-        for attr in attributes:
-            raise RuntimeParseError(f'unknown property attribute "{attr}"')
-
-    @staticmethod
-    def forValue(value):
-        if isinstance(value, PropertyDefault):
-            return value
-        else:
-            return PropertyDefault(set(), set(), lambda self: value)
-
-    def resolveFor(self, prop, overriddenDefs):
+    def resolve_for(self, prop):
         """Create a Specifier for a property from this default and any superclass defaults."""
-        if self.isAdditive:
-            allReqs = self.requiredProperties
-            for other in overriddenDefs:
-                allReqs |= other.requiredProperties
+        return Specifier(prop, DelayedArgument(self.requiredProperties, self.value))
 
-            def concatenator(context):
-                allVals = [self.value(context)]
-                for other in overriddenDefs:
-                    allVals.append(other.value(context))
-                return tuple(allVals)
 
-            val = DelayedArgument(allReqs, concatenator)
-        else:
-            val = DelayedArgument(self.requiredProperties, self.value)
-        return Specifier(prop, val)
+def pd_for_value(value: Any) -> PropertyDefault:
+    if isinstance(value, PropertyDefault):
+        return value
+    else:
+        return PropertyDefault(set(), set(), lambda self: value)
