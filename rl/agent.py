@@ -1,0 +1,2 @@
+def p():
+    print('douce')
