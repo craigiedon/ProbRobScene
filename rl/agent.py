@@ -1,2 +1,5 @@
-def p():
-    print('hello world')
+def reward():
+    return 0
+
+def reset():
+    pass

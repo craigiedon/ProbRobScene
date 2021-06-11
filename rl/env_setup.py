@@ -56,5 +56,32 @@ def main():
     agent_module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(agent_module)
 
+    inputs = []
+    reward = []
+
+    # Setup the environment for the scenario
+    pr.launch(PATH_TO_SCENE_FILE, headless=False, responsive_ui=True)
+
+    # Camera setup for the environment
+    scene_view = Camera('DefaultCamera')
+    scene_view.set_position([3.45, 0.18, 2.0])
+    scene_view.set_orientation(np.array([180, -70, 90]) * np.pi / 180.0)
+
+    for i in range(EPISODES):
+        if i % EPISODE_LENGTH == 0:
+            print('reset episode')
+            agent_module.reset()
+
+        ex_world, y = scenario.generate()
+
+        inputs.append(ex_world)
+        pr.start()
+        pr.step()
+
+        print(y)
+        print(ex_world)
+
+        print(scene_view.get_position())
+
 if __name__ == "__main__":
     main()
