@@ -78,10 +78,10 @@ def main():
         pr.start()
         pr.step()
 
+        print(rc.location_from_depth_cam(pr, scene_view, ))
         print(y)
         print(ex_world)
 
-        print(scene_view.get_position())
 
 if __name__ == "__main__":
     main()
