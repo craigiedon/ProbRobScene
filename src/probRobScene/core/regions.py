@@ -81,6 +81,9 @@ class HalfSpace(Region, Convex):
     normal: Vector3D
     dist: float = 100.0
 
+    def __post_init__(self):
+        assert np.isclose(np.linalg.norm(self.normal), 1.0), f"Normal vector {self.normal} has no-unit magnitude"
+
     @property
     def rot(self):
         return rotation_to_euler(Vector3D(0, 0, 1), self.normal)
@@ -303,7 +306,9 @@ def contains_point(r: Spherical, point: Vector3D) -> bool:
 
 @multimethod
 def contains_point(r: HalfSpace, point: Vector3D) -> bool:
-    return np.dot(r.normal, point - r.point) >= 0
+    offset = point - r.point
+    dp = np.dot(r.normal, offset)
+    return dp >= 0
 
 
 @multimethod

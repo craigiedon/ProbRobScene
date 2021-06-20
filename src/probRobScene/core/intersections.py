@@ -267,7 +267,8 @@ def to_hsi(r: Union[ConvexPolyhedron, ConvexPolygon3D]) -> HalfspaceIntersection
 def to_hsi(r: Cuboid) -> HalfspaceIntersection:
     hs_norms, hs_origins = cube_to_normals(np.array(r.position), np.array(r.dimensions), np.array(r.orientation))
     hs_ineqs = halfspaces_to_inequalities(hs_norms, hs_origins)
-    return HalfspaceIntersection(hs_ineqs, np.array(r.position))
+    in_point = np.array(r.position)
+    return HalfspaceIntersection(hs_ineqs, in_point)
 
 
 # @distributionFunction

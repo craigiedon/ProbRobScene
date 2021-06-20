@@ -1,9 +1,10 @@
 import unittest
 
 from multimethod import DispatchError
+from scipy.spatial import HalfspaceIntersection
 
-from probRobScene.core.intersections import intersect
-from probRobScene.core.regions import All, Empty, Spherical, Cuboid, Intersection, Rectangle3D
+from probRobScene.core.intersections import intersect, to_hsi
+from probRobScene.core.regions import All, Empty, Spherical, Cuboid, Intersection, Rectangle3D, HalfSpace, ConvexPolyhedron, contains, contains_point
 from probRobScene.core.vectors import Vector3D
 
 
@@ -78,14 +79,74 @@ class TestIntersections(unittest.TestCase):
         self.assertRaises(DispatchError, intersect, c, s)
 
     def test_intersection_others(self):
-        inter = Intersection([Cuboid(Vector3D(0,0,0), Vector3D(0,0,0), 1, 1, 1), Rectangle3D(1,1,Vector3D(0,0,0), Vector3D(0,0,0))])
+        inter = Intersection([Cuboid(Vector3D(0, 0, 0), Vector3D(0, 0, 0), 1, 1, 1), Rectangle3D(1, 1, Vector3D(0, 0, 0), Vector3D(0, 0, 0))])
         c = Cuboid(Vector3D(0, 0, 0), Vector3D(0, 0, 0), 1, 1, 1)
         self.assertRaises(DispatchError, intersect, c, inter)
 
     def test_others_intersection(self):
-        inter = Intersection([Cuboid(Vector3D(0,0,0), Vector3D(0,0,0), 1, 1, 1), Rectangle3D(1,1,Vector3D(0,0,0), Vector3D(0,0,0))])
+        inter = Intersection([Cuboid(Vector3D(0, 0, 0), Vector3D(0, 0, 0), 1, 1, 1), Rectangle3D(1, 1, Vector3D(0, 0, 0), Vector3D(0, 0, 0))])
         c = Cuboid(Vector3D(0, 0, 0), Vector3D(0, 0, 0), 1, 1, 1)
         self.assertRaises(DispatchError, intersect, inter, c)
+
+    def test_halfspace_halfspace_same(self):
+        hs_1 = HalfSpace(Vector3D(0, 0, 0), Vector3D(0, 1, 0))
+        hs_2 = HalfSpace(Vector3D(0, 0, 0), Vector3D(0, 1, 0))
+        it = intersect(hs_1, hs_2)
+
+        self.assertTrue(isinstance(it, ConvexPolyhedron))
+
+        self.assertTrue(contains_point(hs_1, Vector3D(*it.hsi.interior_point)))
+        self.assertTrue(contains_point(hs_2, Vector3D(*it.hsi.interior_point)))
+
+    def test_halfspace_halfspace_diff(self):
+        hs_1 = HalfSpace(Vector3D(0, 0, 0), Vector3D(0, 1, 0))
+        hs_2 = HalfSpace(Vector3D(0, 1.0, 0), Vector3D(0, -1, 0))
+        it = intersect(hs_1, hs_2)
+
+        self.assertTrue(isinstance(it, ConvexPolyhedron))
+
+        self.assertTrue(contains_point(hs_1, Vector3D(*it.hsi.interior_point)))
+        self.assertTrue(contains_point(hs_2, Vector3D(*it.hsi.interior_point)))
+
+    def test_halfspace_halfspace_redundant(self):
+        hs_1 = HalfSpace(Vector3D(0, 0, 0), Vector3D(0, 1, 0))
+        hs_2 = HalfSpace(Vector3D(0, 1.0, 0), Vector3D(0, 1, 0))
+        it = intersect(hs_1, hs_2)
+
+        self.assertTrue(isinstance(it, ConvexPolyhedron))
+
+        self.assertTrue(contains_point(hs_1, Vector3D(*it.hsi.interior_point)))
+        self.assertTrue(contains_point(hs_2, Vector3D(*it.hsi.interior_point)))
+
+    def test_halfspace_halfspace_noIntersection(self):
+        hs_1 = HalfSpace(Vector3D(0, 1, 0), Vector3D(0, 1, 0))
+        hs_2 = HalfSpace(Vector3D(0, -1, 0), Vector3D(0, -1, 0))
+        it = intersect(hs_1, hs_2)
+
+        self.assertTrue(isinstance(it, Empty))
+
+    def test_halfspace_halfspace_noIntersectionByDistance(self):
+        hs_1 = HalfSpace(Vector3D(0, 1, 0), Vector3D(0, 1, 0))
+        hs_2 = HalfSpace(Vector3D(0, 10000, 0), Vector3D(0, 1, 0))
+        it = intersect(hs_1, hs_2)
+
+        self.assertTrue(isinstance(it, Empty))
+
+    def test_halfspace_convpolyh_intersection(self):
+        hs = HalfSpace(Vector3D(0, 1, 0), Vector3D(0, 1, 0))
+        cp = ConvexPolyhedron(to_hsi(Cuboid(Vector3D(0.0, 0.0, 0.0), Vector3D(0, 0, 0), 5, 5, 5)))
+        it = intersect(hs, cp)
+
+        self.assertTrue(isinstance(it, ConvexPolyhedron))
+        self.assertTrue(contains_point(hs, Vector3D(*it.hsi.interior_point)))
+        self.assertTrue(contains_point(cp, Vector3D(*it.hsi.interior_point)))
+
+    def test_halfspace_convpolyh_noIntersection(self):
+        hs = HalfSpace(Vector3D(0, 4, 0), Vector3D(0, 1, 0))
+        cp = ConvexPolyhedron(to_hsi(Cuboid(Vector3D(0.0, 0.0, 0.0), Vector3D(0, 0, 0), 1, 1, 1)))
+        it = intersect(hs, cp)
+
+        self.assertTrue(isinstance(it, Empty))
 
 
 if __name__ == '__main__':
