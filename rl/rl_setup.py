@@ -1,10 +1,3 @@
-# this is the important setup for our environment
-# .prs files to setup the environment of the robot
-# .ttt file to setup the scene
-# .py file to specify the environment
-# episode length and number of episodes as input
-# at each stage keep publishing the reward of the agent
-
 # python packages
 import sys
 import argparse
@@ -26,8 +19,7 @@ from probRobScene.wrappers.coppelia.prbCoppeliaWrapper import cop_from_prs
 def main():
     if len(sys.argv) != 6:
         print("Incorret argument")
-        print("python3 env_setup.py <path-to-scenario-file> <path-to-scene-file> <path-to-python-file> <episode-length> <number-of-episodes>")
-    
+        print("python env_setup.py <path-to-scenario-file> <path-to-scene-file> <path-to-python-file> <episode-length> <number-of-episodes>")
 
     parser = argparse.ArgumentParser()
 

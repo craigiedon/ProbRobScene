@@ -35,6 +35,7 @@ class Environment(object):
         """
         self.pr.launch(self.scene_file, headless=False, responsive_ui=True)
 
+        # setup camera in the scene
         scene_view = Camera('DefaultCamera')
         scene_view.set_position([3.45, 0.18, 2.0])
         scene_view.set_orientation(np.array([180, -70, 90]) * np.pi / 180.0)
