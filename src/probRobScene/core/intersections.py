@@ -115,6 +115,11 @@ def intersect(c1: Union[ConvexPolygon3D, Rectangle3D], c2: Convex) -> Region:
     return ConvexPolygon3D(hsi, c1.origin, c1.rot)
 
 
+@multimethod
+def intersect(c1: Convex, c2: Union[ConvexPolygon3D, Rectangle3D]) -> Region:
+    return intersect(c2, c1)
+
+
 # @distributionFunction
 @multimethod
 def intersect(r1: Rectangle3D, r2: Rectangle3D) -> Region:

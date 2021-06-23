@@ -1,11 +1,12 @@
 import unittest
 
+import numpy as np
 from multimethod import DispatchError
 from scipy.spatial import HalfspaceIntersection
 
 from probRobScene.core.intersections import intersect, to_hsi
-from probRobScene.core.regions import All, Empty, Spherical, Cuboid, Intersection, Rectangle3D, HalfSpace, ConvexPolyhedron, contains, contains_point
-from probRobScene.core.vectors import Vector3D
+from probRobScene.core.regions import All, Empty, Spherical, Cuboid, Intersection, Rectangle3D, HalfSpace, ConvexPolyhedron, contains, contains_point, ConvexPolygon3D
+from probRobScene.core.vectors import Vector3D, rotate_euler, rotate_euler_v3d
 
 
 class TestIntersections(unittest.TestCase):
@@ -147,6 +148,78 @@ class TestIntersections(unittest.TestCase):
         it = intersect(hs, cp)
 
         self.assertTrue(isinstance(it, Empty))
+
+    def test_halfspace_convpg_noIntersection(self):
+        hs = HalfSpace(Vector3D(0, 4, 0), Vector3D(0, 1, 0))
+        hsi = HalfspaceIntersection(
+            np.array([
+                [1, 0, -3],
+                [0, 1, -3],
+                [-1, 0, 0],
+                [0, -1, 0]
+            ]),
+            np.array([1.0, 1.0]))
+        cp = ConvexPolygon3D(hsi=hsi, origin=Vector3D(0, 0, 0), rot=Vector3D(0, 0, 0))
+        it = intersect(hs, cp)
+
+        self.assertTrue(isinstance(it, Empty))
+
+    def test_halfspace_convpg_intersection(self):
+        hs = HalfSpace(Vector3D(0, 2, 0), Vector3D(0, 1, 0))
+        hsi = HalfspaceIntersection(
+            np.array([
+                [1, 0, -3],
+                [0, 1, -3],
+                [-1, 0, 0],
+                [0, -1, 0]
+            ]),
+            np.array([1.0, 1.0]))
+        cp = ConvexPolygon3D(hsi=hsi, origin=Vector3D(0, 0, 0), rot=Vector3D(0, 0, 0))
+        it = intersect(hs, cp)
+
+        int_point_3d: Vector3D = rotate_euler_v3d(Vector3D(*it.hsi.interior_point, 0.0), it.rot) + it.origin
+
+        self.assertTrue(isinstance(it, ConvexPolygon3D))
+        self.assertTrue(contains_point(hs, int_point_3d))
+        self.assertTrue(contains_point(cp, int_point_3d))
+
+    def test_halfspace_cuboid_intersect(self):
+        pass
+
+    def test_halfspace_cuboid_noIntersect(self):
+        pass
+
+    def test_halfspace_rect3d_intersect(self):
+        pass
+
+    def test_halfspace_rect3d_noIntersect(self):
+        pass
+
+    def test_halfspace_plane_intersect(self):
+        pass
+
+    def test_halfspace_plane_noIntersect(self):
+        pass
+
+    def test_halfspace_line_intersect(self):
+        pass
+
+    def test_halfspace_line_noIntersect(self):
+        pass
+
+    def test_halfspace_lineSeg_intersect(self):
+        pass
+
+    def test_halfspace_lineSeg_noIntersect(self):
+        pass
+
+    def test_halfspace_pointset_intersect(self):
+        pass
+
+    def test_halfspace_pointset_noIntersect(self):
+        pass
+
+
 
 
 if __name__ == '__main__':
