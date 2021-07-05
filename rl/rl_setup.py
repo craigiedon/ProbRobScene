@@ -16,6 +16,10 @@ from probRobScene.wrappers.coppelia.prbCoppeliaWrapper import cop_from_prs
 from probRobScene.wrappers.coppelia import robotControl as rc
 from probRobScene.wrappers.coppelia.prbCoppeliaWrapper import cop_from_prs
 
+#python packages
+import env_setup
+import agent_setup
+
 def main():
     if len(sys.argv) != 6:
         print("Incorret argument")
@@ -39,9 +43,8 @@ def main():
 
     pr = PyRep()
 
-    # Load the probRobScene file
-    scenario = probRobScene.scenario_from_file(PATH_TO_PRS_FILE)
-
+    # Environment setup for the agent
+    env = env_setup.Environment(PATH_TO_PRS_FILE, PATH_TO_SCENE_FILE)
 
     # accesesing methods associated with the agent
     spec = importlib.util.spec_from_file_location('agent', PATH_TO_PYTHON_FILE)
@@ -51,29 +54,26 @@ def main():
     inputs = []
     reward = []
 
-    # Setup the environment for the scenario
-    pr.launch(PATH_TO_SCENE_FILE, headless=False, responsive_ui=True)
+    #Agent setup
+    rl_agent = agent_setup.Agent(PATH_TO_SCENE_FILE, render_mode='rgb_array')
 
     # Camera setup for the environment
     scene_view = Camera('DefaultCamera')
     scene_view.set_position([3.45, 0.18, 2.0])
     scene_view.set_orientation(np.array([180, -70, 90]) * np.pi / 180.0)
 
-    for i in range(EPISODES):
-        if i % EPISODE_LENGTH == 0:
-            print('reset episode')
-            agent_module.reset()
+    for episode in range(EPISODES):
+        observation = rl_agent.reset()
+        for i in range(EPISODE_LENGTH):
+            action = rl_agent.act(observation)
+            im = rl_agent.render('rgb_array')
+            observation, reward, done, info = rl_agent.step(action)
 
-        ex_world, y = scenario.generate()
-
-        inputs.append(ex_world)
-        pr.start()
-        pr.step()
-
-        print(rc.location_from_depth_cam(pr, scene_view, ))
-        print(y)
-        print(ex_world)
-
+            if done:
+                print('EPISODE COMPLETE AFTER {} timestamps in EPISODE {}'.format(i+1, episode))
+                print(info)
+                break
+    rl_agent.close()
 
 if __name__ == "__main__":
     main()
