@@ -2,7 +2,7 @@
 
 import random
 from dataclasses import dataclass
-from typing import Any, List
+from typing import Any, List, Tuple, Mapping
 
 from probRobScene.core.distributions import Samplable, RejectionException, needs_sampling, sample_all
 from probRobScene.core.geometry import cuboids_intersect
@@ -121,24 +121,27 @@ class Scenario:
         return scene, iterations
 
 
-def rejection_sample(objects, dependencies, workspace, active_reqs, max_iterations, verbosity):
+def rejection_sample(objects, dependencies, workspace, active_reqs, max_iterations, verbosity) -> Tuple[Mapping, int]:
     for i in range(max_iterations):
-        sample, rejection_reason = try_sample(dependencies, objects, workspace, active_reqs)
-        if sample is not None:
-            return sample, i
-        if verbosity >= 2:
-            print(f'  Rejected sample {i} because of: {rejection_reason}')
+        try:
+            sample = sample_all(dependencies)
+        except RejectionException as e:
+            if verbosity >= 2:
+                print(f'Rejected sample {i} because of: {e}')
+            continue
+
+        valid, reason = is_valid_sample(sample, objects, workspace, active_reqs)
+        if not valid:
+            print(f'Rejected sample {i} because of: {reason}')
+            continue
+
+        return sample, i
+
     raise RejectionException(f'failed to generate scenario in {max_iterations} iterations')
 
 
-def try_sample(dependencies, objects, workspace, active_reqs):
-    try:
-        sample = sample_all(dependencies)
-    except RejectionException as e:
-        return None, e
-
+def is_valid_sample(sample: Mapping[Object, Object], objects: List[Object], workspace, active_reqs) -> Tuple[bool, str]:
     obj_samples = [sample[o] for o in objects]
-
     ns = [needs_sampling(o) for o in obj_samples]
     assert not any(ns)
 
@@ -146,28 +149,13 @@ def try_sample(dependencies, objects, workspace, active_reqs):
 
     for o in obj_samples:
         if not contains(workspace, o):
-            return None, 'object containment'
+            return False, 'object containment'
 
     if any(cuboids_intersect(vi, vj) for (i, vi) in enumerate(collidable) for vj in collidable[:i]):
-        return None, 'object intersection'
+        return False, 'object intersection'
 
-    for (i, req) in enumerate(active_reqs):
+    for (j, req) in enumerate(active_reqs):
         if not req(sample):
-            return None, f'user-specified requirement {i}'
+            return False, f'user-specified requirement {j}'
 
-    return sample, None
-
-# def zoom_around(workspace: Region, plt, objects, expansion=2):
-#     """Zoom the schematic around the specified objects"""
-#     positions = (obj.position for obj in objects)
-#     x, y = zip(*positions)
-#     minx, maxx = min_and_max(x)
-#     miny, maxy = min_and_max(y)
-#     sx = expansion * (maxx - minx)
-#     sy = expansion * (maxy - miny)
-#     s = max(sx, sy) / 2.0
-#     s += max(max(obj.width, obj.height) for obj in objects)  # TODO improve
-#     cx = (maxx + minx) / 2.0
-#     cy = (maxy + miny) / 2.0
-#     plt.xlim(cx - s, cx + s)
-#     plt.ylim(cy - s, cy + s)
+    return True, "valid"

@@ -173,10 +173,10 @@ class Constructible(Samplable):
     def allProperties(self):
         return {prop: getattr(self, prop) for prop in self.properties}
 
-    def copyWith(self, **overrides):
-        props = self.allProperties()
-        props.update(overrides)
-        return self.withProperties(props)
+    # def copyWith(self, **overrides):
+    #     props = self.allProperties()
+    #     props.update(overrides)
+    #     return self.withProperties(props)
 
     def isEquivalentTo(self, other):
         if type(other) is not type(self):

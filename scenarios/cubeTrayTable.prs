@@ -1,0 +1,5 @@
+from model import *
+
+table = Table on Vector3D(0,0,0), with width 1.8, with length 0.8, with height 0.8
+t1 = Tray completely on table
+c1 = Cube completely on t1

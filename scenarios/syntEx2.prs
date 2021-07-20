@@ -1,0 +1,6 @@
+from model import *
+
+t = Table on Vector3D(0,0,0), with width 1.8, with length 0.8, with height 0.8
+r1 = Robot on (top back t)
+tr_1 = Tray completely on t, ahead of r1, left of t
+Cube completely on tr_1

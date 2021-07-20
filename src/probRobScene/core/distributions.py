@@ -82,6 +82,7 @@ class Distribution(Samplable, abc.ABC):
         if name.startswith('__') and name.endswith('__'):  # ignore special attributes
             return super().__getattr__(name)
         if name == '_conditioned':
+            s = super()
             return super().__getattr__(name)
         return AttributeDistribution(name, self)
 
@@ -431,11 +432,11 @@ def needs_sampling(thing) -> bool:
     return isinstance(thing, Distribution) or len(thing.dependencies()) > 0
 
 
-def dependency_tree(s: Samplable):
+def dependency_tree_rep(s: Samplable) -> List[str]:
     """Debugging method to print the dependency tree of a Samplable."""
     dep_tree = [str(s)]
     for dep in s.dependencies():
-        for line in dep.dependency_tree():
+        for line in dep.dependency_tree_rep():
             dep_tree.append('  ' + line)
     return dep_tree
 
