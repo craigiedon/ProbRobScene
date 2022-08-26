@@ -51,6 +51,13 @@ To load one of the example scenarios (without a controller), try:
 python coppeliaView.py scenarios/<exampleName>
 ```
 
+
+To take a screenshot of the example scenario, try:
+
+```
+python coppeliaScreenshot.py scenarios/<exampleName>
+```
+
 ### Using ProbRobScene in External Projects
 
 You can install ProbRobScene as an external library dependency using `pip` by running the following command at the top level directory:
